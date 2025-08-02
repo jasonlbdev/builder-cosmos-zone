@@ -402,6 +402,32 @@ export default function Index() {
                 <Separator className="my-4" />
 
                 <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-muted-foreground px-2">Productivity</h3>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
+                    <Link to="/calendar">
+                      <Calendar className="w-4 h-4 mr-3" />
+                      Calendar
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
+                    <Link to="/tasks">
+                      <CheckSquare className="w-4 h-4 mr-3" />
+                      Tasks
+                    </Link>
+                  </Button>
+                </div>
+
+                <Separator className="my-4" />
+
+                <div className="space-y-2">
                   <h3 className="text-sm font-medium text-muted-foreground px-2">Integrations</h3>
 
                   {Object.entries(integrationCategories).map(([categoryKey, category]) => (
