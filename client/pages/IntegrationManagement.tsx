@@ -140,90 +140,38 @@ export default function IntegrationManagement() {
           authUrl = slackData.authUrl;
           break;
         case "whatsapp":
-          // Generate real WhatsApp Web QR code
-          try {
-            const QRCode = await import('qrcode');
-            
-            // Generate a real WhatsApp Web connection session
-            const sessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-            const clientId = `${Math.random().toString(36).substr(2, 16)}`;
-            const whatsappConnectData = {
-              ref: sessionId,
-              clientId: clientId,
-              ttl: Date.now() + (5 * 60 * 1000), // 5 minutes TTL
-              serverToken: `wa-${Math.random().toString(36).substr(2, 32)}`,
-              browserToken: `browser-${Math.random().toString(36).substr(2, 16)}`,
-              secret: btoa(Math.random().toString()).substr(0, 32),
-              version: [2, 2142, 12],
-              platform: "web"
-            };
-            
-            // Generate QR code with real WhatsApp connection data
-            const qrDataString = JSON.stringify(whatsappConnectData);
-            const qrCodeDataUrl = await QRCode.toDataURL(qrDataString, {
-              width: 256,
-              margin: 2,
-              color: {
-                dark: '#000000',
-                light: '#FFFFFF'
-              }
-            });
-            
-            // Create modal with real QR code
-            const whatsappModal = document.createElement('div');
-            whatsappModal.innerHTML = `
-              <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999;">
-                <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center;">
-                  <h3 style="margin-bottom: 1rem; color: #25D366;">Connect WhatsApp Web</h3>
-                  <div style="margin: 0 auto 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; display: inline-block;">
-                    <img src="${qrCodeDataUrl}" alt="WhatsApp QR Code" style="width: 200px; height: 200px; display: block;" />
-                  </div>
-                  <p style="margin-bottom: 0.5rem; color: #666; font-weight: 600;">Quick Steps:</p>
-                  <p style="margin-bottom: 0.5rem; color: #666; text-align: left;">1. Open WhatsApp on your phone</p>
-                  <p style="margin-bottom: 0.5rem; color: #666; text-align: left;">2. Go to Settings > Linked Devices</p>
-                  <p style="margin-bottom: 0.5rem; color: #666; text-align: left;">3. Tap "Link a Device"</p>
-                  <p style="margin-bottom: 1.5rem; color: #666; text-align: left;">4. Point your phone at this screen to capture the code</p>
-                  <div style="margin-bottom: 1rem; padding: 0.75rem; background: #e3f2fd; border-radius: 4px; font-size: 0.875rem; color: #1565c0;">
-                    <strong>Session ID:</strong> ${sessionId}<br/>
-                    <strong>Status:</strong> Waiting for scan...
-                  </div>
-                  <button onclick="this.parentElement.parentElement.remove()" style="background: #25D366; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; margin-right: 0.5rem;">Close</button>
-                  <button onclick="window.location.reload()" style="background: #007bff; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Refresh QR</button>
+          // WhatsApp Business Integration requires official API approval
+          const whatsappModal = document.createElement('div');
+          whatsappModal.innerHTML = `
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+              <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 600px;">
+                <h3 style="margin-bottom: 1rem; color: #25D366;">WhatsApp Business Integration</h3>
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                  <h4 style="color: #856404; margin-bottom: 0.5rem;">⚠️ Official API Required</h4>
+                  <p style="color: #856404; margin: 0; font-size: 0.875rem;">WhatsApp Business integration requires approval from Meta and official API credentials.</p>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                  <h4 style="margin-bottom: 0.5rem; color: #333;">Required Setup Steps:</h4>
+                  <ol style="color: #666; font-size: 0.875rem; padding-left: 1.25rem;">
+                    <li style="margin-bottom: 0.5rem;"><strong>Meta Business Account:</strong> Create a verified Meta Business account</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>WhatsApp Business API:</strong> Apply for WhatsApp Business API access</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>Phone Number Verification:</strong> Verify your business phone number</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>Webhook Configuration:</strong> Set up webhook endpoints for message handling</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>Message Templates:</strong> Create and get approval for message templates</li>
+                  </ol>
+                </div>
+                <div style="background: #e3f2fd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                  <h4 style="color: #1565c0; margin-bottom: 0.5rem;">📋 Alternative Options:</h4>
+                  <p style="color: #1565c0; margin: 0; font-size: 0.875rem;">• Use WhatsApp Business Cloud API (official)<br/>• Integrate with approved WhatsApp BSP providers<br/>• Consider WhatsApp Business Platform partners</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                  <button onclick="window.open('https://developers.facebook.com/docs/whatsapp', '_blank')" style="background: #007bff; color: white; border: none; padding: 0.75rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.875rem;">View Documentation</button>
+                  <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: #25D366; color: white; border: none; padding: 0.75rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.875rem;">Close</button>
                 </div>
               </div>
-            `;
-            document.body.appendChild(whatsappModal);
-            
-            // Set up polling to check connection status
-            const pollInterval = setInterval(async () => {
-              try {
-                const statusResponse = await fetch('/api/integrations/whatsapp/status', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ sessionId, clientId })
-                });
-                
-                if (statusResponse.ok) {
-                  const status = await statusResponse.json();
-                  if (status.connected) {
-                    clearInterval(pollInterval);
-                    whatsappModal.remove();
-                    alert('WhatsApp connected successfully!');
-                    window.location.reload();
-                  }
-                }
-              } catch (error) {
-                console.error('WhatsApp status check error:', error);
-              }
-            }, 2000);
-            
-            // Clear interval after 5 minutes
-            setTimeout(() => clearInterval(pollInterval), 5 * 60 * 1000);
-            
-          } catch (error) {
-            console.error('WhatsApp QR generation error:', error);
-            alert('Failed to generate WhatsApp QR code. Please try again.');
-          }
+            </div>
+          `;
+          document.body.appendChild(whatsappModal);
           return;
           break;
         case "telegram":

@@ -183,6 +183,7 @@ export default function Index() {
   const [replySubject, setReplySubject] = useState("");
   const [selectedIntegration, setSelectedIntegration] = useState<string>("All");
   const [showDexterAI, setShowDexterAI] = useState(false);
+  const [aiContext, setAiContext] = useState<any>(null);
   const [integrationCategories, setIntegrationCategories] = useState(integrations);
   const [emails, setEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(true);
@@ -209,6 +210,21 @@ export default function Index() {
     
     loadEmails();
   }, [selectedEmailId]);
+
+  // Listen for AI modal open events from MessageView buttons
+  useEffect(() => {
+    const handleAIEvent = (event: any) => {
+      const { action, ...context } = event.detail;
+      setAiContext({ action, ...context });
+      setShowDexterAI(true);
+    };
+
+    window.addEventListener('openAI', handleAIEvent);
+
+    return () => {
+      window.removeEventListener('openAI', handleAIEvent);
+    };
+  }, []);
 
   // Filter emails based on selected category and search query
   const getFilteredEmails = () => {
@@ -800,7 +816,14 @@ export default function Index() {
         platformLogo={selectedEmail?.platformLogo}
       />
 
-      <DexterAI open={showDexterAI} onClose={() => setShowDexterAI(false)} />
+      <DexterAI 
+        open={showDexterAI} 
+        onClose={() => {
+          setShowDexterAI(false);
+          setAiContext(null);
+        }}
+        initialContext={aiContext}
+      />
 
       {/* Dexter AI Floating Button */}
       <Button

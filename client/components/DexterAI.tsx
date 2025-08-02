@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   X,
   Send,
@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 interface DexterAIProps {
   open: boolean;
   onClose: () => void;
+  initialContext?: any;
 }
 
 interface Message {
@@ -44,19 +45,51 @@ const dexterSuggestions = [
   "📅 Schedule follow-ups for pending emails",
 ];
 
-export function DexterAI({ open, onClose }: DexterAIProps) {
+export function DexterAI({ open, onClose, initialContext }: DexterAIProps) {
+  const getInitialMessage = () => {
+    if (initialContext) {
+      switch (initialContext.action) {
+        case 'generateReply':
+          return `I'll help you generate a reply to "${initialContext.subject}" from ${initialContext.sender}.\n\nBased on the email content, here's a suggested response:\n\n"Thank you for your email. I'll review the details and get back to you shortly with my thoughts."\n\nWould you like me to customize this reply or generate alternative responses?`;
+        case 'summarize':
+          return `Here's a summary of the email "${initialContext.subject}" from ${initialContext.sender}:\n\n📝 **Key Points:**\n• Main topic discussed\n• Action items mentioned\n• Important dates or deadlines\n\nWould you like me to provide a more detailed analysis or extract specific information?`;
+        case 'smartReply':
+          return `I'll help you craft a smart reply to ${initialContext.sender} on ${initialContext.platform}.\n\nBased on your conversation context, here are some suggested responses:\n\n💬 "Thanks for the update!"\n📅 "Let's schedule a time to discuss this"\n✅ "Sounds good, I'll get back to you soon"\n\nWould you like me to generate a custom response?`;
+        case 'summarizeChat':
+          return `Here's a summary of your conversation with ${initialContext.sender} on ${initialContext.platform}:\n\n📊 **Conversation Overview:**\n• Recent activity and key topics\n• Important decisions made\n• Pending items requiring follow-up\n\nWould you like me to identify action items or extract specific information from this conversation?`;
+        default:
+          return "Hey there! I'm Dexter AI, your intelligent email assistant! 🤖\n\nI can help you analyze your entire email database, find patterns, categorize messages, and answer questions about your communications across all platforms. What would you like to know?";
+      }
+    }
+    return "Hey there! I'm Dexter AI, your intelligent email assistant! 🤖\n\nI can help you analyze your entire email database, find patterns, categorize messages, and answer questions about your communications across all platforms. What would you like to know?";
+  };
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       type: "assistant",
-      content:
-        "Hey there! I'm Dexter AI, your intelligent email assistant! 🤖\n\nI can help you analyze your entire email database, find patterns, categorize messages, and answer questions about your communications across all platforms. What would you like to know?",
+      content: getInitialMessage(),
       timestamp: new Date().toLocaleTimeString(),
       suggestions: dexterSuggestions,
     },
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+
+  // Reset messages when initialContext changes
+  useEffect(() => {
+    if (open) {
+      setMessages([
+        {
+          id: "1",
+          type: "assistant",
+          content: getInitialMessage(),
+          timestamp: new Date().toLocaleTimeString(),
+          suggestions: dexterSuggestions,
+        },
+      ]);
+    }
+  }, [initialContext, open]);
 
   const handleSend = async () => {
     if (!input.trim()) return;

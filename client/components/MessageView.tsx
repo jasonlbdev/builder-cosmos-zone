@@ -235,7 +235,19 @@ const EmailMessageView = ({
             size="sm" 
             variant="outline" 
             className="text-xs"
-            onClick={() => console.log('Generating AI reply for:', message.subject)}
+            onClick={() => {
+              // Open AI modal with generate reply action
+              const event = new CustomEvent('openAI', { 
+                detail: { 
+                  action: 'generateReply', 
+                  emailId: message.id,
+                  subject: message.subject,
+                  content: message.content,
+                  sender: message.sender 
+                } 
+              });
+              window.dispatchEvent(event);
+            }}
           >
             ✨ Generate Reply
           </Button>
@@ -243,7 +255,19 @@ const EmailMessageView = ({
             size="sm" 
             variant="outline" 
             className="text-xs"
-            onClick={() => console.log('Generating AI summary for:', message.subject)}
+            onClick={() => {
+              // Open AI modal with summarize action
+              const event = new CustomEvent('openAI', { 
+                detail: { 
+                  action: 'summarize', 
+                  emailId: message.id,
+                  subject: message.subject,
+                  content: message.content,
+                  sender: message.sender 
+                } 
+              });
+              window.dispatchEvent(event);
+            }}
           >
             📝 Summarize
           </Button>
@@ -562,7 +586,19 @@ const MessagingConversationView = ({ message }: { message: Message }) => {
             size="sm" 
             variant="outline" 
             className="text-xs"
-            onClick={() => console.log('Generating smart reply for:', message.sender)}
+            onClick={() => {
+              // Open AI modal with smart reply action
+              const event = new CustomEvent('openAI', { 
+                detail: { 
+                  action: 'smartReply', 
+                  conversationId: message.id,
+                  sender: message.sender,
+                  platform: message.platform,
+                  lastMessage: message.content 
+                } 
+              });
+              window.dispatchEvent(event);
+            }}
           >
             ✨ Smart Reply
           </Button>
@@ -570,7 +606,19 @@ const MessagingConversationView = ({ message }: { message: Message }) => {
             size="sm" 
             variant="outline" 
             className="text-xs"
-            onClick={() => console.log('Summarizing chat with:', message.sender)}
+            onClick={() => {
+              // Open AI modal with chat summary action
+              const event = new CustomEvent('openAI', { 
+                detail: { 
+                  action: 'summarizeChat', 
+                  conversationId: message.id,
+                  sender: message.sender,
+                  platform: message.platform,
+                  messageCount: 1 // Would be actual count in real implementation
+                } 
+              });
+              window.dispatchEvent(event);
+            }}
           >
             📝 Summarize Chat
           </Button>
