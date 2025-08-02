@@ -46,6 +46,11 @@ import {
   updateSyncSettings,
   getSyncSettings
 } from "./routes/sync-settings";
+import {
+  getConversationMessages,
+  sendMessage as sendConversationMessage,
+  markAsRead as markMessageAsRead
+} from "./routes/messages";
 
 export function createServer() {
   const app = express();
