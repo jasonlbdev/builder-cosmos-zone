@@ -264,15 +264,17 @@ export default function Index() {
         </div>
         
         <div className="flex items-center space-x-3">
-          <Button 
+          <Button
             onClick={() => setShowCompose(true)}
             className="bg-primary hover:bg-primary/90"
           >
             <PenTool className="w-4 h-4 mr-2" />
             Compose
           </Button>
-          <Button variant="ghost" size="icon">
-            <Settings className="w-4 h-4" />
+          <Button variant="ghost" size="icon" asChild>
+            <a href="/settings">
+              <Settings className="w-4 h-4" />
+            </a>
           </Button>
         </div>
       </header>
