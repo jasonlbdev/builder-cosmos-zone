@@ -27,6 +27,30 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
   const [showBcc, setShowBcc] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
 
+  const isEmailPlatform = ['Email', 'Outlook', 'Gmail'].includes(platform);
+  const isMessagingPlatform = ['WhatsApp', 'Slack', 'Telegram', 'Instagram', 'Facebook'].includes(platform);
+
+  const getPlaceholderText = () => {
+    switch (platform) {
+      case 'WhatsApp':
+        return 'Type a message...';
+      case 'Slack':
+        return 'Message #channel or @person...';
+      case 'Telegram':
+        return 'Write a message...';
+      case 'Instagram':
+      case 'Facebook':
+        return 'Write a message...';
+      default:
+        return 'Compose your email...';
+    }
+  };
+
+  const getModalTitle = () => {
+    if (subject) return `Reply - ${platform}`;
+    return `New ${isEmailPlatform ? 'Email' : 'Message'} - ${platform}`;
+  };
+
   const handleSend = async () => {
     try {
       const response = await fetch('/api/emails/send', {
