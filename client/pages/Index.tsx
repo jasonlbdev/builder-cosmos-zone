@@ -403,19 +403,50 @@ export default function Index() {
 
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-muted-foreground px-2">Integrations</h3>
-                  {integrations.map((integration) => (
-                    <Button
-                      key={integration.label}
-                      variant="ghost"
-                      className="w-full justify-start"
-                      asChild
-                    >
-                      <Link to={`/integrations/${integration.label.toLowerCase().replace(' ', '-')}`}>
-                        <span className="mr-3 text-sm">{integration.logo}</span>
-                        {integration.label}
-                      </Link>
-                    </Button>
+
+                  {Object.entries(integrationCategories).map(([categoryKey, category]) => (
+                    <div key={categoryKey} className="space-y-1">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-xs font-medium text-muted-foreground hover:text-foreground"
+                        onClick={() => toggleIntegrationCategory(categoryKey as keyof typeof integrations)}
+                      >
+                        <category.icon className="w-3 h-3 mr-2" />
+                        <span className="flex-1 text-left">{category.label}</span>
+                        {category.isOpen ? (
+                          <ChevronDown className="w-3 h-3" />
+                        ) : (
+                          <ChevronRight className="w-3 h-3" />
+                        )}
+                      </Button>
+
+                      {category.isOpen && category.platforms.map((platform) => (
+                        <Button
+                          key={platform.label}
+                          variant="ghost"
+                          className="w-full justify-start pl-6 text-xs"
+                          asChild
+                        >
+                          <Link to={`/integrations/${platform.label.toLowerCase().replace(' ', '-')}`}>
+                            <div className={cn("w-2 h-2 rounded-full mr-2", getStatusColor(platform.status))} />
+                            <span className="mr-2 text-sm">{platform.logo}</span>
+                            <span className="flex-1 text-left">{platform.label}</span>
+                          </Link>
+                        </Button>
+                      ))}
+                    </div>
                   ))}
+
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-xs text-muted-foreground hover:text-foreground mt-2"
+                    asChild
+                  >
+                    <Link to="/integrations">
+                      <Plus className="w-3 h-3 mr-2" />
+                      Manage Integrations
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </div>
