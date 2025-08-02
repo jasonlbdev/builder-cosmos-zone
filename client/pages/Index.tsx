@@ -583,6 +583,8 @@ export default function Index() {
         }}
         replyTo={replyTo}
         subject={replySubject}
+        platform={selectedEmail.platform}
+        platformLogo={selectedEmail.platformLogo}
       />
 
       <DexterAI
