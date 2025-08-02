@@ -224,16 +224,34 @@ export default function Index() {
 
   // Filter emails based on selected category
   const getFilteredEmails = () => {
-    if (selectedSidebarItem === 'Inbox') {
-      return emailsData;
+    switch (selectedSidebarItem) {
+      case 'Inbox':
+        return emailsData;
+      case 'Sent':
+        return []; // Would fetch sent emails from API
+      case 'Starred':
+        return emailsData.filter(email => email.important);
+      case 'Archive':
+        return []; // Would fetch archived emails from API
+      case 'Trash':
+        return []; // Would fetch deleted emails from API
+      case 'To Respond':
+        return emailsData.filter(email => email.category === 'To Respond');
+      case 'Awaiting Reply':
+        return emailsData.filter(email => email.category === 'Awaiting Reply');
+      case 'Important':
+        return emailsData.filter(email => email.category === 'Important');
+      case 'FYI':
+        return emailsData.filter(email => email.category === 'FYI');
+      case 'Marketing':
+        return emailsData.filter(email => email.category === 'Marketing');
+      case 'Promotions':
+        return emailsData.filter(email => email.category === 'Promotions');
+      case 'Updates':
+        return emailsData.filter(email => email.category === 'Updates');
+      default:
+        return emailsData.filter(email => email.category === selectedSidebarItem);
     }
-    if (selectedSidebarItem === 'Sent') {
-      return []; // Would fetch sent emails from API
-    }
-    if (selectedSidebarItem === 'Starred') {
-      return emailsData.filter(email => email.important);
-    }
-    return emailsData.filter(email => email.category === selectedSidebarItem);
   };
 
   const filteredEmails = getFilteredEmails();
@@ -467,7 +485,7 @@ export default function Index() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <Button size="sm" variant="outline" className="text-xs">
-                    ✨ Generate Reply
+                    �� Generate Reply
                   </Button>
                   <Button size="sm" variant="outline" className="text-xs">
                     📝 Summarize
