@@ -284,10 +284,57 @@ export default function Settings() {
 
             {/* Categories Tab */}
             <TabsContent value="categories" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Email Provider Integration</CardTitle>
+                  <CardDescription>
+                    Configure how Dexter analyzes emails using Microsoft Graph API and Gmail API
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Use Microsoft Graph API metadata</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Analyze Outlook emails using Graph API metadata (To/CC recipients, conversation threads, importance flags)
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Use Gmail API metadata</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Analyze Gmail emails using Gmail API metadata (labels, thread tracking, message references)
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Conversation thread analysis</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Track email conversations to determine "Awaiting Reply" status based on thread history
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Recipient analysis priority</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Prioritize emails sent directly to you (To field) over CC'd emails
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                </CardContent>
+              </Card>
+
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold">Email Categories</h3>
-                  <p className="text-muted-foreground">Manage how emails are automatically organized</p>
+                  <p className="text-muted-foreground">Categories are determined by email metadata first, then keyword analysis as fallback</p>
                 </div>
                 <Dialog open={newCategoryDialog} onOpenChange={setNewCategoryDialog}>
                   <DialogTrigger asChild>
