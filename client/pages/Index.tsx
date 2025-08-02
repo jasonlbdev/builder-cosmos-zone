@@ -48,6 +48,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const sidebarItemsTemplate = [
   { icon: Inbox, label: "Inbox", active: true },
@@ -196,6 +203,11 @@ export default function Index() {
         categoryEmails = emails;
     }
     
+    // Apply platform filter if specific platform selected
+    if (selectedIntegration !== "All") {
+      categoryEmails = categoryEmails.filter((email) => email.platform === selectedIntegration);
+    }
+
     // Apply search filter if search query exists
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -551,6 +563,60 @@ export default function Index() {
                     </Button>
                   </div>
                 </div>
+
+                {/* Platform Filter */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-muted-foreground">Filter by:</span>
+                  <Select value={selectedIntegration} onValueChange={setSelectedIntegration}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="All">
+                        <div className="flex items-center space-x-2">
+                          <span>🌐</span>
+                          <span>All Platforms</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Gmail">
+                        <div className="flex items-center space-x-2">
+                          <span>📧</span>
+                          <span>Gmail</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Outlook">
+                        <div className="flex items-center space-x-2">
+                          <span>📨</span>
+                          <span>Outlook</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="WhatsApp">
+                        <div className="flex items-center space-x-2">
+                          <span>💬</span>
+                          <span>WhatsApp</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Slack">
+                        <div className="flex items-center space-x-2">
+                          <span>💼</span>
+                          <span>Slack</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Telegram">
+                        <div className="flex items-center space-x-2">
+                          <span>📨</span>
+                          <span>Telegram</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  {selectedIntegration !== "All" && (
+                    <Badge variant="secondary" className="text-xs">
+                      {filteredEmails.length} message{filteredEmails.length !== 1 ? 's' : ''}
+                    </Badge>
+                  )}
+                </div>
               </div>
 
               <ScrollArea className="h-[calc(100%-80px)]">
@@ -585,9 +651,16 @@ export default function Index() {
                                 {email.sender}
                               </span>
                               {email.platform && (
-                                <div className="flex items-center">
-                                  <span className="text-xs">{email.platformLogo}</span>
-                                </div>
+                                <Badge 
+                                  variant="outline" 
+                                  className={cn(
+                                    "text-xs px-2 py-0.5",
+                                    email.platformColor?.replace("bg-", "border-") || "border-gray-400"
+                                  )}
+                                >
+                                  <span className="mr-1">{email.platformLogo}</span>
+                                  {email.platform}
+                                </Badge>
                               )}
                             </div>
                             <div className="flex items-center space-x-2">
