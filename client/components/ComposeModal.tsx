@@ -108,7 +108,10 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
       <DialogContent className="max-w-4xl max-h-[90vh] p-0">
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-center justify-between">
-            <DialogTitle>New Message</DialogTitle>
+            <DialogTitle className="flex items-center space-x-2">
+              <span className="text-lg">{platformLogo}</span>
+              <span>{getModalTitle()}</span>
+            </DialogTitle>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="w-4 h-4" />
             </Button>
