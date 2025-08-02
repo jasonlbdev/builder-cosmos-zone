@@ -202,11 +202,31 @@ const MessagingConversationView = ({ message }: { message: Message }) => {
     loadConversation();
   }, [message.id, message.platform]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (replyText.trim()) {
-      // Handle send message logic here
-      console.log('Sending message:', replyText);
-      setReplyText('');
+      try {
+        const response = await fetch(`/api/messages/${message.id}/send?platform=${message.platform}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: replyText,
+            replyTo: message.sender
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            // Add the new message to the conversation
+            setConversationMessages(prev => [...prev, result.message]);
+            setReplyText('');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to send message:', error);
+      }
     }
   };
 
