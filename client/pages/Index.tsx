@@ -42,6 +42,12 @@ import DexterAI from "@/components/DexterAI";
 import MessageView from "@/components/MessageView";
 import { cn } from "@/lib/utils";
 import { getEmails, getSentEmails, getArchivedEmails, getDeletedEmails, type Email } from "../../shared/data/mockData";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const sidebarItemsTemplate = [
   { icon: Inbox, label: "Inbox", active: true },
@@ -120,6 +126,8 @@ export default function Index() {
   const [emails, setEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showIntegrationModal, setShowIntegrationModal] = useState(false);
+  const [selectedIntegrationData, setSelectedIntegrationData] = useState<any>(null);
 
   // Load emails from centralized API on component mount
   useEffect(() => {
@@ -501,11 +509,11 @@ export default function Index() {
                               key={item.name}
                               variant="ghost"
                               className="w-full justify-start text-xs p-1"
-                                                             onClick={() => {
-                                 setSelectedIntegration(item.name);
-                                 // Open integration management page for this platform
-                                 window.open(`/integrations/${item.name.toLowerCase()}`, '_blank');
-                               }}
+                              onClick={() => {
+                                setSelectedIntegration(item.name);
+                                setSelectedIntegrationData(item);
+                                setShowIntegrationModal(true);
+                              }}
                             >
                               <div
                                 className={`w-2 h-2 rounded-full mr-2 ${getStatusColor(
@@ -669,6 +677,90 @@ export default function Index() {
       >
         <div className="text-xl">🤖</div>
       </Button>
+
+      {/* Integration Management Modal */}
+      <Dialog open={showIntegrationModal} onOpenChange={setShowIntegrationModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <span>{selectedIntegrationData?.name} Integration</span>
+              <div
+                className={`w-3 h-3 rounded-full ${getStatusColor(selectedIntegrationData?.status)}`}
+              />
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedIntegrationData && (
+            <div className="space-y-6">
+              {/* Status Section */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium">Connection Status</h3>
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-3 h-3 rounded-full ${getStatusColor(selectedIntegrationData.status)}`} />
+                    <div>
+                      <p className="text-sm font-medium capitalize">{selectedIntegrationData.status}</p>
+                      <p className="text-xs text-muted-foreground">Last sync: {selectedIntegrationData.lastSync}</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    {selectedIntegrationData.status === 'error' ? 'Reconnect' : 'Test Connection'}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Workspaces Section */}
+              {selectedIntegrationData.workspaces && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-medium">Connected {selectedIntegrationData.name === 'Slack' ? 'Workspaces' : 'Accounts'}</h3>
+                  <div className="space-y-2">
+                    {selectedIntegrationData.workspaces.map((workspace: string, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-2 border rounded">
+                        <span className="text-sm">{workspace}</span>
+                        <Badge variant="secondary">Active</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Settings Section */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium">Settings</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Sync messages</span>
+                    <Button variant="outline" size="sm">Enabled</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Email notifications</span>
+                    <Button variant="outline" size="sm">Enabled</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Auto-categorize</span>
+                    <Button variant="outline" size="sm">Enabled</Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-between pt-4 border-t">
+                <Button variant="outline" className="text-red-600">
+                  Disconnect {selectedIntegrationData.name}
+                </Button>
+                <div className="space-x-2">
+                  <Button variant="outline" onClick={() => setShowIntegrationModal(false)}>
+                    Close
+                  </Button>
+                  <Button>
+                    Save Settings
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
