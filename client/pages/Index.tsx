@@ -368,10 +368,12 @@ export default function Index() {
                       key={integration.label}
                       variant="ghost"
                       className="w-full justify-start"
-                      onClick={() => setSelectedIntegration(integration.label)}
+                      asChild
                     >
-                      <span className="mr-3 text-sm">{integration.logo}</span>
-                      {integration.label}
+                      <Link to={`/integrations/${integration.label.toLowerCase().replace(' ', '-')}`}>
+                        <span className="mr-3 text-sm">{integration.logo}</span>
+                        {integration.label}
+                      </Link>
                     </Button>
                   ))}
                 </div>
