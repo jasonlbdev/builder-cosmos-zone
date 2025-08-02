@@ -2,7 +2,9 @@
 // This file contains all mock data for development purposes
 // In production, this entire file should be deleted and replaced with real API calls
 
-export const DEV_MODE = process.env.NODE_ENV === 'development';
+// For now, always show mock data in all environments (development + production)
+// In true production, this entire file would be deleted and replaced with real APIs
+export const DEV_MODE = true;
 
 // Email Mock Data
 export interface Email {

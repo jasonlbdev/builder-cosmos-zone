@@ -41,7 +41,7 @@ import ComposeModal from "@/components/ComposeModal";
 import DexterAI from "@/components/DexterAI";
 import MessageView from "@/components/MessageView";
 import { cn } from "@/lib/utils";
-import { getEmails, type Email } from "@shared/data/mockData";
+import { getEmails, type Email } from "../../shared/data/mockData";
 
 const sidebarItems = [
   { icon: Inbox, label: "Inbox", count: 23, active: true },
