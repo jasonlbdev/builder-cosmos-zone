@@ -8,10 +8,22 @@ import {
   sendEmail,
   markAsRead,
   archiveEmail,
-  getAISuggestion,
-  getIntegrationStatus,
-  connectIntegration
+  getAISuggestion
 } from "./routes/emails";
+import {
+  getIntegrationStatus,
+  initiateSlackOAuth,
+  handleSlackCallback,
+  getSlackWorkspaces,
+  updateSlackChannel,
+  connectTelegramBot,
+  initiateInstagramOAuth,
+  handleInstagramCallback,
+  initiateFacebookOAuth,
+  handleFacebookCallback,
+  disconnectIntegration,
+  syncIntegration
+} from "./routes/integrations";
 
 export function createServer() {
   const app = express();
