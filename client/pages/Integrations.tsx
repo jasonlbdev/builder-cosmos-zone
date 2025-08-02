@@ -259,7 +259,11 @@ export default function Integrations() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center space-x-3">
                         <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", platform.color)}>
-                          <platform.icon className="w-5 h-5 text-white" />
+                          {platform.logo ? (
+                            <span className="text-xl">{platform.logo}</span>
+                          ) : (
+                            <platform.icon className="w-5 h-5 text-white" />
+                          )}
                         </div>
                         <div>
                           <CardTitle className="flex items-center space-x-2">
