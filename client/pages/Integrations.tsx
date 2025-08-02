@@ -25,6 +25,39 @@ interface IntegrationPlatform {
 
 const platforms: IntegrationPlatform[] = [
   {
+    id: 'outlook',
+    name: 'Microsoft Outlook',
+    description: 'Connect your Outlook email account with full Microsoft Graph API integration',
+    icon: MessageSquare,
+    color: 'bg-blue-700',
+    connected: false,
+    metrics: { messages: 0, folders: 0 },
+    features: ['Email Management', 'Calendar Integration', 'Contacts Sync', 'Rules & Filters'],
+    logo: '📧'
+  },
+  {
+    id: 'gmail',
+    name: 'Gmail',
+    description: 'Integrate your Gmail account with advanced Google API features',
+    icon: MessageSquare,
+    color: 'bg-red-500',
+    connected: false,
+    metrics: { messages: 0, labels: 0 },
+    features: ['Email Processing', 'Label Management', 'Smart Filters', 'Thread Tracking'],
+    logo: '✉️'
+  },
+  {
+    id: 'whatsapp',
+    name: 'WhatsApp Business',
+    description: 'Manage WhatsApp Business conversations and customer communications',
+    icon: MessageSquare,
+    color: 'bg-green-500',
+    connected: false,
+    metrics: { messages: 0, conversations: 0 },
+    features: ['Business Messages', 'Customer Support', 'Automated Responses', 'Media Sharing'],
+    logo: '💬'
+  },
+  {
     id: 'slack',
     name: 'Slack',
     description: 'Connect your Slack workspace to manage messages alongside emails',
@@ -32,7 +65,8 @@ const platforms: IntegrationPlatform[] = [
     color: 'bg-purple-500',
     connected: false,
     metrics: { messages: 0, channels: 0 },
-    features: ['Direct Messages', 'Channel Messages', 'Thread Management', 'Status Updates']
+    features: ['Direct Messages', 'Channel Messages', 'Thread Management', 'Status Updates'],
+    logo: '💼'
   },
   {
     id: 'telegram',
@@ -42,7 +76,8 @@ const platforms: IntegrationPlatform[] = [
     color: 'bg-blue-500',
     connected: false,
     metrics: { messages: 0, chats: 0 },
-    features: ['Personal Chats', 'Group Messages', 'Channel Management', 'Bot Integration']
+    features: ['Personal Chats', 'Group Messages', 'Channel Management', 'Bot Integration'],
+    logo: '📨'
   },
   {
     id: 'instagram',
@@ -52,7 +87,8 @@ const platforms: IntegrationPlatform[] = [
     color: 'bg-pink-500',
     connected: false,
     metrics: { messages: 0, conversations: 0 },
-    features: ['Direct Messages', 'Business Conversations', 'Story Replies', 'Comment Management']
+    features: ['Direct Messages', 'Business Conversations', 'Story Replies', 'Comment Management'],
+    logo: '📷'
   },
   {
     id: 'facebook',
@@ -62,7 +98,8 @@ const platforms: IntegrationPlatform[] = [
     color: 'bg-blue-600',
     connected: false,
     metrics: { messages: 0, conversations: 0 },
-    features: ['Page Messages', 'Messenger Chats', 'Automated Responses', 'Customer Support']
+    features: ['Page Messages', 'Messenger Chats', 'Automated Responses', 'Customer Support'],
+    logo: '👥'
   }
 ];
 
