@@ -354,7 +354,24 @@ export default function Index() {
             <div className="h-full border-r border-border">
               <div className="p-4 border-b border-border">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold">{selectedSidebarItem}</h2>
+                  <div className="flex items-center space-x-3">
+                    <h2 className="text-lg font-semibold">{selectedSidebarItem}</h2>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-muted-foreground">•</span>
+                      <select
+                        value={selectedIntegration}
+                        onChange={(e) => setSelectedIntegration(e.target.value)}
+                        className="text-sm bg-transparent border-none focus:outline-none text-muted-foreground"
+                      >
+                        <option value="All">All Platforms</option>
+                        {integrations.map((integration) => (
+                          <option key={integration.label} value={integration.label}>
+                            {integration.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                   <div className="flex items-center space-x-2">
                     <Button variant="ghost" size="icon">
                       <Archive className="w-4 h-4" />
