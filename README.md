@@ -4,7 +4,7 @@ A modern email management platform with AI-powered categorization, task manageme
 
 ## 🚀 Live Application
 
-**Production URL**: https://dexter-cosmos-1kcivlwnj-jasonlbdevs-projects.vercel.app
+**Production URL**: Will be updated after Netlify deployment
 
 ## 📁 Data Configuration System
 
@@ -56,15 +56,15 @@ Access at: http://localhost:3000
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-```bash
-vercel --prod
-```
+### Netlify (Recommended)
+1. **Connect GitHub**: Link your repository to Netlify
+2. **Auto-deploy**: Configured via `netlify.toml` - deploys automatically on push
+3. **Serverless Functions**: API routes handled via `netlify/functions/`
 
 ### Manual Deployment
-1. Build the application: `npm run build`
+1. Build the application: `npm run build:client`
 2. Deploy `dist/spa/` to your static hosting provider
-3. Configure your server to serve the SPA
+3. Configure serverless functions for API endpoints
 
 ## 📋 Features
 
@@ -87,7 +87,7 @@ vercel --prod
 - **Routing**: React Router DOM
 - **State Management**: React Hooks
 - **Build Tool**: Vite
-- **Deployment**: Vercel
+- **Deployment**: Netlify
 
 ## 📝 House Rules
 
