@@ -315,7 +315,7 @@ export default function Index() {
                 <h2 className="text-xl font-semibold mb-4">{selectedEmail.subject}</h2>
                 
                 <div className="flex items-center space-x-2">
-                  <Button size="sm">
+                  <Button size="sm" onClick={handleReply}>
                     <Reply className="w-4 h-4 mr-2" />
                     Reply
                   </Button>
