@@ -345,7 +345,7 @@ export default function Index() {
 
               <ScrollArea className="h-[calc(100%-80px)]">
                 <div className="divide-y divide-border">
-                  {emails.map((email) => (
+                  {filteredEmails.map((email) => (
                     <div
                       key={email.id}
                       className={cn(
