@@ -224,6 +224,8 @@ export default function Index() {
   const [replyTo, setReplyTo] = useState<string>('');
   const [replySubject, setReplySubject] = useState<string>('');
   const [selectedEmailId, setSelectedEmailId] = useState<number>(1);
+  const [selectedIntegration, setSelectedIntegration] = useState<string>('All');
+  const [showDexterAI, setShowDexterAI] = useState(false);
 
   // Filter emails based on selected category
   const getFilteredEmails = () => {
