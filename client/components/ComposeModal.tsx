@@ -133,22 +133,26 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
                   placeholder={isEmailPlatform ? "Enter email addresses..." : `Enter ${platform} username or phone...`}
                   className="flex-1"
                 />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowCc(!showCc)}
-                  className="text-xs"
-                >
-                  Cc
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowBcc(!showBcc)}
-                  className="text-xs"
-                >
-                  Bcc
-                </Button>
+                {isEmailPlatform && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowCc(!showCc)}
+                      className="text-xs"
+                    >
+                      Cc
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowBcc(!showBcc)}
+                      className="text-xs"
+                    >
+                      Bcc
+                    </Button>
+                  </>
+                )}
               </div>
 
               {showCc && (
