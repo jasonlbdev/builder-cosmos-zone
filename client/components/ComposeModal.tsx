@@ -266,3 +266,5 @@ export function ComposeModal({ open, onClose, replyTo, subject }: ComposeModalPr
     </Dialog>
   );
 }
+
+export default ComposeModal;
