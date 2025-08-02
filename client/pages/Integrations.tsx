@@ -178,9 +178,11 @@ export default function Integrations() {
               Connect your communication platforms to manage everything in one place
             </p>
           </div>
-          <Button variant="outline">
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
+          <Button variant="outline" asChild>
+            <Link to="/integrations/management">
+              <Settings className="w-4 h-4 mr-2" />
+              Manage Accounts
+            </Link>
           </Button>
         </div>
       </header>
