@@ -12,6 +12,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-background">
+        <Breadcrumb />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/inbox" element={<Index />} />
