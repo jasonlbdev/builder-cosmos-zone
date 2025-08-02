@@ -14,6 +14,7 @@ function App() {
           <Route path="/sent" element={<Index />} />
           <Route path="/compose" element={<Index />} />
           <Route path="/settings" element={<Index />} />
+          <Route path="/integrations" element={<Integrations />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
