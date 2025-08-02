@@ -372,7 +372,18 @@ export default function Settings() {
                         </Select>
                       </div>
                       <div className="flex space-x-2">
-                        <Button className="flex-1">Create Category</Button>
+                        <Button
+                          className="flex-1"
+                          onClick={() => handleCreateCategory({
+                            name: (document.getElementById('category-name') as HTMLInputElement)?.value,
+                            description: (document.getElementById('category-description') as HTMLTextAreaElement)?.value,
+                            color: 'bg-blue-500',
+                            rules: [],
+                            enabled: true
+                          })}
+                        >
+                          Create Category
+                        </Button>
                         <Button variant="outline" onClick={() => setNewCategoryDialog(false)}>
                           Cancel
                         </Button>
