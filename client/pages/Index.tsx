@@ -319,6 +319,26 @@ export default function Index() {
     setShowCompose(true);
   };
 
+  const toggleIntegrationCategory = (categoryKey: keyof typeof integrations) => {
+    setIntegrationCategories(prev => ({
+      ...prev,
+      [categoryKey]: {
+        ...prev[categoryKey],
+        isOpen: !prev[categoryKey].isOpen
+      }
+    }));
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'healthy': return 'bg-green-500';
+      case 'warning': return 'bg-yellow-500';
+      case 'error': return 'bg-red-500';
+      case 'disconnected': return 'bg-gray-300';
+      default: return 'bg-gray-300';
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Header */}
