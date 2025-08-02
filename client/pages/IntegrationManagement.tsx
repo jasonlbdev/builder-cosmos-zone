@@ -337,9 +337,16 @@ export default function IntegrationManagement() {
                           <p className="text-sm text-muted-foreground">{integration.description}</p>
                         </div>
                       </div>
-                      <Button onClick={() => handleConnect(integration.name)}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Connect
+                      <Button
+                        onClick={() => handleConnect(integration.name)}
+                        disabled={loading === integration.name}
+                      >
+                        {loading === integration.name ? (
+                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Plus className="w-4 h-4 mr-2" />
+                        )}
+                        {loading === integration.name ? 'Connecting...' : 'Connect'}
                       </Button>
                     </div>
                   </CardContent>
