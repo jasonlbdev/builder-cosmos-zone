@@ -100,5 +100,14 @@ export function createServer() {
   app.patch("/api/ai/rules/:ruleId", updateCategoryRule);
   app.delete("/api/ai/rules/:ruleId", deleteCategoryRule);
 
+  // Email provider routes (Outlook, Gmail, WhatsApp)
+  app.get("/api/email-providers", getEmailProviderStatus);
+  app.get("/api/email-providers/outlook/auth", initiateOutlookOAuth);
+  app.post("/api/email-providers/outlook/callback", handleOutlookCallback);
+  app.post("/api/email-providers/outlook/sync", syncOutlookEmails);
+  app.get("/api/email-providers/gmail/auth", initiateGmailOAuth);
+  app.post("/api/email-providers/gmail/callback", handleGmailCallback);
+  app.post("/api/email-providers/gmail/sync", syncGmailEmails);
+
   return app;
 }
