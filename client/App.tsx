@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/sonner";
 
