@@ -122,6 +122,14 @@ Sarah`,
 export default function Index() {
   const [selectedSidebarItem, setSelectedSidebarItem] = useState('Inbox');
   const [showCompose, setShowCompose] = useState(false);
+  const [replyTo, setReplyTo] = useState<string>('');
+  const [replySubject, setReplySubject] = useState<string>('');
+
+  const handleReply = () => {
+    setReplyTo(selectedEmail.email);
+    setReplySubject(`Re: ${selectedEmail.subject}`);
+    setShowCompose(true);
+  };
 
   return (
     <div className="h-screen flex flex-col bg-background">
