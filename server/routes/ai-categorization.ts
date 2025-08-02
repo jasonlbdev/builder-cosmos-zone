@@ -110,18 +110,20 @@ const categorizeEmailAI = (email: {
   const { sender, subject, content, metadata = {} } = email;
   const text = `${sender} ${subject} ${content}`.toLowerCase();
 
-  // Enhanced logic for "Awaiting Reply" - check if we sent an email and haven't received a response
+  // PRIMARY CATEGORIZATION: Use metadata analysis first
+
+  // 1. "Awaiting Reply" - Based on conversation thread analysis, NOT keywords
   if (metadata.sentByMe && metadata.conversationId) {
     // Check if this is our last message in the thread and no response received
-    // In production, this would query the database for the conversation thread
-    const isLastMessageFromUs = true; // Would be determined by checking thread history
-    const timeSinceSent = new Date().getTime() - new Date().getTime(); // Would calculate actual time
+    // In production, this would query the actual conversation thread from Graph API/Gmail API
+    const isLastMessageFromUs = !metadata.inReplyTo || metadata.messageId; // Simplified logic
+    const timeSinceSent = new Date().getTime() - new Date(email.metadata?.sentDateTime || '').getTime();
 
     if (isLastMessageFromUs && timeSinceSent > 24 * 60 * 60 * 1000) { // 24 hours
       return {
         category: 'Awaiting Reply',
         confidence: 0.95,
-        reason: 'Email sent by us with no response received within 24 hours',
+        reason: 'You sent an email with no response received within 24 hours (metadata analysis)',
         suggestedActions: ['Send follow-up', 'Set reminder', 'Mark as low priority']
       };
     }
