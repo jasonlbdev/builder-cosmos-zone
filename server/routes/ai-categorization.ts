@@ -129,27 +129,40 @@ const categorizeEmailAI = (email: {
     }
   }
 
-  // Enhanced "To Respond" logic - check if email is directly to us
+  // 2. "To Respond" - Based on recipient analysis (To field) and urgency metadata
   if (metadata.sentToMe && !metadata.sentByMe) {
-    // Check if it's a direct email to us (not CC)
-    const isDirectRecipient = metadata.toRecipients?.some(recipient =>
-      recipient.includes('you@') || recipient.includes('your-email')
-    );
+    // Check if email is directly TO us (not CC) using metadata
+    const isDirectRecipient = metadata.toRecipients && metadata.toRecipients.length > 0;
+    const isInCC = metadata.ccRecipients && metadata.ccRecipients.length > 0;
 
-    if (isDirectRecipient) {
-      // Check for urgent keywords in subject or metadata
-      const urgentKeywords = ['urgent', 'asap', 'immediate', 'deadline', 'emergency'];
-      const hasUrgentKeywords = urgentKeywords.some(keyword =>
-        subject.toLowerCase().includes(keyword) ||
-        (metadata.importance === 'high')
-      );
+    if (isDirectRecipient && !isInCC) {
+      // Use metadata importance flag first, then fallback to subject keywords
+      const hasHighImportance = metadata.importance === 'high';
+      const hasUrgentInSubject = subject.toLowerCase().includes('urgent') ||
+                                subject.toLowerCase().includes('asap') ||
+                                subject.toLowerCase().includes('deadline');
 
-      if (hasUrgentKeywords) {
+      if (hasHighImportance || hasUrgentInSubject) {
         return {
           category: 'To Respond',
           confidence: 0.95,
-          reason: 'Direct email to you with urgent indicators',
+          reason: `Direct email to you ${hasHighImportance ? 'marked as high importance' : 'with urgent subject'} (metadata analysis)`,
           suggestedActions: ['Reply immediately', 'Set high priority', 'Add to task list']
+        };
+      }
+
+      // Even non-urgent direct emails should be "To Respond" if they're questions/requests
+      const hasQuestionOrRequest = subject.includes('?') ||
+                                 content.toLowerCase().includes('can you') ||
+                                 content.toLowerCase().includes('please') ||
+                                 content.toLowerCase().includes('need');
+
+      if (hasQuestionOrRequest) {
+        return {
+          category: 'To Respond',
+          confidence: 0.85,
+          reason: 'Direct email containing question or request (metadata + content analysis)',
+          suggestedActions: ['Review and respond', 'Set reminder', 'Add to task list']
         };
       }
     }
