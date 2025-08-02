@@ -51,7 +51,27 @@ export function createServer() {
 
   // Integration routes
   app.get("/api/integrations", getIntegrationStatus);
-  app.post("/api/integrations/connect", connectIntegration);
+
+  // Slack integration routes
+  app.get("/api/integrations/slack/auth", initiateSlackOAuth);
+  app.post("/api/integrations/slack/callback", handleSlackCallback);
+  app.get("/api/integrations/slack/workspaces", getSlackWorkspaces);
+  app.patch("/api/integrations/slack/:workspaceId/channels/:channelId", updateSlackChannel);
+
+  // Telegram integration routes
+  app.post("/api/integrations/telegram/connect", connectTelegramBot);
+
+  // Instagram integration routes
+  app.get("/api/integrations/instagram/auth", initiateInstagramOAuth);
+  app.post("/api/integrations/instagram/callback", handleInstagramCallback);
+
+  // Facebook integration routes
+  app.get("/api/integrations/facebook/auth", initiateFacebookOAuth);
+  app.post("/api/integrations/facebook/callback", handleFacebookCallback);
+
+  // Generic integration management
+  app.delete("/api/integrations/:platform/:id", disconnectIntegration);
+  app.post("/api/integrations/:platform/:id/sync", syncIntegration);
 
   return app;
 }
