@@ -42,6 +42,10 @@ import {
   syncGmailEmails,
   getEmailProviderStatus
 } from "./routes/email-providers";
+import {
+  updateSyncSettings,
+  getSyncSettings
+} from "./routes/sync-settings";
 
 export function createServer() {
   const app = express();
