@@ -244,7 +244,7 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Compose your message..."
+              placeholder={getPlaceholderText()}
               className="min-h-[300px] resize-none border-0 focus:ring-0 text-sm leading-relaxed"
             />
           </div>
