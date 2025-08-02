@@ -232,7 +232,7 @@ export default function Settings() {
               Manage your email categories, AI rules, and preferences
             </p>
           </div>
-          <Button>
+          <Button onClick={() => console.log('Saving all settings...')}>
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -442,7 +442,11 @@ export default function Settings() {
                               handleCategoryUpdate(category.id, { enabled })
                             }
                           />
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => setEditingCategory(category.id)}
+                          >
                             <Edit className="w-4 h-4" />
                           </Button>
                           <Button
@@ -868,19 +872,35 @@ export default function Settings() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => console.log('Testing all connections...')}
+                    >
                       <Zap className="w-4 h-4 mr-2" />
                       Test All Connections
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => console.log('Refreshing tokens...')}
+                    >
                       <Shield className="w-4 h-4 mr-2" />
                       Refresh Tokens
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => console.log('Checking permissions...')}
+                    >
                       <Bell className="w-4 h-4 mr-2" />
                       Check Permissions
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => console.log('Resetting configuration...')}
+                    >
                       <Palette className="w-4 h-4 mr-2" />
                       Reset Configuration
                     </Button>
@@ -1057,7 +1077,7 @@ export default function Settings() {
                     Create custom rules to automatically process emails
                   </p>
                 </div>
-                <Button>
+                <Button onClick={() => console.log('Creating new filter...')}>
                   <Plus className="w-4 h-4 mr-2" />
                   Create Filter
                 </Button>
@@ -1074,7 +1094,7 @@ export default function Settings() {
                       Create filters to automatically organize, forward, or
                       delete emails based on specific criteria
                     </p>
-                    <Button>Create Your First Filter</Button>
+                    <Button onClick={() => console.log('Creating first filter...')}>Create Your First Filter</Button>
                   </div>
                 </CardContent>
               </Card>
