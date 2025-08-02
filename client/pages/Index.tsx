@@ -32,7 +32,7 @@ const integrations = [
   { icon: MessageSquare, label: 'Facebook', color: 'bg-blue-600' },
 ];
 
-const emails = [
+const emailsData = [
   {
     id: 1,
     sender: 'Sarah Johnson',
@@ -69,7 +69,7 @@ const emails = [
     unread: false,
     important: false,
     category: 'Marketing',
-    categoryColor: 'bg-gray-400',
+    categoryColor: 'bg-purple-500',
     avatar: 'LI'
   },
   {
@@ -97,6 +97,97 @@ const emails = [
     category: 'Awaiting Reply',
     categoryColor: 'bg-orange-500',
     avatar: 'GH'
+  },
+  {
+    id: 6,
+    sender: 'Amazon',
+    email: 'shipment-tracking@amazon.com',
+    subject: 'Your package has been delivered',
+    preview: 'Great news! Your recent order has been delivered to your address. You can track...',
+    time: '2h ago',
+    unread: true,
+    important: false,
+    category: 'Promotions',
+    categoryColor: 'bg-green-500',
+    avatar: 'AM'
+  },
+  {
+    id: 7,
+    sender: 'Notion',
+    email: 'updates@notion.so',
+    subject: 'New features in Notion AI',
+    preview: 'Discover the latest AI-powered features that will supercharge your productivity...',
+    time: '4h ago',
+    unread: true,
+    important: false,
+    category: 'Updates',
+    categoryColor: 'bg-indigo-500',
+    avatar: 'NO'
+  },
+  {
+    id: 8,
+    sender: 'Jessica Wong',
+    email: 'jessica@company.com',
+    subject: 'Re: Project timeline discussion',
+    preview: 'Thanks for the detailed breakdown. I have a few questions about the milestones...',
+    time: '6h ago',
+    unread: false,
+    important: false,
+    category: 'FYI',
+    categoryColor: 'bg-blue-500',
+    avatar: 'JW'
+  },
+  {
+    id: 9,
+    sender: 'Stripe',
+    email: 'notifications@stripe.com',
+    subject: 'Payment received for Invoice #1234',
+    preview: 'We received a payment of $2,500.00 for invoice #1234. The payment has been...',
+    time: '8h ago',
+    unread: false,
+    important: true,
+    category: 'Important',
+    categoryColor: 'bg-yellow-500',
+    avatar: 'ST'
+  },
+  {
+    id: 10,
+    sender: 'Netflix',
+    email: 'info@netflix.com',
+    subject: 'New releases this week',
+    preview: 'Check out the latest movies and TV shows added to Netflix this week...',
+    time: '1d ago',
+    unread: false,
+    important: false,
+    category: 'Marketing',
+    categoryColor: 'bg-purple-500',
+    avatar: 'NF'
+  },
+  {
+    id: 11,
+    sender: 'David Kim',
+    email: 'david@clientcompany.com',
+    subject: 'Urgent: Contract review needed',
+    preview: 'Hi, we need to review the contract terms before tomorrow\'s meeting. Can you...',
+    time: '30m ago',
+    unread: true,
+    important: true,
+    category: 'To Respond',
+    categoryColor: 'bg-red-500',
+    avatar: 'DK'
+  },
+  {
+    id: 12,
+    sender: 'Slack',
+    email: 'notifications@slack.com',
+    subject: 'Weekly activity summary',
+    preview: 'Here\'s your team\'s activity summary for this week in the Development workspace...',
+    time: '1d ago',
+    unread: false,
+    important: false,
+    category: 'Updates',
+    categoryColor: 'bg-indigo-500',
+    avatar: 'SL'
   }
 ];
 
