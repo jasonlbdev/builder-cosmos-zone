@@ -77,6 +77,9 @@ export function createServer() {
   app.patch("/api/integrations/slack/:workspaceId/channels/:channelId", updateSlackChannel);
 
   // Telegram integration routes
+  app.get("/api/integrations/telegram/auth", (req, res) => {
+    res.status(501).json({ error: 'Telegram OAuth not implemented, use bot token instead' });
+  });
   app.post("/api/integrations/telegram/connect", connectTelegramBot);
 
   // Instagram integration routes
