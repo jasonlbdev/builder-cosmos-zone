@@ -92,7 +92,7 @@ export function DexterAI({ open, onClose }: DexterAIProps) {
 
     if (lowerQuery.includes('trends') || lowerQuery.includes('week')) {
       return {
-        content: "📈 **This Week's Email Trends:**\n\n**Volume Analysis:**\n• Monday: 32 emails (highest)\n• Tuesday: 28 emails\n• Wednesday: 24 emails\n• Thursday: 19 emails (today)\n• Average: 25.8 emails/day\n\n**Category Breakdown:**\n• Marketing: 35% (↑5% from last week)\n• Work: 40% (↓2% from last week)\n• Important: 15% (↑3% from last week)\n• Social: 10% (stable)\n\n**Response Time:** Average 2.5 hours (improving!)",
+        content: "📈 **This Week's Email Trends:**\n\n**Volume Analysis:**\n• Monday: 32 emails (highest)\n• Tuesday: 28 emails\n• Wednesday: 24 emails\n�� Thursday: 19 emails (today)\n• Average: 25.8 emails/day\n\n**Category Breakdown:**\n• Marketing: 35% (↑5% from last week)\n• Work: 40% (↓2% from last week)\n• Important: 15% (↑3% from last week)\n• Social: 10% (stable)\n\n**Response Time:** Average 2.5 hours (improving!)",
         suggestions: ["📊 Show monthly trends", "⏰ Optimize response times", "🎯 Set email goals"]
       };
     }
@@ -272,3 +272,5 @@ export function DexterAI({ open, onClose }: DexterAIProps) {
     </Dialog>
   );
 }
+
+export default DexterAI;
