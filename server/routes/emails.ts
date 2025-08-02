@@ -1,20 +1,5 @@
 import { RequestHandler } from "express";
-
-export interface Email {
-  id: string;
-  sender: string;
-  email: string;
-  subject: string;
-  content: string;
-  preview: string;
-  time: string;
-  unread: boolean;
-  important: boolean;
-  category: string;
-  categoryColor: string;
-  avatar: string;
-  labels?: string[];
-}
+import { getEmails as getMockEmails, type Email } from "../../shared/data/mockData";
 
 export interface EmailsResponse {
   emails: Email[];
@@ -38,271 +23,13 @@ export interface AIResponse {
   confidence: number;
 }
 
-// Mock data for development - comprehensive email set
-const mockEmails: Email[] = [
-  {
-    id: "1",
-    sender: "Sarah Johnson",
-    email: "sarah@company.com",
-    subject: "Q4 Budget Review Meeting",
-    content:
-      "Hi team, I wanted to schedule a review meeting for our Q4 budget planning...",
-    preview:
-      "Hi team, I wanted to schedule a review meeting for our Q4 budget planning. Can we...",
-    time: "2m ago",
-    unread: true,
-    important: true,
-    category: "To Respond",
-    categoryColor: "bg-red-500",
-    avatar: "SJ",
-    labels: ["work", "budget", "meeting"],
-  },
-  {
-    id: "2",
-    sender: "Marcus Chen",
-    email: "marcus@designco.com",
-    subject: "New Design System Updates",
-    content: "The latest updates to our design system are now available...",
-    preview:
-      "The latest updates to our design system are now available. Please review the new...",
-    time: "15m ago",
-    unread: true,
-    important: false,
-    category: "FYI",
-    categoryColor: "bg-blue-500",
-    avatar: "MC",
-    labels: ["design", "updates"],
-  },
-  {
-    id: "3",
-    sender: "LinkedIn",
-    email: "notifications@linkedin.com",
-    subject: "Your weekly summary is ready",
-    content:
-      "See who viewed your profile this week and discover new connections...",
-    preview:
-      "See who viewed your profile this week and discover new connections in your industry...",
-    time: "1h ago",
-    unread: false,
-    important: false,
-    category: "Marketing",
-    categoryColor: "bg-purple-500",
-    avatar: "LI",
-    labels: ["social", "newsletter"],
-  },
-  {
-    id: "4",
-    sender: "Alex Rivera",
-    email: "alex@startup.io",
-    subject: "Collaboration Opportunity",
-    content:
-      "I came across your work and would love to discuss a potential collaboration...",
-    preview:
-      "I came across your work and would love to discuss a potential collaboration on...",
-    time: "3h ago",
-    unread: true,
-    important: true,
-    category: "Important",
-    categoryColor: "bg-yellow-500",
-    avatar: "AR",
-    labels: ["opportunity", "collaboration"],
-  },
-  {
-    id: "5",
-    sender: "GitHub",
-    email: "noreply@github.com",
-    subject: "Pull request merged: feat/new-dashboard",
-    content:
-      "Your pull request has been successfully merged into the main branch...",
-    preview:
-      "Your pull request has been successfully merged into the main branch. View the changes...",
-    time: "5h ago",
-    unread: false,
-    important: false,
-    category: "Awaiting Reply",
-    categoryColor: "bg-orange-500",
-    avatar: "GH",
-    labels: ["development", "git"],
-  },
-  {
-    id: "6",
-    sender: "Amazon",
-    email: "shipment-tracking@amazon.com",
-    subject: "Your package has been delivered",
-    content:
-      "Great news! Your recent order has been delivered to your address...",
-    preview:
-      "Great news! Your recent order has been delivered to your address. You can track...",
-    time: "2h ago",
-    unread: true,
-    important: false,
-    category: "Promotions",
-    categoryColor: "bg-green-500",
-    avatar: "AM",
-    labels: ["shopping", "delivery"],
-  },
-  {
-    id: "7",
-    sender: "Notion",
-    email: "updates@notion.so",
-    subject: "New features in Notion AI",
-    content:
-      "Discover the latest AI-powered features that will supercharge your productivity...",
-    preview:
-      "Discover the latest AI-powered features that will supercharge your productivity...",
-    time: "4h ago",
-    unread: true,
-    important: false,
-    category: "Updates",
-    categoryColor: "bg-indigo-500",
-    avatar: "NO",
-    labels: ["product", "ai", "features"],
-  },
-  {
-    id: "8",
-    sender: "Jessica Wong",
-    email: "jessica@company.com",
-    subject: "Re: Project timeline discussion",
-    content:
-      "Thanks for the detailed breakdown. I have a few questions about the milestones...",
-    preview:
-      "Thanks for the detailed breakdown. I have a few questions about the milestones...",
-    time: "6h ago",
-    unread: false,
-    important: false,
-    category: "FYI",
-    categoryColor: "bg-blue-500",
-    avatar: "JW",
-    labels: ["project", "timeline"],
-  },
-  {
-    id: "9",
-    sender: "Stripe",
-    email: "notifications@stripe.com",
-    subject: "Payment received for Invoice #1234",
-    content:
-      "We received a payment of $2,500.00 for invoice #1234. The payment has been...",
-    preview:
-      "We received a payment of $2,500.00 for invoice #1234. The payment has been...",
-    time: "8h ago",
-    unread: false,
-    important: true,
-    category: "Important",
-    categoryColor: "bg-yellow-500",
-    avatar: "ST",
-    labels: ["payment", "invoice", "financial"],
-  },
-  {
-    id: "10",
-    sender: "Netflix",
-    email: "info@netflix.com",
-    subject: "New releases this week",
-    content:
-      "Check out the latest movies and TV shows added to Netflix this week...",
-    preview:
-      "Check out the latest movies and TV shows added to Netflix this week...",
-    time: "1d ago",
-    unread: false,
-    important: false,
-    category: "Marketing",
-    categoryColor: "bg-purple-500",
-    avatar: "NF",
-    labels: ["entertainment", "newsletter"],
-  },
-  {
-    id: "11",
-    sender: "David Kim",
-    email: "david@clientcompany.com",
-    subject: "Urgent: Contract review needed",
-    content:
-      "Hi, we need to review the contract terms before tomorrow's meeting. Can you...",
-    preview:
-      "Hi, we need to review the contract terms before tomorrow's meeting. Can you...",
-    time: "30m ago",
-    unread: true,
-    important: true,
-    category: "To Respond",
-    categoryColor: "bg-red-500",
-    avatar: "DK",
-    labels: ["urgent", "contract", "legal"],
-  },
-  {
-    id: "12",
-    sender: "Slack",
-    email: "notifications@slack.com",
-    subject: "Weekly activity summary",
-    content:
-      "Here's your team's activity summary for this week in the Development workspace...",
-    preview:
-      "Here's your team's activity summary for this week in the Development workspace...",
-    time: "1d ago",
-    unread: false,
-    important: false,
-    category: "Updates",
-    categoryColor: "bg-indigo-500",
-    avatar: "SL",
-    labels: ["team", "productivity"],
-  },
-  {
-    id: "13",
-    sender: "Adobe",
-    email: "offers@adobe.com",
-    subject: "50% off Creative Cloud - Limited time",
-    content:
-      "Don't miss out on this exclusive offer for Creative Cloud subscriptions...",
-    preview:
-      "Don't miss out on this exclusive offer for Creative Cloud subscriptions...",
-    time: "2d ago",
-    unread: false,
-    important: false,
-    category: "Promotions",
-    categoryColor: "bg-green-500",
-    avatar: "AD",
-    labels: ["discount", "software", "offer"],
-  },
-  {
-    id: "14",
-    sender: "Emily Chen",
-    email: "emily.chen@partner.com",
-    subject: "Partnership proposal follow-up",
-    content:
-      "Following up on our conversation last week about the partnership opportunity...",
-    preview:
-      "Following up on our conversation last week about the partnership opportunity...",
-    time: "1d ago",
-    unread: true,
-    important: false,
-    category: "Awaiting Reply",
-    categoryColor: "bg-orange-500",
-    avatar: "EC",
-    labels: ["partnership", "business"],
-  },
-  {
-    id: "15",
-    sender: "Zoom",
-    email: "updates@zoom.us",
-    subject: "New security features available",
-    content:
-      "We've added new security features to help protect your meetings and data...",
-    preview:
-      "We've added new security features to help protect your meetings and data...",
-    time: "3d ago",
-    unread: false,
-    important: false,
-    category: "Updates",
-    categoryColor: "bg-indigo-500",
-    avatar: "ZO",
-    labels: ["security", "features", "meetings"],
-  },
-];
-
 export const getEmails: RequestHandler = (req, res) => {
   const { category, page = 1, limit = 50, search } = req.query;
 
-  let filteredEmails = mockEmails;
+  let filteredEmails = getMockEmails();
 
   if (category && category !== "Inbox") {
-    filteredEmails = mockEmails.filter((email) => email.category === category);
+    filteredEmails = getMockEmails().filter((email) => email.category === category);
   }
 
   if (search) {
@@ -330,7 +57,7 @@ export const getEmails: RequestHandler = (req, res) => {
 
 export const getEmailById: RequestHandler = (req, res) => {
   const { id } = req.params;
-  const email = mockEmails.find((e) => e.id === id);
+  const email = getMockEmails().find((e) => e.id === id);
 
   if (!email) {
     return res.status(404).json({ error: "Email not found" });
@@ -369,7 +96,7 @@ export const sendEmail: RequestHandler = (req, res) => {
 
 export const markAsRead: RequestHandler = (req, res) => {
   const { id } = req.params;
-  const email = mockEmails.find((e) => e.id === id);
+  const email = getMockEmails().find((e) => e.id === id);
 
   if (!email) {
     return res.status(404).json({ error: "Email not found" });
@@ -381,7 +108,7 @@ export const markAsRead: RequestHandler = (req, res) => {
 
 export const archiveEmail: RequestHandler = (req, res) => {
   const { id } = req.params;
-  const email = mockEmails.find((e) => e.id === id);
+  const email = getMockEmails().find((e) => e.id === id);
 
   if (!email) {
     return res.status(404).json({ error: "Email not found" });
