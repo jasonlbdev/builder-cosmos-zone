@@ -196,7 +196,7 @@ const emailsData = [
     categoryColor: 'bg-purple-500',
     avatar: 'NF',
     platform: 'Instagram',
-    platformLogo: '���',
+    platformLogo: '📷',
     platformColor: 'bg-pink-500'
   },
   {
@@ -497,74 +497,9 @@ export default function Index() {
 
           <ResizableHandle />
 
-          {/* Email Content */}
+          {/* Message Content */}
           <ResizablePanel defaultSize={45}>
-            <div className="h-full flex flex-col">
-              <div className="p-4 border-b border-border">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarFallback>{selectedEmail.avatar}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold">{selectedEmail.sender}</h3>
-                      <p className="text-sm text-muted-foreground">{selectedEmail.email}</p>
-                    </div>
-                  </div>
-                  <span className="text-sm text-muted-foreground">{selectedEmail.time}</span>
-                </div>
-                
-                <h2 className="text-xl font-semibold mb-4">{selectedEmail.subject}</h2>
-                
-                <div className="flex items-center space-x-2">
-                  <Button size="sm" onClick={handleReply}>
-                    <Reply className="w-4 h-4 mr-2" />
-                    Reply
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    <Forward className="w-4 h-4 mr-2" />
-                    Forward
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    <Archive className="w-4 h-4 mr-2" />
-                    Archive
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    <Star className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-              
-              <ScrollArea className="flex-1 p-4">
-                <div className="prose prose-sm max-w-none">
-                  <div className="whitespace-pre-line text-sm leading-relaxed">
-                    {selectedEmail.content}
-                  </div>
-                </div>
-              </ScrollArea>
-
-              {/* AI Assistant Panel */}
-              <div className="border-t border-border p-4 bg-muted/30">
-                <div className="flex items-center space-x-2 mb-3">
-                  <Zap className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">AI Assistant</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button size="sm" variant="outline" className="text-xs">
-                    ✨ Generate Reply
-                  </Button>
-                  <Button size="sm" variant="outline" className="text-xs">
-                    📝 Summarize
-                  </Button>
-                  <Button size="sm" variant="outline" className="text-xs">
-                    📅 Schedule Meeting
-                  </Button>
-                  <Button size="sm" variant="outline" className="text-xs">
-                    🔖 Add to Task
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <MessageView message={selectedEmail} />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
