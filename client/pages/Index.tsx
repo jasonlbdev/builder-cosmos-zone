@@ -72,6 +72,26 @@ const sidebarItemsTemplate = [
 ];
 
 const integrations = {
+  emailProviders: {
+    name: "Email Providers",
+    isOpen: true,
+    items: [
+      {
+        name: "Gmail",
+        status: "healthy",
+        lastSync: "1 min ago",
+        workspaces: ["Personal", "Work"],
+        unreadCount: 24,
+      },
+      {
+        name: "Outlook",
+        status: "healthy",
+        lastSync: "3 mins ago",
+        workspaces: ["Business", "Corporate"],
+        unreadCount: 15,
+      },
+    ],
+  },
   communication: {
     name: "Communication",
     isOpen: true,
@@ -116,6 +136,40 @@ const integrations = {
         lastSync: "3 hours ago",
         workspaces: ["Page Messages"],
         unreadCount: 8,
+      },
+    ],
+  },
+  fileStorage: {
+    name: "File Storage",
+    isOpen: false,
+    items: [
+      {
+        name: "OneDrive",
+        status: "healthy",
+        lastSync: "15 mins ago",
+        workspaces: ["Personal", "Business"],
+        unreadCount: 0,
+      },
+      {
+        name: "Google Drive",
+        status: "healthy",
+        lastSync: "8 mins ago",
+        workspaces: ["Shared Drives", "My Drive"],
+        unreadCount: 0,
+      },
+      {
+        name: "SharePoint",
+        status: "warning",
+        lastSync: "2 hours ago",
+        workspaces: ["Team Sites", "Document Libraries"],
+        unreadCount: 0,
+      },
+      {
+        name: "Dropbox",
+        status: "disconnected",
+        lastSync: "Never",
+        workspaces: [],
+        unreadCount: 0,
       },
     ],
   },
