@@ -13,6 +13,8 @@ interface ComposeModalProps {
   onClose: () => void;
   replyTo?: string;
   subject?: string;
+  platform?: string;
+  platformLogo?: string;
 }
 
 export function ComposeModal({ open, onClose, replyTo, subject }: ComposeModalProps) {
