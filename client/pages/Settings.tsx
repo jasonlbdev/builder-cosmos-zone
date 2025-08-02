@@ -372,7 +372,7 @@ export default function Settings() {
       <div className="flex-1 p-6">
         <div className="max-w-6xl mx-auto">
           <Tabs defaultValue="categories" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="categories">
                 <Tag className="w-4 h-4 mr-2" />
                 Categories
@@ -380,6 +380,10 @@ export default function Settings() {
               <TabsTrigger value="ai-rules">
                 <Bot className="w-4 h-4 mr-2" />
                 AI Rules
+              </TabsTrigger>
+              <TabsTrigger value="integrations">
+                <Settings className="w-4 h-4 mr-2" />
+                Integrations
               </TabsTrigger>
               <TabsTrigger value="filters">
                 <Filter className="w-4 h-4 mr-2" />
