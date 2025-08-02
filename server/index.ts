@@ -50,6 +50,28 @@ import {
   sendMessage as sendConversationMessage,
   markAsRead as markMessageAsRead,
 } from "./routes/messages";
+import {
+  testIMAPConnection,
+  setupIMAPIntegration,
+  syncIMAPEmails,
+  getIMAPProviders,
+} from "./routes/imap-integration";
+import {
+  categorizeEmailAI,
+  generateEmailReply,
+  summarizeEmail,
+  chatWithAI,
+  getAIStatus,
+} from "./routes/ai-api";
+import {
+  initiateWhatsAppBrowser,
+  initiateTelegramBrowser,
+  getBrowserQRCode,
+  checkBrowserStatus,
+  getBrowserMessages,
+  closeBrowserSession,
+  getBrowserSessions,
+} from "./routes/headless-automation";
 
 export function createServer() {
   const app = express();
@@ -87,11 +109,26 @@ export function createServer() {
     updateSlackChannel,
   );
 
-  // Telegram integration routes
+  // Telegram integration routes (redirect to browser automation)
   app.get("/api/integrations/telegram/auth", (req, res) => {
-    res
-      .status(501)
-      .json({ error: "Telegram OAuth not implemented, use bot token instead" });
+    res.json({
+      success: true,
+      message: 'Telegram integration available via browser automation',
+      method: 'headless_browser',
+      endpoints: {
+        start: '/api/browser/telegram/start',
+        qr: '/api/browser/{sessionId}/qr',
+        status: '/api/browser/{sessionId}/status',
+        messages: '/api/browser/{sessionId}/messages',
+      },
+      instructions: [
+        '1. Call POST /api/browser/telegram/start to begin session',
+        '2. Get QR code or enter phone number',
+        '3. Complete authentication via mobile app',
+        '4. Check status and retrieve messages',
+      ],
+      note: 'Uses headless browser automation to connect to Telegram Web'
+    });
   });
   app.post("/api/integrations/telegram/connect", connectTelegramBot);
 
@@ -137,6 +174,28 @@ export function createServer() {
   app.get("/api/messages/:messageId/conversation", getConversationMessages);
   app.post("/api/messages/:messageId/send", sendConversationMessage);
   app.post("/api/messages/:messageId/read", markMessageAsRead);
+
+  // IMAP/POP Integration routes
+  app.get("/api/imap/providers", getIMAPProviders);
+  app.post("/api/imap/test", testIMAPConnection);
+  app.post("/api/imap/setup", setupIMAPIntegration);
+  app.post("/api/imap/sync", syncIMAPEmails);
+
+  // Real AI API routes
+  app.get("/api/ai/status", getAIStatus);
+  app.post("/api/ai/categorize", categorizeEmailAI);
+  app.post("/api/ai/reply", generateEmailReply);
+  app.post("/api/ai/summarize", summarizeEmail);
+  app.post("/api/ai/chat", chatWithAI);
+
+  // Headless Browser Automation routes
+  app.get("/api/browser/sessions", getBrowserSessions);
+  app.post("/api/browser/whatsapp/start", initiateWhatsAppBrowser);
+  app.post("/api/browser/telegram/start", initiateTelegramBrowser);
+  app.get("/api/browser/:sessionId/qr", getBrowserQRCode);
+  app.get("/api/browser/:sessionId/status", checkBrowserStatus);
+  app.get("/api/browser/:sessionId/messages", getBrowserMessages);
+  app.delete("/api/browser/:sessionId", closeBrowserSession);
 
   return app;
 }

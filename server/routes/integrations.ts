@@ -656,47 +656,42 @@ export const syncIntegration: RequestHandler = async (req, res) => {
 // No session simulation - real implementation requires webhook setup
 
 export const checkWhatsAppStatus: RequestHandler = async (req, res) => {
-  // WhatsApp Business API integration requires official Meta approval and setup
-  // This endpoint honestly returns the requirements instead of simulating fake connections
-  
-  res.status(501).json({
-    error: 'WhatsApp integration not available',
-    message: 'WhatsApp Business API integration requires official Meta Business verification',
-    requirements: {
-      metaBusinessAccount: 'Verified Meta Business Account required',
-      whatsappBusinessApi: 'Official WhatsApp Business API access needed',
-      phoneVerification: 'Business phone number verification required',
-      webhookSetup: 'Webhook endpoints must be configured',
-      messageTemplates: 'Pre-approved message templates required'
+  // Redirect to headless browser automation for WhatsApp Web
+  res.json({
+    success: true,
+    message: 'WhatsApp integration available via browser automation',
+    method: 'headless_browser',
+    endpoints: {
+      start: '/api/browser/whatsapp/start',
+      qr: '/api/browser/{sessionId}/qr',
+      status: '/api/browser/{sessionId}/status',
+      messages: '/api/browser/{sessionId}/messages',
     },
-    documentation: 'https://developers.facebook.com/docs/whatsapp/cloud-api/get-started',
-    note: 'Contact Meta to begin the verification process for production WhatsApp integration'
+    instructions: [
+      '1. Call POST /api/browser/whatsapp/start to begin session',
+      '2. Get QR code from /api/browser/{sessionId}/qr',
+      '3. Scan QR code with WhatsApp mobile app',
+      '4. Check status and retrieve messages',
+    ],
+    note: 'Uses headless browser automation to connect to WhatsApp Web'
   });
 };
 
 export const initiateWhatsAppConnection: RequestHandler = async (req, res) => {
-  // WhatsApp Business API integration requires official Meta approval and setup
-  // This endpoint honestly returns the requirements instead of providing fake QR codes
-  
-  res.status(501).json({
-    error: 'WhatsApp integration not available',
-    message: 'WhatsApp Business API integration requires official Meta Business verification',
-    setupSteps: [
-      'Create and verify Meta Business Account',
-      'Apply for WhatsApp Business API access',
-      'Complete business verification process',
-      'Set up webhook endpoints for message handling',
-      'Configure and approve message templates',
-      'Implement OAuth flow for user authorization'
-    ],
-    requirements: {
-      businessAccount: 'Meta Business Manager account with verified business',
-      apiAccess: 'Approved WhatsApp Business API application',
-      webhooks: 'HTTPS webhook endpoints for receiving messages',
-      templates: 'Pre-approved message templates for notifications',
-      compliance: 'WhatsApp Business Policy compliance'
-    },
-    documentation: 'https://developers.facebook.com/docs/whatsapp/cloud-api/get-started',
-    note: 'Real WhatsApp integration cannot be simulated - official API approval required'
-  });
+  // Redirect to headless browser automation
+  try {
+    const response = await fetch('http://localhost:3000/api/browser/whatsapp/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to start WhatsApp browser session',
+      message: error.message,
+      fallback: 'Try calling /api/browser/whatsapp/start directly'
+    });
+  }
 };
