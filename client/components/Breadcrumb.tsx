@@ -13,6 +13,8 @@ const routeNames: Record<string, string> = {
   'integrations': 'Integrations',
   'integrations/management': 'Integration Management',
   'settings': 'Settings',
+  'calendar': 'Calendar',
+  'tasks': 'Tasks',
   'slack': 'Slack Integration'
 };
 
