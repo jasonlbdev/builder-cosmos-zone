@@ -276,6 +276,7 @@ export default function Index() {
   const [selectedEmailId, setSelectedEmailId] = useState<number>(1);
   const [selectedIntegration, setSelectedIntegration] = useState<string>('All');
   const [showDexterAI, setShowDexterAI] = useState(false);
+  const [integrationCategories, setIntegrationCategories] = useState(integrations);
 
   // Filter emails based on selected category
   const getFilteredEmails = () => {
