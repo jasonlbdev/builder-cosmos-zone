@@ -55,6 +55,9 @@ interface ConversationMessage {
 interface MessageViewProps {
   message: Message;
   className?: string;
+  onReply?: () => void;
+  onForward?: () => void;
+  onArchive?: () => void;
 }
 
 const isMessagingPlatform = (platform: string) => {
@@ -87,7 +90,17 @@ const fetchConversationMessages = async (
   }
 };
 
-const EmailMessageView = ({ message }: { message: Message }) => {
+const EmailMessageView = ({ 
+  message, 
+  onReply, 
+  onForward, 
+  onArchive 
+}: { 
+  message: Message;
+  onReply?: () => void;
+  onForward?: () => void;
+  onArchive?: () => void;
+}) => {
   return (
     <>
       <div className="p-4 border-b border-border">
@@ -115,15 +128,15 @@ const EmailMessageView = ({ message }: { message: Message }) => {
         <h2 className="text-xl font-semibold mb-4">{message.subject}</h2>
 
         <div className="flex items-center space-x-2">
-          <Button size="sm">
+          <Button size="sm" onClick={onReply}>
             <Reply className="w-4 h-4 mr-2" />
             Reply
           </Button>
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="outline" onClick={onForward}>
             <Forward className="w-4 h-4 mr-2" />
             Forward
           </Button>
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="outline" onClick={onArchive}>
             <Archive className="w-4 h-4 mr-2" />
             Archive
           </Button>
@@ -148,10 +161,20 @@ const EmailMessageView = ({ message }: { message: Message }) => {
           <span className="text-sm font-medium">AI Assistant</span>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <Button size="sm" variant="outline" className="text-xs">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="text-xs"
+            onClick={() => console.log('Generating AI reply for:', message.subject)}
+          >
             ✨ Generate Reply
           </Button>
-          <Button size="sm" variant="outline" className="text-xs">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="text-xs"
+            onClick={() => console.log('Generating AI summary for:', message.subject)}
+          >
             📝 Summarize
           </Button>
           <Button
@@ -465,10 +488,20 @@ const MessagingConversationView = ({ message }: { message: Message }) => {
           <span className="text-sm font-medium">AI Assistant</span>
         </div>
         <div className="grid grid-cols-3 gap-2 mt-2">
-          <Button size="sm" variant="outline" className="text-xs">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="text-xs"
+            onClick={() => console.log('Generating smart reply for:', message.sender)}
+          >
             ✨ Smart Reply
           </Button>
-          <Button size="sm" variant="outline" className="text-xs">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="text-xs"
+            onClick={() => console.log('Summarizing chat with:', message.sender)}
+          >
             📝 Summarize Chat
           </Button>
           <Button
@@ -488,7 +521,13 @@ const MessagingConversationView = ({ message }: { message: Message }) => {
   );
 };
 
-export default function MessageView({ message, className }: MessageViewProps) {
+export default function MessageView({ 
+  message, 
+  className, 
+  onReply, 
+  onForward, 
+  onArchive 
+}: MessageViewProps) {
   if (isMessagingPlatform(message.platform)) {
     return (
       <div className={cn("h-full flex flex-col", className)}>
@@ -500,7 +539,12 @@ export default function MessageView({ message, className }: MessageViewProps) {
   if (isEmailPlatform(message.platform)) {
     return (
       <div className={cn("h-full flex flex-col", className)}>
-        <EmailMessageView message={message} />
+        <EmailMessageView 
+          message={message} 
+          onReply={onReply}
+          onForward={onForward}
+          onArchive={onArchive}
+        />
       </div>
     );
   }

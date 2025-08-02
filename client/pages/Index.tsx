@@ -43,19 +43,19 @@ import MessageView from "@/components/MessageView";
 import { cn } from "@/lib/utils";
 import { getEmails, type Email } from "../../shared/data/mockData";
 
-const sidebarItems = [
-  { icon: Inbox, label: "Inbox", count: 23, active: true },
-  { icon: Send, label: "Sent", count: 156 },
-  { icon: CheckCircle, label: "To Respond", count: 3 },
-  { icon: Clock, label: "Awaiting Reply", count: 5 },
-  { icon: AlertCircle, label: "Important", count: 8 },
-  { icon: Star, label: "Starred", count: 12 },
-  { icon: Users, label: "FYI", count: 4 },
-  { icon: MessageSquare, label: "Marketing", count: 7 },
-  { icon: Zap, label: "Promotions", count: 9 },
-  { icon: Settings, label: "Updates", count: 6 },
-  { icon: Archive, label: "Archive", count: 234 },
-  { icon: Trash2, label: "Trash", count: 12 },
+const sidebarItemsTemplate = [
+  { icon: Inbox, label: "Inbox", active: true },
+  { icon: Send, label: "Sent" },
+  { icon: CheckCircle, label: "To Respond" },
+  { icon: Clock, label: "Awaiting Reply" },
+  { icon: AlertCircle, label: "Important" },
+  { icon: Star, label: "Starred" },
+  { icon: Users, label: "FYI" },
+  { icon: MessageSquare, label: "Marketing" },
+  { icon: Zap, label: "Promotions" },
+  { icon: Settings, label: "Updates" },
+  { icon: Archive, label: "Archive" },
+  { icon: Trash2, label: "Trash" },
 ];
 
 const integrations = {
@@ -178,6 +178,90 @@ export default function Index() {
   const selectedEmail = selectedEmailId ? 
     emails.find((email) => email.id === selectedEmailId) || emails[0] : 
     emails[0];
+
+  // Calculate dynamic counts for sidebar items
+  const getSidebarItemsWithCounts = () => {
+    return sidebarItemsTemplate.map(item => {
+      let count = 0;
+      
+      switch (item.label) {
+        case "Inbox":
+          count = emails.length;
+          break;
+        case "Sent":
+          count = 0; // Would be actual sent emails count
+          break;
+        case "To Respond":
+          count = emails.filter(email => email.category === "To Respond").length;
+          break;
+        case "Awaiting Reply":
+          count = emails.filter(email => email.category === "Awaiting Reply").length;
+          break;
+        case "Important":
+          count = emails.filter(email => email.category === "Important" || email.important).length;
+          break;
+        case "Starred":
+          count = emails.filter(email => email.important).length;
+          break;
+        case "FYI":
+          count = emails.filter(email => email.category === "FYI").length;
+          break;
+        case "Marketing":
+          count = emails.filter(email => email.category === "Marketing").length;
+          break;
+        case "Promotions":
+          count = emails.filter(email => email.category === "Promotions").length;
+          break;
+        case "Updates":
+          count = emails.filter(email => email.category === "Updates").length;
+          break;
+        case "Archive":
+          count = 0; // Would be actual archived emails count
+          break;
+        case "Trash":
+          count = 0; // Would be actual deleted emails count
+          break;
+        default:
+          count = 0;
+      }
+      
+      return { ...item, count };
+    });
+  };
+
+  const sidebarItems = getSidebarItemsWithCounts();
+
+  // Email action handlers
+  const handleReply = () => {
+    if (selectedEmail) {
+      setReplyTo(selectedEmail.email);
+      setReplySubject(`Re: ${selectedEmail.subject}`);
+      setShowCompose(true);
+    }
+  };
+
+  const handleForward = () => {
+    if (selectedEmail) {
+      setReplyTo("");
+      setReplySubject(`Fwd: ${selectedEmail.subject}`);
+      setShowCompose(true);
+    }
+  };
+
+  const handleArchive = () => {
+    if (selectedEmail) {
+      console.log('Archiving email:', selectedEmail.id);
+      // In production, would call API to archive email
+      // For now, just remove from current view
+      setEmails(prev => prev.filter(email => email.id !== selectedEmail.id));
+      // Select next email
+      const currentIndex = filteredEmails.findIndex(email => email.id === selectedEmail.id);
+      const nextEmail = filteredEmails[currentIndex + 1] || filteredEmails[currentIndex - 1];
+      if (nextEmail) {
+        setSelectedEmailId(nextEmail.id);
+      }
+    }
+  };
 
   const toggleIntegrationCategory = (categoryKey: keyof typeof integrations) => {
     setIntegrationCategories((prev) => ({
@@ -460,7 +544,12 @@ export default function Index() {
 
           {/* Message Content */}
           <ResizablePanel defaultSize={45}>
-            <MessageView message={selectedEmail} />
+            <MessageView 
+              message={selectedEmail} 
+              onReply={handleReply}
+              onForward={handleForward}
+              onArchive={handleArchive}
+            />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
