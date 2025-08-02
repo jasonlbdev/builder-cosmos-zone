@@ -350,8 +350,10 @@ export default function Index() {
                       key={email.id}
                       className={cn(
                         "p-4 hover:bg-muted/50 cursor-pointer transition-colors",
-                        email.unread && "bg-muted/30"
+                        email.unread && "bg-muted/30",
+                        selectedEmailId === email.id && "bg-accent/30 border-l-2 border-primary"
                       )}
+                      onClick={() => setSelectedEmailId(email.id)}
                     >
                       <div className="flex items-start space-x-3">
                         <Avatar className="w-8 h-8">
