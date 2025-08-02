@@ -834,6 +834,17 @@ export default function Settings() {
           </Tabs>
         </div>
       </div>
+
+      {/* Rule Creation Dialog */}
+      <RuleCreationDialog
+        open={newRuleDialog}
+        onOpenChange={setNewRuleDialog}
+        onCreateRule={(ruleData) => {
+          if (selectedCategoryForRule) {
+            handleAddRule(selectedCategoryForRule, ruleData);
+          }
+        }}
+      />
     </div>
   );
 }
