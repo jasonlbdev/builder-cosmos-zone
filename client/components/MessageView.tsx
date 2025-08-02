@@ -276,8 +276,13 @@ const MessagingConversationView = ({ message }: { message: Message }) => {
 
       {/* Conversation Messages */}
       <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
-          {mockConversation.map((msg) => (
+        {loading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="text-sm text-muted-foreground">Loading conversation...</div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {conversationMessages.map((msg) => (
             <div
               key={msg.id}
               className={cn(
@@ -321,8 +326,9 @@ const MessagingConversationView = ({ message }: { message: Message }) => {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </ScrollArea>
 
       {/* Message Input */}
