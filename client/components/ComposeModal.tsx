@@ -17,7 +17,7 @@ interface ComposeModalProps {
   platformLogo?: string;
 }
 
-export function ComposeModal({ open, onClose, replyTo, subject }: ComposeModalProps) {
+export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Email', platformLogo = '📧' }: ComposeModalProps) {
   const [to, setTo] = useState(replyTo || '');
   const [cc, setCc] = useState('');
   const [bcc, setBcc] = useState('');
