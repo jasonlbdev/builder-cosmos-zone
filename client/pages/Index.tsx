@@ -276,7 +276,7 @@ export default function Index() {
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <Zap className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold">FlowMail AI</h1>
+            <h1 className="text-xl font-bold">Dexter</h1>
           </div>
           
           <div className="relative">
