@@ -81,7 +81,10 @@ const emailsData = [
     important: false,
     category: 'Marketing',
     categoryColor: 'bg-purple-500',
-    avatar: 'LI'
+    avatar: 'LI',
+    platform: 'Gmail',
+    platformLogo: '✉️',
+    platformColor: 'bg-red-500'
   },
   {
     id: 4,
