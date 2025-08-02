@@ -130,5 +130,10 @@ export function createServer() {
   app.get("/api/settings/sync", getSyncSettings);
   app.post("/api/settings/sync", updateSyncSettings);
 
+  // Conversation message routes
+  app.get("/api/messages/:messageId/conversation", getConversationMessages);
+  app.post("/api/messages/:messageId/send", sendConversationMessage);
+  app.post("/api/messages/:messageId/read", markMessageAsRead);
+
   return app;
 }
