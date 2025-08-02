@@ -20,6 +20,8 @@ function App() {
           <Route path="/inbox" element={<Index />} />
           <Route path="/sent" element={<Index />} />
           <Route path="/compose" element={<Index />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/tasks" element={<Tasks />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/integrations" element={<Integrations />} />
           <Route path="/integrations/slack" element={<SlackIntegration />} />
