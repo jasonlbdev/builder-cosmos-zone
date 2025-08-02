@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   X,
   Send,
@@ -9,6 +9,11 @@ import {
   Underline,
   Link,
   Zap,
+  ChevronDown,
+  Mail,
+  MessageSquare,
+  Plus,
+  Users,
 } from "lucide-react";
 import {
   Dialog,
@@ -22,6 +27,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { getUserAccounts, getContacts, getFrequentContacts, type UserAccount, type Contact } from "../../shared/data/mockData";
 
 interface ComposeModalProps {
   open: boolean;
@@ -32,42 +52,68 @@ interface ComposeModalProps {
   platformLogo?: string;
 }
 
+// Available platforms for composing
+const availablePlatforms = [
+  { id: "Gmail", name: "Gmail", icon: "📧", type: "email" },
+  { id: "Outlook", name: "Outlook", icon: "📨", type: "email" },
+  { id: "WhatsApp", name: "WhatsApp", icon: "💬", type: "messaging" },
+  { id: "Telegram", name: "Telegram", icon: "📱", type: "messaging" },
+  { id: "Slack", name: "Slack", icon: "💼", type: "messaging" },
+];
+
 export function ComposeModal({
   open,
   onClose,
   replyTo,
   subject,
-  platform = "Email",
+  platform: initialPlatform = "Gmail",
   platformLogo = "📧",
 }: ComposeModalProps) {
+  // Platform and account selection
+  const [selectedPlatform, setSelectedPlatform] = useState(initialPlatform);
+  const [selectedFromAccount, setSelectedFromAccount] = useState<UserAccount | null>(null);
+  const [userAccounts, setUserAccounts] = useState<UserAccount[]>([]);
+  
+  // Recipients and contacts
   const [to, setTo] = useState(replyTo || "");
   const [cc, setCc] = useState("");
   const [bcc, setBcc] = useState("");
+  const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
+  const [availableContacts, setAvailableContacts] = useState<Contact[]>([]);
+  const [showContactPicker, setShowContactPicker] = useState(false);
+  
+  // Content
   const [emailSubject, setEmailSubject] = useState(subject || "");
   const [content, setContent] = useState("");
   const [showCc, setShowCc] = useState(false);
   const [showBcc, setShowBcc] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
 
-  const isEmailPlatform = ["Email", "Outlook", "Gmail"].includes(platform);
-  const isMessagingPlatform = [
-    "WhatsApp",
-    "Slack",
-    "Telegram",
-    "Instagram",
-    "Facebook",
-  ].includes(platform);
+  // Load user accounts and contacts when platform changes
+  useEffect(() => {
+    const accounts = getUserAccounts(selectedPlatform);
+    setUserAccounts(accounts);
+    
+    // Set default account
+    const defaultAccount = accounts.find(acc => acc.isDefault) || accounts[0];
+    setSelectedFromAccount(defaultAccount);
+    
+    // Load contacts for this platform
+    const contacts = getContacts(selectedPlatform);
+    setAvailableContacts(contacts);
+  }, [selectedPlatform]);
+
+  const currentPlatform = availablePlatforms.find(p => p.id === selectedPlatform);
+  const isEmailPlatform = currentPlatform?.type === "email";
+  const isMessagingPlatform = currentPlatform?.type === "messaging";
 
   const getPlaceholderText = () => {
-    switch (platform) {
+    switch (selectedPlatform) {
       case "WhatsApp":
         return "Type a message...";
       case "Slack":
         return "Message #channel or @person...";
       case "Telegram":
-        return "Write a message...";
-      case "Instagram":
-      case "Facebook":
         return "Write a message...";
       default:
         return "Compose your email...";
@@ -75,8 +121,33 @@ export function ComposeModal({
   };
 
   const getModalTitle = () => {
-    if (subject) return `Reply - ${platform}`;
-    return `New ${isEmailPlatform ? "Email" : "Message"} - ${platform}`;
+    if (subject) return `Reply - ${currentPlatform?.name}`;
+    return `New ${isEmailPlatform ? "Email" : "Message"} - ${currentPlatform?.name}`;
+  };
+
+  // Contact selection handlers
+  const handleContactSelect = (contact: Contact) => {
+    const platformData = contact.platforms.find(p => p.platform === selectedPlatform);
+    if (platformData) {
+      const currentTo = to.split(',').map(t => t.trim()).filter(t => t);
+      if (!currentTo.includes(platformData.address)) {
+        setTo([...currentTo, platformData.address].join(', '));
+      }
+      setSelectedContacts([...selectedContacts, contact]);
+      setShowContactPicker(false);
+    }
+  };
+
+  const removeContact = (contactId: string) => {
+    const contact = selectedContacts.find(c => c.id === contactId);
+    if (contact) {
+      const platformData = contact.platforms.find(p => p.platform === selectedPlatform);
+      if (platformData) {
+        const currentTo = to.split(',').map(t => t.trim()).filter(t => t !== platformData.address);
+        setTo(currentTo.join(', '));
+      }
+      setSelectedContacts(selectedContacts.filter(c => c.id !== contactId));
+    }
   };
 
   const handleSend = async () => {
@@ -137,7 +208,7 @@ export function ComposeModal({
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center space-x-2">
-              <span className="text-lg">{platformLogo}</span>
+              <span className="text-lg">{currentPlatform?.icon}</span>
               <span>{getModalTitle()}</span>
             </DialogTitle>
             <Button variant="ghost" size="icon" onClick={onClose}>
@@ -148,23 +219,204 @@ export function ComposeModal({
 
         <div className="flex flex-col h-full max-h-[70vh]">
           <div className="p-6 space-y-4">
+            {/* Platform Selection */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Platform</Label>
+                <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+                  <SelectTrigger>
+                    <SelectValue>
+                      <div className="flex items-center space-x-2">
+                        <span>{currentPlatform?.icon}</span>
+                        <span>{currentPlatform?.name}</span>
+                      </div>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availablePlatforms.map((platform) => (
+                      <SelectItem key={platform.id} value={platform.id}>
+                        <div className="flex items-center space-x-2">
+                          <span>{platform.icon}</span>
+                          <span>{platform.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* From Account Selection */}
+              <div>
+                <Label className="text-sm font-medium mb-2 block">From</Label>
+                <Select 
+                  value={selectedFromAccount?.id || ""} 
+                  onValueChange={(accountId) => {
+                    const account = userAccounts.find(acc => acc.id === accountId);
+                    setSelectedFromAccount(account || null);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue>
+                      {selectedFromAccount && (
+                        <div className="flex items-center space-x-2">
+                          <Avatar className="w-5 h-5">
+                            <AvatarFallback className="text-xs">
+                              {selectedFromAccount.avatar || selectedFromAccount.displayName.slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col items-start">
+                            <span className="text-sm">{selectedFromAccount.displayName}</span>
+                            <span className="text-xs text-muted-foreground">{selectedFromAccount.address}</span>
+                          </div>
+                        </div>
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {userAccounts.map((account) => (
+                      <SelectItem key={account.id} value={account.id}>
+                        <div className="flex items-center space-x-2">
+                          <Avatar className="w-5 h-5">
+                            <AvatarFallback className="text-xs">
+                              {account.avatar || account.displayName.slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col items-start">
+                            <span className="text-sm">{account.displayName}</span>
+                            <span className="text-xs text-muted-foreground">{account.address}</span>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             {/* Recipients */}
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Label htmlFor="to" className="text-sm font-medium min-w-0 w-8">
                   To:
                 </Label>
-                <Input
-                  id="to"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  placeholder={
-                    isEmailPlatform
-                      ? "Enter email addresses..."
-                      : `Enter ${platform} username or phone...`
-                  }
-                  className="flex-1"
-                />
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      id="to"
+                      value={to}
+                      onChange={(e) => setTo(e.target.value)}
+                      placeholder={
+                        isEmailPlatform
+                          ? "Enter email addresses..."
+                          : `Enter ${currentPlatform?.name} username or phone...`
+                      }
+                      className="flex-1"
+                    />
+                    <Popover open={showContactPicker} onOpenChange={setShowContactPicker}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Users className="w-4 h-4 mr-1" />
+                          Contacts
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80" align="end">
+                        <div className="space-y-3">
+                          <h4 className="font-medium">Select Contact</h4>
+                          
+                          {/* Frequent Contacts */}
+                          <div>
+                            <Label className="text-xs text-muted-foreground">FREQUENT</Label>
+                            <ScrollArea className="h-32">
+                              <div className="space-y-1">
+                                {getFrequentContacts(selectedPlatform).map((contact) => {
+                                  const platformData = contact.platforms.find(p => p.platform === selectedPlatform);
+                                  return platformData ? (
+                                    <Button
+                                      key={contact.id}
+                                      variant="ghost"
+                                      size="sm"
+                                      className="w-full justify-start h-auto p-2"
+                                      onClick={() => handleContactSelect(contact)}
+                                    >
+                                      <Avatar className="w-8 h-8 mr-3">
+                                        <AvatarFallback>{contact.avatar}</AvatarFallback>
+                                      </Avatar>
+                                      <div className="flex flex-col items-start">
+                                        <span className="text-sm font-medium">{contact.name}</span>
+                                        <span className="text-xs text-muted-foreground">{platformData.address}</span>
+                                        {contact.company && (
+                                          <span className="text-xs text-muted-foreground">{contact.company}</span>
+                                        )}
+                                      </div>
+                                    </Button>
+                                  ) : null;
+                                })}
+                              </div>
+                            </ScrollArea>
+                          </div>
+
+                          <Separator />
+
+                          {/* All Contacts */}
+                          <div>
+                            <Label className="text-xs text-muted-foreground">ALL CONTACTS</Label>
+                            <ScrollArea className="h-40">
+                              <div className="space-y-1">
+                                {availableContacts.map((contact) => {
+                                  const platformData = contact.platforms.find(p => p.platform === selectedPlatform);
+                                  return platformData ? (
+                                    <Button
+                                      key={contact.id}
+                                      variant="ghost"
+                                      size="sm"
+                                      className="w-full justify-start h-auto p-2"
+                                      onClick={() => handleContactSelect(contact)}
+                                    >
+                                      <Avatar className="w-8 h-8 mr-3">
+                                        <AvatarFallback>{contact.avatar}</AvatarFallback>
+                                      </Avatar>
+                                      <div className="flex flex-col items-start">
+                                        <span className="text-sm font-medium">{contact.name}</span>
+                                        <span className="text-xs text-muted-foreground">{platformData.address}</span>
+                                        {platformData.lastContact && (
+                                          <span className="text-xs text-muted-foreground">Last: {platformData.lastContact}</span>
+                                        )}
+                                      </div>
+                                    </Button>
+                                  ) : null;
+                                })}
+                              </div>
+                            </ScrollArea>
+                          </div>
+
+                          <Separator />
+
+                          <Button variant="outline" size="sm" className="w-full">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add New Contact
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* Selected Contacts */}
+                  {selectedContacts.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {selectedContacts.map((contact) => (
+                        <Badge
+                          key={contact.id}
+                          variant="secondary"
+                          className="cursor-pointer"
+                          onClick={() => removeContact(contact.id)}
+                        >
+                          {contact.name} ×
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 {isEmailPlatform && (
                   <>
                     <Button

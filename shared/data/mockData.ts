@@ -6,6 +6,209 @@
 // In true production, this entire file would be deleted and replaced with real APIs
 export const DEV_MODE = true;
 
+// User Accounts Mock Data - Multiple accounts per platform
+export interface UserAccount {
+  id: string;
+  platform: string;
+  type: "email" | "phone" | "username";
+  address: string; // email address, phone number, or username
+  displayName: string;
+  isDefault: boolean;
+  isActive: boolean;
+  avatar?: string;
+}
+
+export const mockUserAccounts: UserAccount[] = [
+  // Email Accounts
+  {
+    id: "email1",
+    platform: "Gmail",
+    type: "email",
+    address: "john.doe@gmail.com",
+    displayName: "John Doe (Personal)",
+    isDefault: true,
+    isActive: true,
+    avatar: "JD",
+  },
+  {
+    id: "email2", 
+    platform: "Gmail",
+    type: "email",
+    address: "j.doe.work@gmail.com",
+    displayName: "John Doe (Work)",
+    isDefault: false,
+    isActive: true,
+    avatar: "JW",
+  },
+  {
+    id: "email3",
+    platform: "Outlook",
+    type: "email", 
+    address: "john.doe@company.com",
+    displayName: "John Doe (Company)",
+    isDefault: false,
+    isActive: true,
+    avatar: "JC",
+  },
+  // WhatsApp Accounts
+  {
+    id: "whatsapp1",
+    platform: "WhatsApp",
+    type: "phone",
+    address: "+1-555-0123",
+    displayName: "Personal WhatsApp",
+    isDefault: true,
+    isActive: true,
+  },
+  {
+    id: "whatsapp2",
+    platform: "WhatsApp", 
+    type: "phone",
+    address: "+1-555-9876",
+    displayName: "Business WhatsApp",
+    isDefault: false,
+    isActive: true,
+  },
+  // Telegram Accounts
+  {
+    id: "telegram1",
+    platform: "Telegram",
+    type: "username",
+    address: "@johndoe_dev",
+    displayName: "John Doe Developer",
+    isDefault: true,
+    isActive: true,
+  },
+  // Slack Accounts  
+  {
+    id: "slack1",
+    platform: "Slack",
+    type: "username",
+    address: "john.doe",
+    displayName: "Development Team",
+    isDefault: true,
+    isActive: true,
+  },
+  {
+    id: "slack2",
+    platform: "Slack",
+    type: "username", 
+    address: "j.doe",
+    displayName: "Marketing Team",
+    isDefault: false,
+    isActive: true,
+  },
+];
+
+// Contact Mock Data - People to send messages to
+export interface Contact {
+  id: string;
+  name: string;
+  platforms: {
+    platform: string;
+    address: string; // email, phone, username
+    lastContact?: string;
+    frequency?: number; // how often contacted
+  }[];
+  avatar: string;
+  company?: string;
+  isFrequent: boolean;
+}
+
+export const mockContacts: Contact[] = [
+  {
+    id: "contact1",
+    name: "Sarah Johnson",
+    platforms: [
+      { platform: "Gmail", address: "sarah@company.com", lastContact: "2h ago", frequency: 15 },
+      { platform: "Slack", address: "sarah.johnson", lastContact: "5m ago", frequency: 25 },
+      { platform: "WhatsApp", address: "+1-555-0234", lastContact: "1d ago", frequency: 8 },
+    ],
+    avatar: "SJ",
+    company: "Tech Corp",
+    isFrequent: true,
+  },
+  {
+    id: "contact2", 
+    name: "Marcus Chen",
+    platforms: [
+      { platform: "Gmail", address: "marcus@designco.com", lastContact: "15m ago", frequency: 12 },
+      { platform: "Telegram", address: "@marcuschen", lastContact: "3h ago", frequency: 6 },
+    ],
+    avatar: "MC",
+    company: "Design Co",
+    isFrequent: true,
+  },
+  {
+    id: "contact3",
+    name: "Alex Rivera", 
+    platforms: [
+      { platform: "Gmail", address: "alex@startup.io", lastContact: "3h ago", frequency: 9 },
+      { platform: "WhatsApp", address: "+1-555-0345", lastContact: "2h ago", frequency: 14 },
+      { platform: "Slack", address: "alex.rivera", lastContact: "30m ago", frequency: 18 },
+    ],
+    avatar: "AR",
+    company: "Startup Inc",
+    isFrequent: true,
+  },
+  {
+    id: "contact4",
+    name: "Jessica Wong",
+    platforms: [
+      { platform: "Outlook", address: "jessica@company.com", lastContact: "6h ago", frequency: 7 },
+      { platform: "Telegram", address: "@jessicaw", lastContact: "1d ago", frequency: 3 },
+    ],
+    avatar: "JW", 
+    company: "Tech Corp",
+    isFrequent: false,
+  },
+  {
+    id: "contact5",
+    name: "David Kim",
+    platforms: [
+      { platform: "Gmail", address: "david@clientcompany.com", lastContact: "30m ago", frequency: 11 },
+      { platform: "WhatsApp", address: "+1-555-0456", lastContact: "45m ago", frequency: 16 },
+    ],
+    avatar: "DK",
+    company: "Client Company", 
+    isFrequent: true,
+  },
+  {
+    id: "contact6",
+    name: "Emily Chen",
+    platforms: [
+      { platform: "Gmail", address: "emily.chen@partner.com", lastContact: "1d ago", frequency: 5 },
+      { platform: "Slack", address: "emily.chen", lastContact: "2h ago", frequency: 8 },
+    ],
+    avatar: "EC",
+    company: "Partner Corp",
+    isFrequent: false,
+  },
+];
+
+// Helper functions to get user accounts and contacts
+export const getUserAccounts = (platform?: string): UserAccount[] => {
+  if (!DEV_MODE) return [];
+  return platform ? mockUserAccounts.filter(account => account.platform === platform) : mockUserAccounts;
+};
+
+export const getContacts = (platform?: string): Contact[] => {
+  if (!DEV_MODE) return [];
+  if (platform) {
+    return mockContacts.filter(contact => 
+      contact.platforms.some(p => p.platform === platform)
+    );
+  }
+  return mockContacts;
+};
+
+export const getFrequentContacts = (platform?: string, limit: number = 5): Contact[] => {
+  if (!DEV_MODE) return [];
+  return getContacts(platform)
+    .filter(contact => contact.isFrequent)
+    .slice(0, limit);
+};
+
 // Email Mock Data
 export interface Email {
   id: string;
