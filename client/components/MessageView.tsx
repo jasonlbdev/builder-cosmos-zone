@@ -148,10 +148,26 @@ const EmailMessageView = ({ message }: { message: Message }) => {
           <Button size="sm" variant="outline" className="text-xs">
             📝 Summarize
           </Button>
-          <Button size="sm" variant="outline" className="text-xs">
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs"
+            onClick={() => {
+              const url = `/calendar?from-email=true&messageId=${message.id}&sender=${encodeURIComponent(message.sender)}&subject=${encodeURIComponent(message.subject || '')}&platform=${message.platform}`;
+              window.open(url, '_blank');
+            }}
+          >
             📅 Schedule Meeting
           </Button>
-          <Button size="sm" variant="outline" className="text-xs">
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs"
+            onClick={() => {
+              const url = `/tasks?from-email=true&messageId=${message.id}&sender=${encodeURIComponent(message.sender)}&subject=${encodeURIComponent(message.subject || '')}&platform=${message.platform}&platformLogo=${encodeURIComponent(message.platformLogo)}`;
+              window.open(url, '_blank');
+            }}
+          >
             🔖 Add to Task
           </Button>
         </div>
