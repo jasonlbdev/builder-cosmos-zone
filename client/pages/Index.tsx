@@ -537,6 +537,20 @@ export default function Index() {
         replyTo={replyTo}
         subject={replySubject}
       />
+
+      <DexterAI
+        open={showDexterAI}
+        onClose={() => setShowDexterAI(false)}
+      />
+
+      {/* Dexter AI Floating Button */}
+      <Button
+        onClick={() => setShowDexterAI(true)}
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg z-50"
+        size="icon"
+      >
+        <div className="text-xl">🤖</div>
+      </Button>
     </div>
   );
 }
