@@ -384,7 +384,24 @@ export default function IntegrationManagement() {
                     Automatically sync new messages and emails
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch
+                  defaultChecked
+                  onCheckedChange={async (checked) => {
+                    try {
+                      await fetch('/api/settings/sync', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ autoSync: checked, interval: 5 })
+                      });
+                      if (checked) {
+                        // Trigger immediate sync for all connected accounts
+                        connectedAccounts.forEach(account => handleSync(account.id));
+                      }
+                    } catch (error) {
+                      console.error('Failed to update auto-sync setting:', error);
+                    }
+                  }}
+                />
               </div>
               <div className="flex items-center justify-between">
                 <div>
@@ -393,7 +410,26 @@ export default function IntegrationManagement() {
                     Get instant notifications for new messages
                   </p>
                 </div>
-                <Switch defaultChecked />
+                <Switch
+                  defaultChecked
+                  onCheckedChange={async (checked) => {
+                    try {
+                      await fetch('/api/settings/sync', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ realTimeNotifications: checked })
+                      });
+                      if (checked) {
+                        // Request notification permissions
+                        if ('Notification' in window) {
+                          await Notification.requestPermission();
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Failed to update notification setting:', error);
+                    }
+                  }}
+                />
               </div>
               <div className="flex items-center justify-between">
                 <div>
@@ -402,7 +438,64 @@ export default function IntegrationManagement() {
                     Continue syncing when the app is in background
                   </p>
                 </div>
-                <Switch />
+                <Switch
+                  onCheckedChange={async (checked) => {
+                    try {
+                      await fetch('/api/settings/sync', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ backgroundSync: checked })
+                      });
+                      if (checked) {
+                        // Enable service worker for background sync
+                        if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+                          const registration = await navigator.serviceWorker.ready;
+                          await registration.sync.register('background-sync');
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Failed to update background sync setting:', error);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Immediate Sync Actions */}
+              <div className="pt-4 border-t">
+                <h4 className="font-medium mb-3">Immediate Actions</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      // Sync all connected accounts immediately
+                      connectedAccounts.forEach(account => handleSync(account.id));
+                    }}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Sync All Now
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        await fetch('/api/settings/sync', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ forceRefresh: true })
+                        });
+                        // Force refresh all integrations
+                        window.location.reload();
+                      } catch (error) {
+                        console.error('Failed to force refresh:', error);
+                      }
+                    }}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Force Refresh
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
