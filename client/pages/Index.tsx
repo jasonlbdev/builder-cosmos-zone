@@ -366,6 +366,17 @@ export default function Index() {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
+
+      <ComposeModal
+        open={showCompose}
+        onClose={() => {
+          setShowCompose(false);
+          setReplyTo('');
+          setReplySubject('');
+        }}
+        replyTo={replyTo}
+        subject={replySubject}
+      />
     </div>
   );
 }
