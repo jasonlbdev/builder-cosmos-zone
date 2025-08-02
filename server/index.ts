@@ -121,5 +121,9 @@ export function createServer() {
   app.post("/api/email-providers/gmail/callback", handleGmailCallback);
   app.post("/api/email-providers/gmail/sync", syncGmailEmails);
 
+  // Sync settings routes
+  app.get("/api/settings/sync", getSyncSettings);
+  app.post("/api/settings/sync", updateSyncSettings);
+
   return app;
 }
