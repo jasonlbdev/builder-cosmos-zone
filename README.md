@@ -8,35 +8,27 @@ A modern email management platform with AI-powered categorization, task manageme
 
 ## 📁 Data Configuration System
 
-This application uses an external data configuration system that follows the house rule: **"No mock, example or truncated code - Production only!"**
+This application follows the house rule: **"No mock, example or truncated code - Production only!"**
 
 ### Data Structure
 
-All mock data is stored in external JSON configuration files located in:
-- `config/data/` - Source configuration files
-- `public/config/data/` - Files served to the frontend
+All mock data is centralized in a single file:
+- `shared/data/mockData.ts` - Contains all mock data and helper functions
 
-### Configuration Files
+### Data Management
 
-1. **`config/data/tasks.json`** - Task management data
-2. **`config/data/calendar.json`** - Calendar events data  
-3. **`config/data/settings.json`** - Email categories and AI rules
-4. **`config/data/conversations.json`** - Message conversation data
-
-### Data Service
-
-The application uses `shared/services/dataService.ts` to load data from external files. This service:
-- Loads data asynchronously from JSON files
-- Provides fallback handling for missing files
-- Can be easily replaced with API calls in production
+The application uses `shared/data/mockData.ts` which:
+- Contains all mock data in one place
+- Provides helper functions to access data
+- Can be easily deleted for production
 - Maintains type safety with TypeScript interfaces
 
 ### Production Migration
 
 To migrate to production:
-1. **Remove config files**: Delete `config/data/` and `public/config/data/` directories
-2. **Replace data service**: Update `shared/services/dataService.ts` to make API calls
-3. **Deploy**: The application will automatically use real data sources
+1. **Delete mock data file**: Remove `shared/data/mockData.ts`
+2. **Replace with API calls**: Update components to fetch from real APIs
+3. **Deploy**: The application will use real data sources
 
 ## 🛠️ Development
 
@@ -110,11 +102,11 @@ vercel --prod
 - `VITE_API_URL`: API endpoint for production data
 
 ### Data Configuration
-Edit the JSON files in `config/data/` to modify application data:
-- Add/remove tasks in `tasks.json`
-- Update calendar events in `calendar.json`
-- Modify email categories in `settings.json`
-- Change conversation data in `conversations.json`
+Edit `shared/data/mockData.ts` to modify application data:
+- Add/remove tasks in the `mockTasks` array
+- Update calendar events in the `mockEvents` array
+- Modify email categories in the `mockEmailCategories` array
+- Change conversation data in the `mockConversations` object
 
 ## 📄 License
 
