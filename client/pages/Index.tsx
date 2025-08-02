@@ -418,7 +418,11 @@ export default function Index() {
                               key={item.name}
                               variant="ghost"
                               className="w-full justify-start text-xs p-1"
-                              onClick={() => setSelectedIntegration(item.name)}
+                                                             onClick={() => {
+                                 setSelectedIntegration(item.name);
+                                 // Open integration management page for this platform
+                                 window.open(`/integrations/${item.name.toLowerCase()}`, '_blank');
+                               }}
                             >
                               <div
                                 className={`w-2 h-2 rounded-full mr-2 ${getStatusColor(
