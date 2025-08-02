@@ -315,7 +315,7 @@ export default function Integrations() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="h-[calc(100vh-48px)] flex flex-col bg-background">
       {/* Header */}
       <header className="border-b border-border px-6 py-4">
         <div className="flex items-center justify-between">
