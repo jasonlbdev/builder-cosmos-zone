@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { loadTasks, type Task } from "../../shared/services/dataService";
+import { getTasks, type Task } from "../../shared/data/mockData";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -50,22 +50,7 @@ import { cn } from "@/lib/utils";
 
 export default function Tasks() {
   const [searchParams] = useSearchParams();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const taskData = await loadTasks();
-        setTasks(taskData);
-      } catch (error) {
-        console.error('Failed to load tasks:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTasks();
-  }, []);
+  const [tasks, setTasks] = useState<Task[]>(getTasks());
   const [newTaskDialog, setNewTaskDialog] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [filter, setFilter] = useState<

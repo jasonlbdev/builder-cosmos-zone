@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { loadEmailCategories, loadAIRules, type EmailCategory, type CategoryRule, type AIRule } from "../../shared/services/dataService";
+import { getEmailCategories, type EmailCategory, type CategoryRule } from "../../shared/data/mockData";
 import {
   Plus,
   Trash2,
@@ -104,27 +104,8 @@ const defaultAIRules: AIRule[] = [
 ];
 
 export default function Settings() {
-  const [categories, setCategories] = useState<EmailCategory[]>([]);
-  const [aiRules, setAiRules] = useState<AIRule[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [categoryData, aiRuleData] = await Promise.all([
-          loadEmailCategories(),
-          loadAIRules()
-        ]);
-        setCategories(categoryData);
-        setAiRules(aiRuleData);
-      } catch (error) {
-        console.error('Failed to load settings data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const [categories, setCategories] = useState<EmailCategory[]>(getEmailCategories());
+  const [aiRules, setAiRules] = useState<AIRule[]>(defaultAIRules);
   const [newCategoryDialog, setNewCategoryDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [newRuleDialog, setNewRuleDialog] = useState(false);

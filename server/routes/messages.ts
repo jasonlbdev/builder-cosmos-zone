@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { loadConversations, type ConversationMessage } from "../../shared/services/dataService";
+import { getConversations, type ConversationMessage } from "../../shared/data/mockData";
 
 export const getConversationMessages = async (req: Request, res: Response) => {
   try {
@@ -14,7 +14,7 @@ export const getConversationMessages = async (req: Request, res: Response) => {
     }
 
     const conversationKey = `${(platform as string).toLowerCase()}_${messageId}`;
-    const conversationData = await loadConversations();
+    const conversationData = getConversations();
     const messages = conversationData[conversationKey] || [];
 
     // In production, this would fetch from the actual platform APIs:
@@ -76,7 +76,7 @@ export const sendMessage = async (req: Request, res: Response) => {
 
     // Add to conversation data for demo purposes
     const conversationKey = `${(platform as string).toLowerCase()}_${messageId}`;
-    const conversationData = await loadConversations();
+    const conversationData = getConversations();
     if (conversationData[conversationKey]) {
       conversationData[conversationKey].push(newMessage);
     }

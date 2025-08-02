@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
-import { loadEvents, type CalendarEvent } from "../../shared/services/dataService";
+import { getEvents, type CalendarEvent } from "../../shared/data/mockData";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -47,22 +47,7 @@ import { cn } from "@/lib/utils";
 export default function Calendar() {
   const [searchParams] = useSearchParams();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const eventData = await loadEvents();
-        setEvents(eventData);
-      } catch (error) {
-        console.error('Failed to load events:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
+  const [events, setEvents] = useState<CalendarEvent[]>(getEvents());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
     null,
   );
