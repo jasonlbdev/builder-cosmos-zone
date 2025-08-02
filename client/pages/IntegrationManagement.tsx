@@ -69,6 +69,7 @@ export default function IntegrationManagement() {
   const handleConnect = async (platform: string) => {
     setLoading(platform);
     setError(null);
+    setSuccess(null);
 
     try {
       let authUrl: string;
