@@ -24,10 +24,12 @@ interface EmailCategory {
 
 interface CategoryRule {
   id: string;
-  type: 'sender' | 'subject' | 'content' | 'domain' | 'keywords';
-  condition: 'contains' | 'equals' | 'starts_with' | 'ends_with' | 'regex';
+  type: 'sender' | 'subject' | 'content' | 'domain' | 'keywords' | 'toRecipients' | 'ccRecipients' | 'importance' | 'hasAttachments' | 'conversationId' | 'categories' | 'flag' | 'messageClass';
+  condition: 'contains' | 'equals' | 'starts_with' | 'ends_with' | 'regex' | 'is_null' | 'is_not_null' | 'greater_than' | 'less_than';
   value: string;
   enabled: boolean;
+  apiField?: string; // Microsoft Graph API field reference
+  description?: string;
 }
 
 interface AIRule {
