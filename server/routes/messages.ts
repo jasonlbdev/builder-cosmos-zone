@@ -1,57 +1,5 @@
 import { Request, Response } from "express";
-// Mock conversation data - in production this would come from database
-interface ConversationMessage {
-  id: string;
-  sender: string;
-  content: string;
-  time: string;
-  isMe: boolean;
-  avatar: string;
-  status?: "sent" | "delivered" | "read";
-}
-
-const conversationData: Record<string, ConversationMessage[]> = {
-  whatsapp_6: [
-    {
-      id: "1",
-      sender: "Amazon Support",
-      content: "Hello! Your package #AMZ123456 has been shipped and is on its way.",
-      time: "2h ago",
-      isMe: false,
-      avatar: "AS",
-    },
-    {
-      id: "2",
-      sender: "You",
-      content: "Great! Can you provide an estimated delivery time?",
-      time: "2h ago",
-      isMe: true,
-      avatar: "YU",
-      status: "read",
-    },
-  ],
-  slack_5: [
-    {
-      id: "1",
-      sender: "GitHub Bot",
-      content: "Pull request merged: feat/new-dashboard",
-      time: "5h ago",
-      isMe: false,
-      avatar: "GB",
-    },
-    {
-      id: "2",
-      sender: "You",
-      content: "Thanks! Was this tested in staging?",
-      time: "5h ago",
-      isMe: true,
-      avatar: "YU",
-      status: "delivered",
-    },
-  ],
-};
-
-const getConversations = () => conversationData;
+import { loadConversations, type ConversationMessage } from "../../shared/services/dataService";
 
 export const getConversationMessages = async (req: Request, res: Response) => {
   try {
@@ -66,7 +14,7 @@ export const getConversationMessages = async (req: Request, res: Response) => {
     }
 
     const conversationKey = `${(platform as string).toLowerCase()}_${messageId}`;
-    const conversationData = getConversations();
+    const conversationData = await loadConversations();
     const messages = conversationData[conversationKey] || [];
 
     // In production, this would fetch from the actual platform APIs:
@@ -128,7 +76,7 @@ export const sendMessage = async (req: Request, res: Response) => {
 
     // Add to conversation data for demo purposes
     const conversationKey = `${(platform as string).toLowerCase()}_${messageId}`;
-    const conversationData = getConversations();
+    const conversationData = await loadConversations();
     if (conversationData[conversationKey]) {
       conversationData[conversationKey].push(newMessage);
     }

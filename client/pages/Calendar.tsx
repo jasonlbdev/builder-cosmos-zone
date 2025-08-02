@@ -1,61 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
-// Production-ready calendar data - in production this would come from API
-interface CalendarEvent {
-  id: string;
-  title: string;
-  description?: string;
-  startTime: Date;
-  endTime: Date;
-  attendees: string[];
-  location?: string;
-  type: "meeting" | "call" | "event";
-  status: "confirmed" | "tentative" | "cancelled";
-  emailAccount?: string;
-  platform?: string;
-  emailContext?: {
-    messageId: string;
-    sender: string;
-    subject: string;
-    platform: string;
-  };
-}
-
-const mockEvents: CalendarEvent[] = [
-  {
-    id: "1",
-    title: "Q4 Budget Review Meeting",
-    description: "Review budget allocations and revenue projections for Q4",
-    startTime: new Date(2024, 11, 20, 14, 0),
-    endTime: new Date(2024, 11, 20, 15, 30),
-    attendees: ["sarah@company.com", "john@company.com", "you@company.com"],
-    location: "Conference Room A",
-    type: "meeting",
-    status: "confirmed",
-    emailAccount: "you@company.com",
-    platform: "Outlook",
-    emailContext: {
-      messageId: "1",
-      sender: "Sarah Johnson",
-      subject: "Q4 Budget Review Meeting",
-      platform: "Outlook",
-    },
-  },
-  {
-    id: "2",
-    title: "Project Sync Call",
-    description: "Weekly project synchronization with the development team",
-    startTime: new Date(2024, 11, 22, 10, 0),
-    endTime: new Date(2024, 11, 22, 11, 0),
-    attendees: ["dev-team@company.com", "you@company.com"],
-    type: "call",
-    status: "confirmed",
-    emailAccount: "you@company.com",
-    platform: "Platform-hosted",
-  },
-];
-
-const getEvents = () => mockEvents;
+import { loadEvents, type CalendarEvent } from "../../shared/services/dataService";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -102,7 +47,22 @@ import { cn } from "@/lib/utils";
 export default function Calendar() {
   const [searchParams] = useSearchParams();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState<CalendarEvent[]>(getEvents());
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const eventData = await loadEvents();
+        setEvents(eventData);
+      } catch (error) {
+        console.error('Failed to load events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
     null,
   );

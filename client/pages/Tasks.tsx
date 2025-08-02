@@ -1,89 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-// Production-ready task data - in production this would come from API
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  status: "todo" | "in-progress" | "completed";
-  priority: "low" | "medium" | "high" | "urgent";
-  assignee?: string;
-  assignees?: string[];
-  dueDate?: Date;
-  tags: string[];
-  emailContext?: {
-    messageId: string;
-    sender: string;
-    subject: string;
-    platform: string;
-    platformLogo: string;
-  };
-  followUpConfig?: {
-    enabled: boolean;
-    timeframe: number;
-    message: string;
-    recipients: string[];
-  };
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const mockTasks: Task[] = [
-  {
-    id: "1",
-    title: "Review Q4 budget proposals",
-    description: "Review budget allocations, revenue projections, department spending, and new project funding requests.",
-    status: "todo",
-    priority: "high",
-    assignee: "you@company.com",
-    assignees: ["you@company.com", "sarah@company.com"],
-    dueDate: new Date(2024, 11, 22),
-    tags: ["finance", "quarterly"],
-    emailContext: {
-      messageId: "1",
-      sender: "Sarah Johnson",
-      subject: "Q4 Budget Review Meeting",
-      platform: "Outlook",
-      platformLogo: "📧",
-    },
-    followUpConfig: {
-      enabled: true,
-      timeframe: 48,
-      message: "Hi, just following up on the Q4 budget review. Could you please provide an update?",
-      recipients: ["sarah@company.com"]
-    },
-    createdAt: new Date(2024, 11, 18),
-    updatedAt: new Date(2024, 11, 18),
-  },
-  {
-    id: "2",
-    title: "Prepare project timeline discussion",
-    description: "Review milestones and prepare talking points for the project timeline meeting.",
-    status: "in-progress",
-    priority: "medium",
-    assignee: "you@company.com",
-    assignees: ["you@company.com", "jessica@company.com"],
-    dueDate: new Date(2024, 11, 20),
-    tags: ["project", "planning"],
-    emailContext: {
-      messageId: "8",
-      sender: "Jessica Wong",
-      subject: "Re: Project timeline discussion",
-      platform: "Outlook",
-      platformLogo: "📧",
-    },
-    followUpConfig: {
-      enabled: true,
-      timeframe: 24,
-      message: "Following up on the project timeline discussion. Any updates?",
-      recipients: ["jessica@company.com"]
-    },
-    createdAt: new Date(2024, 11, 17),
-    updatedAt: new Date(2024, 11, 19),
-  },
-];
-
-const getTasks = () => mockTasks;
+import { loadTasks, type Task } from "../../shared/services/dataService";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -133,7 +50,22 @@ import { cn } from "@/lib/utils";
 
 export default function Tasks() {
   const [searchParams] = useSearchParams();
-  const [tasks, setTasks] = useState<Task[]>(getTasks());
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const taskData = await loadTasks();
+        setTasks(taskData);
+      } catch (error) {
+        console.error('Failed to load tasks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTasks();
+  }, []);
   const [newTaskDialog, setNewTaskDialog] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [filter, setFilter] = useState<

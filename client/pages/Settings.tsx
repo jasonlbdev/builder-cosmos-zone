@@ -1,47 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-// Production-ready settings data - in production this would come from API
-interface EmailCategory {
-  id: string;
-  name: string;
-  color: string;
-  description: string;
-  rules: CategoryRule[];
-  enabled: boolean;
-}
-
-interface CategoryRule {
-  id: string;
-  type: "sender" | "subject" | "content" | "domain" | "keywords" | "toRecipients" | "ccRecipients" | "importance" | "hasAttachments" | "conversationId" | "categories" | "flag" | "messageClass";
-  condition: "contains" | "equals" | "starts_with" | "ends_with" | "regex" | "is_null" | "is_not_null" | "greater_than" | "less_than";
-  value: string;
-  enabled: boolean;
-  apiField?: string;
-  description?: string;
-}
-
-const mockEmailCategories: EmailCategory[] = [
-  {
-    id: "to-respond",
-    name: "To Respond",
-    color: "bg-red-500",
-    description: "Emails requiring immediate response",
-    rules: [
-      {
-        id: "1",
-        type: "toRecipients",
-        condition: "contains",
-        value: "your-email@domain.com",
-        enabled: true,
-        apiField: "toRecipients/emailAddress/address",
-        description: "Emails directly addressed to you (not CC)",
-      },
-    ],
-    enabled: true,
-  },
-];
-
-const getEmailCategories = () => mockEmailCategories;
+import { loadEmailCategories, loadAIRules, type EmailCategory, type CategoryRule, type AIRule } from "../../shared/services/dataService";
 import {
   Plus,
   Trash2,
@@ -145,9 +104,27 @@ const defaultAIRules: AIRule[] = [
 ];
 
 export default function Settings() {
-  const [categories, setCategories] =
-    useState<EmailCategory[]>(getEmailCategories());
-  const [aiRules, setAiRules] = useState<AIRule[]>(defaultAIRules);
+  const [categories, setCategories] = useState<EmailCategory[]>([]);
+  const [aiRules, setAiRules] = useState<AIRule[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [categoryData, aiRuleData] = await Promise.all([
+          loadEmailCategories(),
+          loadAIRules()
+        ]);
+        setCategories(categoryData);
+        setAiRules(aiRuleData);
+      } catch (error) {
+        console.error('Failed to load settings data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
   const [newCategoryDialog, setNewCategoryDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [newRuleDialog, setNewRuleDialog] = useState(false);

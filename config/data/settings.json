@@ -1,0 +1,50 @@
+{
+  "emailCategories": [
+    {
+      "id": "to-respond",
+      "name": "To Respond",
+      "color": "bg-red-500",
+      "description": "Emails requiring immediate response",
+      "rules": [
+        {
+          "id": "1",
+          "type": "toRecipients",
+          "condition": "contains",
+          "value": "your-email@domain.com",
+          "enabled": true,
+          "apiField": "toRecipients/emailAddress/address",
+          "description": "Emails directly addressed to you (not CC)"
+        }
+      ],
+      "enabled": true
+    }
+  ],
+  "aiRules": [
+    {
+      "id": "ai-1",
+      "name": "Auto-categorize newsletters",
+      "description": "Automatically categorize newsletter emails as Marketing",
+      "action": "categorize",
+      "conditions": [
+        "Contains unsubscribe link",
+        "From marketing domain",
+        "Weekly/Monthly frequency"
+      ],
+      "confidence": 0.85,
+      "enabled": true
+    },
+    {
+      "id": "ai-2",
+      "name": "Priority urgent emails",
+      "description": "Mark emails with urgent keywords as high priority",
+      "action": "priority",
+      "conditions": [
+        "Contains urgent keywords",
+        "From internal domain",
+        "Short response time expected"
+      ],
+      "confidence": 0.9,
+      "enabled": true
+    }
+  ]
+} 

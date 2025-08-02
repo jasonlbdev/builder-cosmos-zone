@@ -1,0 +1,42 @@
+{
+  "conversations": {
+    "whatsapp_6": [
+      {
+        "id": "1",
+        "sender": "Amazon Support",
+        "content": "Hello! Your package #AMZ123456 has been shipped and is on its way.",
+        "time": "2h ago",
+        "isMe": false,
+        "avatar": "AS"
+      },
+      {
+        "id": "2",
+        "sender": "You",
+        "content": "Great! Can you provide an estimated delivery time?",
+        "time": "2h ago",
+        "isMe": true,
+        "avatar": "YU",
+        "status": "read"
+      }
+    ],
+    "slack_5": [
+      {
+        "id": "1",
+        "sender": "GitHub Bot",
+        "content": "Pull request merged: feat/new-dashboard",
+        "time": "5h ago",
+        "isMe": false,
+        "avatar": "GB"
+      },
+      {
+        "id": "2",
+        "sender": "You",
+        "content": "Thanks! Was this tested in staging?",
+        "time": "5h ago",
+        "isMe": true,
+        "avatar": "YU",
+        "status": "delivered"
+      }
+    ]
+  }
+} 
