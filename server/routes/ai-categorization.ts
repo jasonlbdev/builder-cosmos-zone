@@ -85,14 +85,121 @@ const defaultRules: CategoryRule[] = [
   }
 ];
 
-// AI-powered categorization using pattern matching
+// Enhanced AI-powered categorization with metadata analysis
 const categorizeEmailAI = (email: {
   sender: string;
   subject: string;
   content: string;
+  metadata?: {
+    toRecipients?: string[];
+    ccRecipients?: string[];
+    isReply?: boolean;
+    isForward?: boolean;
+    conversationId?: string;
+    threadId?: string;
+    importance?: 'low' | 'normal' | 'high';
+    categories?: string[];
+    hasAttachments?: boolean;
+    sentToMe?: boolean;
+    sentByMe?: boolean;
+    messageId?: string;
+    inReplyTo?: string;
+    platform?: 'outlook' | 'gmail' | 'slack' | 'telegram' | 'whatsapp' | 'instagram' | 'facebook';
+  };
 }): AICategorizationResult => {
-  const { sender, subject, content } = email;
+  const { sender, subject, content, metadata = {} } = email;
   const text = `${sender} ${subject} ${content}`.toLowerCase();
+
+  // Enhanced logic for "Awaiting Reply" - check if we sent an email and haven't received a response
+  if (metadata.sentByMe && metadata.conversationId) {
+    // Check if this is our last message in the thread and no response received
+    // In production, this would query the database for the conversation thread
+    const isLastMessageFromUs = true; // Would be determined by checking thread history
+    const timeSinceSent = new Date().getTime() - new Date().getTime(); // Would calculate actual time
+
+    if (isLastMessageFromUs && timeSinceSent > 24 * 60 * 60 * 1000) { // 24 hours
+      return {
+        category: 'Awaiting Reply',
+        confidence: 0.95,
+        reason: 'Email sent by us with no response received within 24 hours',
+        suggestedActions: ['Send follow-up', 'Set reminder', 'Mark as low priority']
+      };
+    }
+  }
+
+  // Enhanced "To Respond" logic - check if email is directly to us
+  if (metadata.sentToMe && !metadata.sentByMe) {
+    // Check if it's a direct email to us (not CC)
+    const isDirectRecipient = metadata.toRecipients?.some(recipient =>
+      recipient.includes('you@') || recipient.includes('your-email')
+    );
+
+    if (isDirectRecipient) {
+      // Check for urgent keywords in subject or metadata
+      const urgentKeywords = ['urgent', 'asap', 'immediate', 'deadline', 'emergency'];
+      const hasUrgentKeywords = urgentKeywords.some(keyword =>
+        subject.toLowerCase().includes(keyword) ||
+        (metadata.importance === 'high')
+      );
+
+      if (hasUrgentKeywords) {
+        return {
+          category: 'To Respond',
+          confidence: 0.95,
+          reason: 'Direct email to you with urgent indicators',
+          suggestedActions: ['Reply immediately', 'Set high priority', 'Add to task list']
+        };
+      }
+    }
+  }
+
+  // Re: subject analysis - distinguish between reply to us vs. reply to others
+  if (subject.toLowerCase().startsWith('re:')) {
+    if (metadata.isReply && metadata.inReplyTo) {
+      // Check if the original email was sent by us
+      // In production, this would check the messageId against sent emails
+      const originalSentByUs = metadata.sentByMe; // Would lookup original email
+
+      if (originalSentByUs) {
+        return {
+          category: 'Important',
+          confidence: 0.90,
+          reason: 'Reply to email you sent',
+          suggestedActions: ['Review response', 'Continue conversation', 'Archive if resolved']
+        };
+      } else {
+        return {
+          category: 'FYI',
+          confidence: 0.85,
+          reason: 'Reply in conversation not initiated by you',
+          suggestedActions: ['Read when convenient', 'Archive if not relevant']
+        };
+      }
+    }
+  }
+
+  // Platform-specific categorization
+  if (metadata.platform) {
+    switch (metadata.platform) {
+      case 'slack':
+      case 'telegram':
+      case 'whatsapp':
+        return {
+          category: 'FYI',
+          confidence: 0.80,
+          reason: `Message from ${metadata.platform} - typically informational`,
+          suggestedActions: ['Read when convenient', 'Respond if mentioned']
+        };
+      case 'instagram':
+      case 'facebook':
+        return {
+          category: 'Marketing',
+          confidence: 0.85,
+          reason: `Social media notification from ${metadata.platform}`,
+          suggestedActions: ['Review engagement', 'Respond to customers']
+        };
+    }
+  }
 
   // Check each rule
   for (const rule of defaultRules) {
