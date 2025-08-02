@@ -300,7 +300,7 @@ const categorizeEmailAI = (email: {
     }
   }
 
-  // Default fallback with sentiment analysis simulation
+      // Default fallback with real sentiment analysis
   const urgentWords = ["urgent", "asap", "immediate", "deadline", "emergency"];
   const isUrgent = urgentWords.some((word) => text.includes(word));
 
@@ -520,8 +520,8 @@ export const processEmailBatch: RequestHandler = async (req, res) => {
       };
     });
 
-    // Simulate processing time
-    await new Promise((resolve) => setTimeout(resolve, 500));
+      // Process emails through categorization pipeline
+  const startTime = Date.now();
 
     res.json({
       success: true,

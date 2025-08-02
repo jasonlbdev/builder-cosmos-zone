@@ -183,54 +183,221 @@ const syncIntegration = async (
       await syncTelegram(integration, options);
       break;
     default:
-      console.log(`Sync not implemented for ${integration.platform}`);
+      console.warn(`Sync not implemented for platform: ${integration.platform}`);
   }
 };
 
 const syncOutlook = async (integration: any, options: any) => {
-  // In production: Use Microsoft Graph API to fetch latest emails
-  console.log("Syncing Outlook emails...");
-  // Simulate API call delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  console.log("Outlook sync completed");
+  try {
+    const response = await fetch(`https://graph.microsoft.com/v1.0/me/messages`, {
+      headers: {
+        'Authorization': `Bearer ${integration.accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Outlook sync failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return { success: true, count: data.value?.length || 0 };
+  } catch (error) {
+    console.error('Outlook sync error:', error);
+    throw error;
+  }
 };
 
 const syncGmail = async (integration: any, options: any) => {
-  // In production: Use Gmail API to fetch latest emails
-  console.log("Syncing Gmail emails...");
-  await new Promise((resolve) => setTimeout(resolve, 1200));
-  console.log("Gmail sync completed");
+  try {
+    const response = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=50`, {
+      headers: {
+        'Authorization': `Bearer ${integration.accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Gmail sync failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return { success: true, count: data.messages?.length || 0 };
+  } catch (error) {
+    console.error('Gmail sync error:', error);
+    throw error;
+  }
 };
 
 const syncSlack = async (integration: any, options: any) => {
-  // In production: Use Slack API to fetch latest messages
-  console.log("Syncing Slack messages...");
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  console.log("Slack sync completed");
+  try {
+    const response = await fetch(`https://slack.com/api/conversations.history?channel=${integration.channelId}&limit=50`, {
+      headers: {
+        'Authorization': `Bearer ${integration.accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Slack sync failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (!data.ok) {
+      throw new Error(`Slack API error: ${data.error}`);
+    }
+    
+    return { success: true, count: data.messages?.length || 0 };
+  } catch (error) {
+    console.error('Slack sync error:', error);
+    throw error;
+  }
 };
 
 const syncWhatsApp = async (integration: any, options: any) => {
-  // In production: Use WhatsApp Business API
-  console.log("Syncing WhatsApp messages...");
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-  console.log("WhatsApp sync completed");
+  try {
+    const response = await fetch(`https://graph.facebook.com/v18.0/${integration.phoneNumberId}/messages`, {
+      headers: {
+        'Authorization': `Bearer ${integration.accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`WhatsApp sync failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return { success: true, count: data.data?.length || 0 };
+  } catch (error) {
+    console.error('WhatsApp sync error:', error);
+    throw error;
+  }
 };
 
 const syncTelegram = async (integration: any, options: any) => {
-  // In production: Use Telegram Bot API
-  console.log("Syncing Telegram messages...");
-  await new Promise((resolve) => setTimeout(resolve, 900));
-  console.log("Telegram sync completed");
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${integration.botToken}/getUpdates?limit=50`, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Telegram sync failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (!data.ok) {
+      throw new Error(`Telegram API error: ${data.description}`);
+    }
+    
+    return { success: true, count: data.result?.length || 0 };
+  } catch (error) {
+    console.error('Telegram sync error:', error);
+    throw error;
+  }
 };
 
 const clearIntegrationCache = async (customerId: string) => {
-  console.log(`Clearing integration cache for customer ${customerId}`);
-  // In production: Clear Redis cache or similar
+  try {
+    // Production: Clear cache storage (Redis, Memcached, etc.)
+    // For now, clear any in-memory caches
+    const cacheKey = `integrations:${customerId}`;
+    
+    // If using Redis:
+    // await redisClient.del(cacheKey);
+    
+    // If using in-memory cache:
+    if (global.integrationCache) {
+      delete global.integrationCache[cacheKey];
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Cache clear error:', error);
+    throw error;
+  }
 };
 
 const refreshIntegrationAuth = async (integration: any) => {
-  console.log(`Refreshing authentication for ${integration.platform}`);
-  // In production: Refresh OAuth tokens
+  try {
+    switch (integration.platform) {
+      case "outlook":
+        // Refresh Microsoft Graph token
+        const outlookResponse = await fetch("https://login.microsoftonline.com/common/oauth2/v2.0/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: process.env.OUTLOOK_CLIENT_ID || "",
+            client_secret: process.env.OUTLOOK_CLIENT_SECRET || "",
+            refresh_token: integration.refreshToken,
+            grant_type: "refresh_token"
+          })
+        });
+        
+        if (!outlookResponse.ok) {
+          throw new Error(`Outlook token refresh failed: ${outlookResponse.status}`);
+        }
+        
+        const outlookData = await outlookResponse.json();
+        integration.accessToken = outlookData.access_token;
+        integration.refreshToken = outlookData.refresh_token || integration.refreshToken;
+        break;
+        
+      case "gmail":
+        // Refresh Google OAuth token
+        const gmailResponse = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: process.env.GMAIL_CLIENT_ID || "",
+            client_secret: process.env.GMAIL_CLIENT_SECRET || "",
+            refresh_token: integration.refreshToken,
+            grant_type: "refresh_token"
+          })
+        });
+        
+        if (!gmailResponse.ok) {
+          throw new Error(`Gmail token refresh failed: ${gmailResponse.status}`);
+        }
+        
+        const gmailData = await gmailResponse.json();
+        integration.accessToken = gmailData.access_token;
+        break;
+        
+      case "slack":
+        // Slack tokens typically don't expire, but check if refresh is needed
+        if (integration.refreshToken) {
+          const slackResponse = await fetch("https://slack.com/api/oauth.v2.access", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+              client_id: process.env.SLACK_CLIENT_ID || "",
+              client_secret: process.env.SLACK_CLIENT_SECRET || "",
+              refresh_token: integration.refreshToken,
+              grant_type: "refresh_token"
+            })
+          });
+          
+          if (slackResponse.ok) {
+            const slackData = await slackResponse.json();
+            if (slackData.ok) {
+              integration.accessToken = slackData.access_token;
+            }
+          }
+        }
+        break;
+        
+      default:
+        throw new Error(`Token refresh not implemented for ${integration.platform}`);
+    }
+    
+    return { success: true, accessToken: integration.accessToken };
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    throw error;
+  }
 };
 
 // Auto-sync scheduler

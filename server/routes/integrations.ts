@@ -96,6 +96,64 @@ const FacebookOAuthSchema = z.object({
   redirectUri: z.string().url(),
 });
 
+// Helper function for integration sync
+const performIntegrationSync = async (integrationId: string, platform: string) => {
+  try {
+    switch (platform) {
+      case "slack":
+        const slackIntegration = integrationsDB.slack.find(s => s.workspaceId === integrationId);
+        if (!slackIntegration) throw new Error('Slack integration not found');
+        
+        const slackResponse = await fetch(`https://slack.com/api/conversations.list`, {
+          headers: { 'Authorization': `Bearer ${slackIntegration.accessToken}` }
+        });
+        
+        if (!slackResponse.ok) throw new Error('Slack sync failed');
+        const slackData = await slackResponse.json();
+        return { success: slackData.ok, data: slackData };
+        
+      case "telegram":
+        const telegramIntegration = integrationsDB.telegram.find(t => t.botToken.includes(integrationId));
+        if (!telegramIntegration) throw new Error('Telegram integration not found');
+        
+        const telegramResponse = await fetch(`https://api.telegram.org/bot${telegramIntegration.botToken}/getUpdates`);
+        if (!telegramResponse.ok) throw new Error('Telegram sync failed');
+        const telegramData = await telegramResponse.json();
+        return { success: telegramData.ok, data: telegramData };
+        
+      case "instagram":
+        const instagramIntegration = integrationsDB.instagram.find(i => i.userId === integrationId);
+        if (!instagramIntegration) throw new Error('Instagram integration not found');
+        
+        const instagramResponse = await fetch(`https://graph.instagram.com/v18.0/me/conversations`, {
+          headers: { 'Authorization': `Bearer ${instagramIntegration.accessToken}` }
+        });
+        
+        if (!instagramResponse.ok) throw new Error('Instagram sync failed');
+        const instagramData = await instagramResponse.json();
+        return { success: true, data: instagramData };
+        
+      case "facebook":
+        const facebookIntegration = integrationsDB.facebook.find(f => f.pageId === integrationId);
+        if (!facebookIntegration) throw new Error('Facebook integration not found');
+        
+        const facebookResponse = await fetch(`https://graph.facebook.com/v18.0/${facebookIntegration.pageId}/conversations`, {
+          headers: { 'Authorization': `Bearer ${facebookIntegration.accessToken}` }
+        });
+        
+        if (!facebookResponse.ok) throw new Error('Facebook sync failed');
+        const facebookData = await facebookResponse.json();
+        return { success: true, data: facebookData };
+        
+      default:
+        throw new Error(`Sync not supported for platform: ${platform}`);
+    }
+  } catch (error) {
+    console.error(`${platform} sync error:`, error);
+    return { success: false, error: error.message };
+  }
+};
+
 // Mock database - in production, this would be replaced with actual database
 let integrationsDB = {
   slack: [] as SlackIntegration[],
@@ -556,8 +614,11 @@ export const syncIntegration: RequestHandler = async (req, res) => {
   const { platform, id } = req.params;
 
   try {
-    // Simulate sync process
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // Perform actual integration sync based on platform
+    const syncResult = await performIntegrationSync(id, platform);
+    if (!syncResult.success) {
+      throw new Error(syncResult.error || 'Sync failed');
+    }
 
     // Update last sync timestamp
     const now = new Date().toISOString();
