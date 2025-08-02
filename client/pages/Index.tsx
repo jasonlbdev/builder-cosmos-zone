@@ -219,6 +219,24 @@ export default function Index() {
   const [showCompose, setShowCompose] = useState(false);
   const [replyTo, setReplyTo] = useState<string>('');
   const [replySubject, setReplySubject] = useState<string>('');
+  const [selectedEmailId, setSelectedEmailId] = useState<number>(1);
+
+  // Filter emails based on selected category
+  const getFilteredEmails = () => {
+    if (selectedSidebarItem === 'Inbox') {
+      return emailsData;
+    }
+    if (selectedSidebarItem === 'Sent') {
+      return []; // Would fetch sent emails from API
+    }
+    if (selectedSidebarItem === 'Starred') {
+      return emailsData.filter(email => email.important);
+    }
+    return emailsData.filter(email => email.category === selectedSidebarItem);
+  };
+
+  const filteredEmails = getFilteredEmails();
+  const selectedEmail = emailsData.find(email => email.id === selectedEmailId) || emailsData[0];
 
   const handleReply = () => {
     setReplyTo(selectedEmail.email);
