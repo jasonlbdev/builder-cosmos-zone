@@ -250,6 +250,8 @@ export default function Settings() {
   const [aiRules, setAiRules] = useState<AIRule[]>(defaultAIRules);
   const [newCategoryDialog, setNewCategoryDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [newRuleDialog, setNewRuleDialog] = useState(false);
+  const [selectedCategoryForRule, setSelectedCategoryForRule] = useState<string | null>(null);
 
   // User Settings State
   const [userSettings, setUserSettings] = useState({
