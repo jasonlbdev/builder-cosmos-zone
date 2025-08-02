@@ -49,7 +49,10 @@ const emailsData = [
     important: true,
     category: 'To Respond',
     categoryColor: 'bg-red-500',
-    avatar: 'SJ'
+    avatar: 'SJ',
+    platform: 'Outlook',
+    platformLogo: '📧',
+    platformColor: 'bg-blue-700'
   },
   {
     id: 2,
