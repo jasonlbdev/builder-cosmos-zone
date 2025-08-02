@@ -113,7 +113,10 @@ const emailsData = [
     important: false,
     category: 'Awaiting Reply',
     categoryColor: 'bg-orange-500',
-    avatar: 'GH'
+    avatar: 'GH',
+    platform: 'Slack',
+    platformLogo: '💼',
+    platformColor: 'bg-purple-500'
   },
   {
     id: 6,
