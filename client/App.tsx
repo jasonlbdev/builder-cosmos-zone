@@ -5,6 +5,7 @@ import SlackIntegration from "./pages/SlackIntegration";
 import IntegrationManagement from "./pages/IntegrationManagement";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Breadcrumb from "./components/Breadcrumb";
 import { Toaster } from "@/components/ui/sonner";
 
 function App() {
