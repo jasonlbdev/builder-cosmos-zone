@@ -33,6 +33,15 @@ import {
   deleteCategoryRule,
   processEmailBatch
 } from "./routes/ai-categorization";
+import {
+  initiateOutlookOAuth,
+  handleOutlookCallback,
+  initiateGmailOAuth,
+  handleGmailCallback,
+  syncOutlookEmails,
+  syncGmailEmails,
+  getEmailProviderStatus
+} from "./routes/email-providers";
 
 export function createServer() {
   const app = express();
