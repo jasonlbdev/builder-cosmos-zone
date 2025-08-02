@@ -185,18 +185,20 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
                 </div>
               )}
 
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="subject" className="text-sm font-medium min-w-0 w-8">
-                  Subject:
-                </Label>
-                <Input
-                  id="subject"
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                  placeholder="Enter subject..."
-                  className="flex-1"
-                />
-              </div>
+              {isEmailPlatform && (
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="subject" className="text-sm font-medium min-w-0 w-8">
+                    Subject:
+                  </Label>
+                  <Input
+                    id="subject"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    placeholder="Enter subject..."
+                    className="flex-1"
+                  />
+                </div>
+              )}
             </div>
 
             <Separator />
