@@ -130,7 +130,7 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
                   id="to"
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
-                  placeholder="Enter email addresses..."
+                  placeholder={isEmailPlatform ? "Enter email addresses..." : `Enter ${platform} username or phone...`}
                   className="flex-1"
                 />
                 <Button
