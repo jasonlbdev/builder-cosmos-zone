@@ -24,6 +24,15 @@ import {
   disconnectIntegration,
   syncIntegration
 } from "./routes/integrations";
+import {
+  categorizeEmail,
+  bulkCategorizeEmails,
+  getCategoryRules,
+  updateCategoryRule,
+  createCategoryRule,
+  deleteCategoryRule,
+  processEmailBatch
+} from "./routes/ai-categorization";
 
 export function createServer() {
   const app = express();
