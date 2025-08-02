@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ComposeModal } from '@/components/ComposeModal';
 import { DexterAI } from '@/components/DexterAI';
+import MessageView from '@/components/MessageView';
 import { cn } from '@/lib/utils';
 
 const sidebarItems = [
@@ -195,7 +196,7 @@ const emailsData = [
     categoryColor: 'bg-purple-500',
     avatar: 'NF',
     platform: 'Instagram',
-    platformLogo: '📷',
+    platformLogo: '���',
     platformColor: 'bg-pink-500'
   },
   {
