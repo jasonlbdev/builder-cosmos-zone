@@ -1,18 +1,36 @@
-import { useState, useEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Plus, 
+import { useState, useEffect } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
   Calendar as CalendarIcon,
   Clock,
   MapPin,
@@ -21,9 +39,9 @@ import {
   Phone,
   Mail,
   Settings,
-  Filter
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  Filter,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CalendarEvent {
   id: string;
@@ -33,8 +51,8 @@ interface CalendarEvent {
   endTime: Date;
   attendees: string[];
   location?: string;
-  type: 'meeting' | 'call' | 'event';
-  status: 'confirmed' | 'tentative' | 'cancelled';
+  type: "meeting" | "call" | "event";
+  status: "confirmed" | "tentative" | "cancelled";
   emailContext?: {
     messageId: string;
     sender: string;
@@ -45,60 +63,62 @@ interface CalendarEvent {
 
 const mockEvents: CalendarEvent[] = [
   {
-    id: '1',
-    title: 'Q4 Budget Review Meeting',
-    description: 'Review budget allocations and revenue projections for Q4',
+    id: "1",
+    title: "Q4 Budget Review Meeting",
+    description: "Review budget allocations and revenue projections for Q4",
     startTime: new Date(2024, 11, 20, 14, 0),
     endTime: new Date(2024, 11, 20, 15, 30),
-    attendees: ['sarah@company.com', 'john@company.com', 'you@company.com'],
-    location: 'Conference Room A',
-    type: 'meeting',
-    status: 'confirmed',
+    attendees: ["sarah@company.com", "john@company.com", "you@company.com"],
+    location: "Conference Room A",
+    type: "meeting",
+    status: "confirmed",
     emailContext: {
-      messageId: '1',
-      sender: 'Sarah Johnson',
-      subject: 'Q4 Budget Review Meeting',
-      platform: 'Outlook'
-    }
+      messageId: "1",
+      sender: "Sarah Johnson",
+      subject: "Q4 Budget Review Meeting",
+      platform: "Outlook",
+    },
   },
   {
-    id: '2',
-    title: 'Project Sync Call',
-    description: 'Weekly project synchronization with the development team',
+    id: "2",
+    title: "Project Sync Call",
+    description: "Weekly project synchronization with the development team",
     startTime: new Date(2024, 11, 22, 10, 0),
     endTime: new Date(2024, 11, 22, 11, 0),
-    attendees: ['dev-team@company.com', 'you@company.com'],
-    type: 'call',
-    status: 'confirmed'
+    attendees: ["dev-team@company.com", "you@company.com"],
+    type: "call",
+    status: "confirmed",
   },
   {
-    id: '3',
-    title: 'Client Presentation',
-    description: 'Present project milestone updates to the client',
+    id: "3",
+    title: "Client Presentation",
+    description: "Present project milestone updates to the client",
     startTime: new Date(2024, 11, 25, 16, 0),
     endTime: new Date(2024, 11, 25, 17, 0),
-    attendees: ['client@external.com', 'you@company.com'],
-    location: 'Zoom Meeting',
-    type: 'meeting',
-    status: 'tentative'
-  }
+    attendees: ["client@external.com", "you@company.com"],
+    location: "Zoom Meeting",
+    type: "meeting",
+    status: "tentative",
+  },
 ];
 
 export default function Calendar() {
   const [searchParams] = useSearchParams();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
+    null,
+  );
   const [newEventDialog, setNewEventDialog] = useState(false);
-  const [view, setView] = useState<'month' | 'week' | 'day'>('month');
+  const [view, setView] = useState<"month" | "week" | "day">("month");
 
   // Handle email context from URL parameters
   useEffect(() => {
-    const emailContext = searchParams.get('from-email');
-    const messageId = searchParams.get('messageId');
-    const sender = searchParams.get('sender');
-    const subject = searchParams.get('subject');
-    const platform = searchParams.get('platform');
+    const emailContext = searchParams.get("from-email");
+    const messageId = searchParams.get("messageId");
+    const sender = searchParams.get("sender");
+    const subject = searchParams.get("subject");
+    const platform = searchParams.get("platform");
 
     if (emailContext && messageId && sender && subject) {
       setNewEventDialog(true);
@@ -111,60 +131,71 @@ export default function Calendar() {
     const month = date.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
-    
+
     const days = [];
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(null);
     }
-    
+
     // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day));
     }
-    
+
     return days;
   };
 
   const getEventsForDate = (date: Date | null) => {
     if (!date) return [];
-    return events.filter(event => {
+    return events.filter((event) => {
       const eventDate = new Date(event.startTime);
       return eventDate.toDateString() === date.toDateString();
     });
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     });
   };
 
   const nextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
+    );
   };
 
   const prevMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
+    );
   };
 
   const getEventTypeIcon = (type: string) => {
     switch (type) {
-      case 'call': return <Phone className="w-4 h-4" />;
-      case 'meeting': return <Video className="w-4 h-4" />;
-      default: return <CalendarIcon className="w-4 h-4" />;
+      case "call":
+        return <Phone className="w-4 h-4" />;
+      case "meeting":
+        return <Video className="w-4 h-4" />;
+      default:
+        return <CalendarIcon className="w-4 h-4" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'bg-green-500';
-      case 'tentative': return 'bg-yellow-500';
-      case 'cancelled': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case "confirmed":
+        return "bg-green-500";
+      case "tentative":
+        return "bg-yellow-500";
+      case "cancelled":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
@@ -180,7 +211,12 @@ export default function Calendar() {
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Select value={view} onValueChange={(value: 'month' | 'week' | 'day') => setView(value)}>
+            <Select
+              value={view}
+              onValueChange={(value: "month" | "week" | "day") =>
+                setView(value)
+              }
+            >
               <SelectTrigger className="w-24">
                 <SelectValue />
               </SelectTrigger>
@@ -204,14 +240,18 @@ export default function Calendar() {
                 <DialogHeader>
                   <DialogTitle>Create New Event</DialogTitle>
                 </DialogHeader>
-                <NewEventForm 
+                <NewEventForm
                   onClose={() => setNewEventDialog(false)}
-                  emailContext={searchParams.get('from-email') ? {
-                    messageId: searchParams.get('messageId') || '',
-                    sender: searchParams.get('sender') || '',
-                    subject: searchParams.get('subject') || '',
-                    platform: searchParams.get('platform') || ''
-                  } : undefined}
+                  emailContext={
+                    searchParams.get("from-email")
+                      ? {
+                          messageId: searchParams.get("messageId") || "",
+                          sender: searchParams.get("sender") || "",
+                          subject: searchParams.get("subject") || "",
+                          platform: searchParams.get("platform") || "",
+                        }
+                      : undefined
+                  }
                 />
               </DialogContent>
             </Dialog>
@@ -228,21 +268,30 @@ export default function Calendar() {
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <h2 className="text-xl font-semibold">
-                {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                {currentDate.toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
               </h2>
               <Button variant="outline" size="icon" onClick={nextMonth}>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
-            <Button variant="outline" onClick={() => setCurrentDate(new Date())}>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentDate(new Date())}
+            >
               Today
             </Button>
           </div>
 
           {/* Calendar Grid */}
           <div className="grid grid-cols-7 gap-1 mb-4">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="p-3 text-center text-sm font-medium text-muted-foreground">
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+              <div
+                key={day}
+                className="p-3 text-center text-sm font-medium text-muted-foreground"
+              >
                 {day}
               </div>
             ))}
@@ -254,29 +303,35 @@ export default function Calendar() {
                 key={index}
                 className={cn(
                   "min-h-[120px] border border-border p-2 bg-card hover:bg-accent/50 transition-colors",
-                  date && date.toDateString() === new Date().toDateString() && "bg-primary/5 border-primary"
+                  date &&
+                    date.toDateString() === new Date().toDateString() &&
+                    "bg-primary/5 border-primary",
                 )}
               >
                 {date && (
                   <>
-                    <div className="font-medium text-sm mb-2">{date.getDate()}</div>
+                    <div className="font-medium text-sm mb-2">
+                      {date.getDate()}
+                    </div>
                     <div className="space-y-1">
-                      {getEventsForDate(date).slice(0, 3).map(event => (
-                        <div
-                          key={event.id}
-                          className="text-xs p-1 rounded cursor-pointer hover:opacity-80"
-                          style={{ backgroundColor: `hsl(var(--primary))` }}
-                          onClick={() => setSelectedEvent(event)}
-                        >
-                          <div className="flex items-center space-x-1 text-primary-foreground">
-                            {getEventTypeIcon(event.type)}
-                            <span className="truncate">{event.title}</span>
+                      {getEventsForDate(date)
+                        .slice(0, 3)
+                        .map((event) => (
+                          <div
+                            key={event.id}
+                            className="text-xs p-1 rounded cursor-pointer hover:opacity-80"
+                            style={{ backgroundColor: `hsl(var(--primary))` }}
+                            onClick={() => setSelectedEvent(event)}
+                          >
+                            <div className="flex items-center space-x-1 text-primary-foreground">
+                              {getEventTypeIcon(event.type)}
+                              <span className="truncate">{event.title}</span>
+                            </div>
+                            <div className="text-primary-foreground/80">
+                              {formatTime(event.startTime)}
+                            </div>
                           </div>
-                          <div className="text-primary-foreground/80">
-                            {formatTime(event.startTime)}
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                       {getEventsForDate(date).length > 3 && (
                         <div className="text-xs text-muted-foreground">
                           +{getEventsForDate(date).length - 3} more
@@ -293,13 +348,21 @@ export default function Calendar() {
 
       {/* Event Details Dialog */}
       {selectedEvent && (
-        <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
+        <Dialog
+          open={!!selectedEvent}
+          onOpenChange={() => setSelectedEvent(null)}
+        >
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle className="flex items-center space-x-2">
                 {getEventTypeIcon(selectedEvent.type)}
                 <span>{selectedEvent.title}</span>
-                <div className={cn("w-2 h-2 rounded-full", getStatusColor(selectedEvent.status))} />
+                <div
+                  className={cn(
+                    "w-2 h-2 rounded-full",
+                    getStatusColor(selectedEvent.status),
+                  )}
+                />
               </DialogTitle>
             </DialogHeader>
             <EventDetailsView event={selectedEvent} />
@@ -310,10 +373,10 @@ export default function Calendar() {
   );
 }
 
-function NewEventForm({ 
-  onClose, 
-  emailContext 
-}: { 
+function NewEventForm({
+  onClose,
+  emailContext,
+}: {
   onClose: () => void;
   emailContext?: {
     messageId: string;
@@ -322,26 +385,32 @@ function NewEventForm({
     platform: string;
   };
 }) {
-  const [title, setTitle] = useState(emailContext ? `Meeting: ${emailContext.subject}` : '');
-  const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-  const [startTime, setStartTime] = useState('09:00');
-  const [endTime, setEndTime] = useState('10:00');
-  const [attendees, setAttendees] = useState(emailContext ? emailContext.sender : '');
-  const [location, setLocation] = useState('');
+  const [title, setTitle] = useState(
+    emailContext ? `Meeting: ${emailContext.subject}` : "",
+  );
+  const [description, setDescription] = useState("");
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("10:00");
+  const [attendees, setAttendees] = useState(
+    emailContext ? emailContext.sender : "",
+  );
+  const [location, setLocation] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In production, this would create the event via API
-    console.log('Creating event:', {
+    console.log("Creating event:", {
       title,
       description,
       startDate,
       startTime,
       endTime,
-      attendees: attendees.split(',').map(email => email.trim()),
+      attendees: attendees.split(",").map((email) => email.trim()),
       location,
-      emailContext
+      emailContext,
     });
     onClose();
   };
@@ -440,9 +509,7 @@ function NewEventForm({
         <Button type="button" variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button type="submit">
-          Create Event
-        </Button>
+        <Button type="submit">Create Event</Button>
       </div>
     </form>
   );
@@ -453,7 +520,7 @@ function EventDetailsView({ event }: { event: CalendarEvent }) {
     <div className="space-y-4">
       <div>
         <Label className="text-sm text-muted-foreground">Description</Label>
-        <p className="mt-1">{event.description || 'No description provided'}</p>
+        <p className="mt-1">{event.description || "No description provided"}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -490,7 +557,7 @@ function EventDetailsView({ event }: { event: CalendarEvent }) {
             <div key={index} className="flex items-center space-x-2">
               <Avatar className="w-6 h-6">
                 <AvatarFallback className="text-xs">
-                  {attendee.split('@')[0].charAt(0).toUpperCase()}
+                  {attendee.split("@")[0].charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <span className="text-sm">{attendee}</span>

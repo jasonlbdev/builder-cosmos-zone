@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response } from "express";
 
 interface SyncSettings {
   autoSync?: boolean;
@@ -14,19 +14,21 @@ let syncSettings: Record<string, SyncSettings> = {};
 
 export const updateSyncSettings = async (req: Request, res: Response) => {
   try {
-    const customerId = req.headers['x-customer-id'] as string || 'default';
+    const customerId = (req.headers["x-customer-id"] as string) || "default";
     const settings: SyncSettings = req.body;
 
     // Update settings
     syncSettings[customerId] = {
       ...syncSettings[customerId],
-      ...settings
+      ...settings,
     };
 
     // Handle immediate actions
     if (settings.autoSync !== undefined) {
       if (settings.autoSync) {
-        console.log(`Enabling auto-sync for customer ${customerId} with interval ${settings.interval || 5} minutes`);
+        console.log(
+          `Enabling auto-sync for customer ${customerId} with interval ${settings.interval || 5} minutes`,
+        );
         // In production: Set up recurring sync job
         triggerImmediateSync(customerId);
       } else {
@@ -37,10 +39,14 @@ export const updateSyncSettings = async (req: Request, res: Response) => {
 
     if (settings.realTimeNotifications !== undefined) {
       if (settings.realTimeNotifications) {
-        console.log(`Enabling real-time notifications for customer ${customerId}`);
+        console.log(
+          `Enabling real-time notifications for customer ${customerId}`,
+        );
         // In production: Set up WebSocket connections or push notifications
       } else {
-        console.log(`Disabling real-time notifications for customer ${customerId}`);
+        console.log(
+          `Disabling real-time notifications for customer ${customerId}`,
+        );
       }
     }
 
@@ -60,39 +66,37 @@ export const updateSyncSettings = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      settings: syncSettings[customerId]
+      settings: syncSettings[customerId],
     });
-
   } catch (error) {
-    console.error('Sync settings error:', error);
+    console.error("Sync settings error:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to update sync settings'
+      error: "Failed to update sync settings",
     });
   }
 };
 
 export const getSyncSettings = async (req: Request, res: Response) => {
   try {
-    const customerId = req.headers['x-customer-id'] as string || 'default';
-    
+    const customerId = (req.headers["x-customer-id"] as string) || "default";
+
     const customerSettings = syncSettings[customerId] || {
       autoSync: true,
       interval: 5,
       realTimeNotifications: true,
-      backgroundSync: false
+      backgroundSync: false,
     };
 
     res.json({
       success: true,
-      settings: customerSettings
+      settings: customerSettings,
     });
-
   } catch (error) {
-    console.error('Get sync settings error:', error);
+    console.error("Get sync settings error:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get sync settings'
+      error: "Failed to get sync settings",
     });
   }
 };
@@ -100,10 +104,10 @@ export const getSyncSettings = async (req: Request, res: Response) => {
 const triggerImmediateSync = async (customerId: string) => {
   try {
     console.log(`Triggering immediate sync for customer ${customerId}`);
-    
+
     // Get all connected integrations for this customer
     const integrations = await getCustomerIntegrations(customerId);
-    
+
     // Sync each integration
     for (const integration of integrations) {
       try {
@@ -115,20 +119,20 @@ const triggerImmediateSync = async (customerId: string) => {
 
     console.log(`Immediate sync completed for customer ${customerId}`);
   } catch (error) {
-    console.error('Immediate sync error:', error);
+    console.error("Immediate sync error:", error);
   }
 };
 
 const forceRefreshAllIntegrations = async (customerId: string) => {
   try {
     console.log(`Force refreshing all integrations for customer ${customerId}`);
-    
+
     // Clear any cached data
     await clearIntegrationCache(customerId);
-    
+
     // Re-authenticate all integrations
     const integrations = await getCustomerIntegrations(customerId);
-    
+
     for (const integration of integrations) {
       try {
         await refreshIntegrationAuth(integration);
@@ -140,7 +144,7 @@ const forceRefreshAllIntegrations = async (customerId: string) => {
 
     console.log(`Force refresh completed for customer ${customerId}`);
   } catch (error) {
-    console.error('Force refresh error:', error);
+    console.error("Force refresh error:", error);
   }
 };
 
@@ -148,29 +152,34 @@ const forceRefreshAllIntegrations = async (customerId: string) => {
 const getCustomerIntegrations = async (customerId: string) => {
   // Mock data - in production, fetch from database
   return [
-    { id: '1', platform: 'outlook', connected: true },
-    { id: '2', platform: 'gmail', connected: true },
-    { id: '3', platform: 'slack', connected: true }
+    { id: "1", platform: "outlook", connected: true },
+    { id: "2", platform: "gmail", connected: true },
+    { id: "3", platform: "slack", connected: true },
   ];
 };
 
-const syncIntegration = async (integration: any, options: { forceRefresh?: boolean } = {}) => {
-  console.log(`Syncing ${integration.platform}${options.forceRefresh ? ' (force refresh)' : ''}`);
-  
+const syncIntegration = async (
+  integration: any,
+  options: { forceRefresh?: boolean } = {},
+) => {
+  console.log(
+    `Syncing ${integration.platform}${options.forceRefresh ? " (force refresh)" : ""}`,
+  );
+
   switch (integration.platform.toLowerCase()) {
-    case 'outlook':
+    case "outlook":
       await syncOutlook(integration, options);
       break;
-    case 'gmail':
+    case "gmail":
       await syncGmail(integration, options);
       break;
-    case 'slack':
+    case "slack":
       await syncSlack(integration, options);
       break;
-    case 'whatsapp':
+    case "whatsapp":
       await syncWhatsApp(integration, options);
       break;
-    case 'telegram':
+    case "telegram":
       await syncTelegram(integration, options);
       break;
     default:
@@ -180,38 +189,38 @@ const syncIntegration = async (integration: any, options: { forceRefresh?: boole
 
 const syncOutlook = async (integration: any, options: any) => {
   // In production: Use Microsoft Graph API to fetch latest emails
-  console.log('Syncing Outlook emails...');
+  console.log("Syncing Outlook emails...");
   // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  console.log('Outlook sync completed');
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log("Outlook sync completed");
 };
 
 const syncGmail = async (integration: any, options: any) => {
   // In production: Use Gmail API to fetch latest emails
-  console.log('Syncing Gmail emails...');
-  await new Promise(resolve => setTimeout(resolve, 1200));
-  console.log('Gmail sync completed');
+  console.log("Syncing Gmail emails...");
+  await new Promise((resolve) => setTimeout(resolve, 1200));
+  console.log("Gmail sync completed");
 };
 
 const syncSlack = async (integration: any, options: any) => {
   // In production: Use Slack API to fetch latest messages
-  console.log('Syncing Slack messages...');
-  await new Promise(resolve => setTimeout(resolve, 800));
-  console.log('Slack sync completed');
+  console.log("Syncing Slack messages...");
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  console.log("Slack sync completed");
 };
 
 const syncWhatsApp = async (integration: any, options: any) => {
   // In production: Use WhatsApp Business API
-  console.log('Syncing WhatsApp messages...');
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  console.log('WhatsApp sync completed');
+  console.log("Syncing WhatsApp messages...");
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+  console.log("WhatsApp sync completed");
 };
 
 const syncTelegram = async (integration: any, options: any) => {
   // In production: Use Telegram Bot API
-  console.log('Syncing Telegram messages...');
-  await new Promise(resolve => setTimeout(resolve, 900));
-  console.log('Telegram sync completed');
+  console.log("Syncing Telegram messages...");
+  await new Promise((resolve) => setTimeout(resolve, 900));
+  console.log("Telegram sync completed");
 };
 
 const clearIntegrationCache = async (customerId: string) => {
@@ -227,18 +236,26 @@ const refreshIntegrationAuth = async (integration: any) => {
 // Auto-sync scheduler
 const scheduledSyncs: Record<string, NodeJS.Timeout> = {};
 
-export const scheduleAutoSync = (customerId: string, intervalMinutes: number) => {
+export const scheduleAutoSync = (
+  customerId: string,
+  intervalMinutes: number,
+) => {
   // Clear existing schedule
   if (scheduledSyncs[customerId]) {
     clearInterval(scheduledSyncs[customerId]);
   }
 
   // Set up new schedule
-  scheduledSyncs[customerId] = setInterval(() => {
-    triggerImmediateSync(customerId);
-  }, intervalMinutes * 60 * 1000);
+  scheduledSyncs[customerId] = setInterval(
+    () => {
+      triggerImmediateSync(customerId);
+    },
+    intervalMinutes * 60 * 1000,
+  );
 
-  console.log(`Scheduled auto-sync for customer ${customerId} every ${intervalMinutes} minutes`);
+  console.log(
+    `Scheduled auto-sync for customer ${customerId} every ${intervalMinutes} minutes`,
+  );
 };
 
 export const cancelAutoSync = (customerId: string) => {

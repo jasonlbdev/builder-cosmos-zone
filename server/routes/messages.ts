@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response } from "express";
 
 interface ConversationMessage {
   id: string;
@@ -7,91 +7,96 @@ interface ConversationMessage {
   time: string;
   isMe: boolean;
   avatar: string;
-  status?: 'sent' | 'delivered' | 'read';
+  status?: "sent" | "delivered" | "read";
 }
 
 // Mock conversation data by platform and message ID
 const conversationData: Record<string, ConversationMessage[]> = {
-  'whatsapp_6': [
+  whatsapp_6: [
     {
-      id: '1',
-      sender: 'Amazon Support',
-      content: 'Hello! Your package #AMZ123456 has been shipped and is on its way.',
-      time: '2h ago',
+      id: "1",
+      sender: "Amazon Support",
+      content:
+        "Hello! Your package #AMZ123456 has been shipped and is on its way.",
+      time: "2h ago",
       isMe: false,
-      avatar: 'AS'
+      avatar: "AS",
     },
     {
-      id: '2',
-      sender: 'You',
-      content: 'Great! Can you provide an estimated delivery time?',
-      time: '2h ago',
+      id: "2",
+      sender: "You",
+      content: "Great! Can you provide an estimated delivery time?",
+      time: "2h ago",
       isMe: true,
-      avatar: 'YU',
-      status: 'read'
+      avatar: "YU",
+      status: "read",
     },
     {
-      id: '3',
-      sender: 'Amazon Support',
-      content: 'Your package will be delivered today between 2-6 PM. You can track it here: [tracking link]',
-      time: '1h ago',
+      id: "3",
+      sender: "Amazon Support",
+      content:
+        "Your package will be delivered today between 2-6 PM. You can track it here: [tracking link]",
+      time: "1h ago",
       isMe: false,
-      avatar: 'AS'
+      avatar: "AS",
     },
     {
-      id: '4',
-      sender: 'Amazon Support',
-      content: 'Great news! Your recent order has been delivered to your address. You can track your order history in your account.',
-      time: '30m ago',
+      id: "4",
+      sender: "Amazon Support",
+      content:
+        "Great news! Your recent order has been delivered to your address. You can track your order history in your account.",
+      time: "30m ago",
       isMe: false,
-      avatar: 'AS'
-    }
+      avatar: "AS",
+    },
   ],
-  'slack_5': [
+  slack_5: [
     {
-      id: '1',
-      sender: 'GitHub Bot',
-      content: 'Pull request merged: feat/new-dashboard',
-      time: '5h ago',
+      id: "1",
+      sender: "GitHub Bot",
+      content: "Pull request merged: feat/new-dashboard",
+      time: "5h ago",
       isMe: false,
-      avatar: 'GB'
+      avatar: "GB",
     },
     {
-      id: '2',
-      sender: 'You',
-      content: 'Thanks! Was this tested in staging?',
-      time: '5h ago',
+      id: "2",
+      sender: "You",
+      content: "Thanks! Was this tested in staging?",
+      time: "5h ago",
       isMe: true,
-      avatar: 'YU',
-      status: 'delivered'
+      avatar: "YU",
+      status: "delivered",
     },
     {
-      id: '3',
-      sender: 'GitHub Bot',
-      content: 'Yes, all tests passed. The deployment has been triggered automatically.',
-      time: '4h ago',
+      id: "3",
+      sender: "GitHub Bot",
+      content:
+        "Yes, all tests passed. The deployment has been triggered automatically.",
+      time: "4h ago",
       isMe: false,
-      avatar: 'GB'
-    }
+      avatar: "GB",
+    },
   ],
-  'telegram_7': [
+  telegram_7: [
     {
-      id: '1',
-      sender: 'Notion Updates',
-      content: 'New features in Notion AI',
-      time: '4h ago',
+      id: "1",
+      sender: "Notion Updates",
+      content: "New features in Notion AI",
+      time: "4h ago",
       isMe: false,
-      avatar: 'NO'
+      avatar: "NO",
     },
     {
-      id: '2',
-      sender: 'Notion Updates',
-      content: 'Discover the latest AI-powered features that will supercharge your productivity and help you work smarter, not harder.',
-      time: '4h ago',
+      id: "2",
+      sender: "Notion Updates",
+      content:
+        "Discover the latest AI-powered features that will supercharge your productivity and help you work smarter, not harder.",
+      time: "4h ago",
       isMe: false,
-      avatar: 'NO'
-    }
-  ]
+      avatar: "NO",
+    },
+  ],
 };
 
 export const getConversationMessages = async (req: Request, res: Response) => {
@@ -102,7 +107,7 @@ export const getConversationMessages = async (req: Request, res: Response) => {
     if (!messageId || !platform) {
       return res.status(400).json({
         success: false,
-        error: 'Message ID and platform are required'
+        error: "Message ID and platform are required",
       });
     }
 
@@ -123,15 +128,14 @@ export const getConversationMessages = async (req: Request, res: Response) => {
         platform,
         messageId,
         totalMessages: messages.length,
-        hasMore: false // In production, implement pagination
-      }
+        hasMore: false, // In production, implement pagination
+      },
     });
-
   } catch (error) {
-    console.error('Get conversation messages error:', error);
+    console.error("Get conversation messages error:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch conversation messages'
+      error: "Failed to fetch conversation messages",
     });
   }
 };
@@ -145,7 +149,7 @@ export const sendMessage = async (req: Request, res: Response) => {
     if (!messageId || !platform || !content) {
       return res.status(400).json({
         success: false,
-        error: 'Message ID, platform, and content are required'
+        error: "Message ID, platform, and content are required",
       });
     }
 
@@ -153,18 +157,18 @@ export const sendMessage = async (req: Request, res: Response) => {
     console.log(`Sending message via ${platform}:`, {
       messageId,
       content,
-      replyTo
+      replyTo,
     });
 
     // Mock response
     const newMessage: ConversationMessage = {
       id: Date.now().toString(),
-      sender: 'You',
+      sender: "You",
       content,
-      time: 'Just now',
+      time: "Just now",
       isMe: true,
-      avatar: 'YU',
-      status: 'sent'
+      avatar: "YU",
+      status: "sent",
     };
 
     // Add to conversation data for demo purposes
@@ -179,15 +183,14 @@ export const sendMessage = async (req: Request, res: Response) => {
       metadata: {
         platform,
         messageId,
-        sentAt: new Date().toISOString()
-      }
+        sentAt: new Date().toISOString(),
+      },
     });
-
   } catch (error) {
-    console.error('Send message error:', error);
+    console.error("Send message error:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to send message'
+      error: "Failed to send message",
     });
   }
 };
@@ -200,7 +203,7 @@ export const markAsRead = async (req: Request, res: Response) => {
     if (!messageId || !platform) {
       return res.status(400).json({
         success: false,
-        error: 'Message ID and platform are required'
+        error: "Message ID and platform are required",
       });
     }
 
@@ -212,15 +215,14 @@ export const markAsRead = async (req: Request, res: Response) => {
       metadata: {
         platform,
         messageId,
-        markedReadAt: new Date().toISOString()
-      }
+        markedReadAt: new Date().toISOString(),
+      },
     });
-
   } catch (error) {
-    console.error('Mark as read error:', error);
+    console.error("Mark as read error:", error);
     res.status(500).json({
       success: false,
-      error: 'Failed to mark message as read'
+      error: "Failed to mark message as read",
     });
   }
 };

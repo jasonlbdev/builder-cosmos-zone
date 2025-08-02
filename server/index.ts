@@ -8,7 +8,7 @@ import {
   sendEmail,
   markAsRead,
   archiveEmail,
-  getAISuggestion
+  getAISuggestion,
 } from "./routes/emails";
 import {
   getIntegrationStatus,
@@ -22,7 +22,7 @@ import {
   initiateFacebookOAuth,
   handleFacebookCallback,
   disconnectIntegration,
-  syncIntegration
+  syncIntegration,
 } from "./routes/integrations";
 import {
   categorizeEmail,
@@ -31,7 +31,7 @@ import {
   updateCategoryRule,
   createCategoryRule,
   deleteCategoryRule,
-  processEmailBatch
+  processEmailBatch,
 } from "./routes/ai-categorization";
 import {
   initiateOutlookOAuth,
@@ -40,16 +40,13 @@ import {
   handleGmailCallback,
   syncOutlookEmails,
   syncGmailEmails,
-  getEmailProviderStatus
+  getEmailProviderStatus,
 } from "./routes/email-providers";
-import {
-  updateSyncSettings,
-  getSyncSettings
-} from "./routes/sync-settings";
+import { updateSyncSettings, getSyncSettings } from "./routes/sync-settings";
 import {
   getConversationMessages,
   sendMessage as sendConversationMessage,
-  markAsRead as markMessageAsRead
+  markAsRead as markMessageAsRead,
 } from "./routes/messages";
 
 export function createServer() {
@@ -83,11 +80,16 @@ export function createServer() {
   app.get("/api/integrations/slack/auth", initiateSlackOAuth);
   app.post("/api/integrations/slack/callback", handleSlackCallback);
   app.get("/api/integrations/slack/workspaces", getSlackWorkspaces);
-  app.patch("/api/integrations/slack/:workspaceId/channels/:channelId", updateSlackChannel);
+  app.patch(
+    "/api/integrations/slack/:workspaceId/channels/:channelId",
+    updateSlackChannel,
+  );
 
   // Telegram integration routes
   app.get("/api/integrations/telegram/auth", (req, res) => {
-    res.status(501).json({ error: 'Telegram OAuth not implemented, use bot token instead' });
+    res
+      .status(501)
+      .json({ error: "Telegram OAuth not implemented, use bot token instead" });
   });
   app.post("/api/integrations/telegram/connect", connectTelegramBot);
 
@@ -101,7 +103,9 @@ export function createServer() {
 
   // WhatsApp integration routes
   app.get("/api/integrations/whatsapp/auth", (req, res) => {
-    res.status(501).json({ error: 'WhatsApp Business API requires manual setup' });
+    res
+      .status(501)
+      .json({ error: "WhatsApp Business API requires manual setup" });
   });
 
   // Generic integration management

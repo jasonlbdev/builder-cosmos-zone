@@ -1,9 +1,15 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function Settings() {
-  const [testState, setTestState] = useState('test');
+  const [testState, setTestState] = useState("test");
 
   return (
     <div className="h-[calc(100vh-48px)] flex flex-col bg-background">
@@ -16,9 +22,7 @@ export default function Settings() {
               Manage your email categories, AI rules, and preferences
             </p>
           </div>
-          <Button onClick={() => setTestState('clicked')}>
-            Test Button
-          </Button>
+          <Button onClick={() => setTestState("clicked")}>Test Button</Button>
         </div>
       </header>
 
@@ -27,7 +31,9 @@ export default function Settings() {
           <Card>
             <CardHeader>
               <CardTitle>Debug Settings</CardTitle>
-              <CardDescription>This is a minimal settings page for debugging</CardDescription>
+              <CardDescription>
+                This is a minimal settings page for debugging
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <p>Current state: {testState}</p>

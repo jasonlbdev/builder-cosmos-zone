@@ -48,7 +48,7 @@ export interface ComposeEmailRequest {
   bcc?: string[];
   subject: string;
   content: string;
-  priority?: 'low' | 'normal' | 'high';
+  priority?: "low" | "normal" | "high";
   scheduledSend?: string;
   attachments?: File[];
 }
@@ -62,13 +62,13 @@ export interface SendEmailResponse {
 
 export interface AIResponse {
   suggestion: string;
-  type: 'reply' | 'summary' | 'action' | 'draft';
+  type: "reply" | "summary" | "action" | "draft";
   confidence: number;
   alternatives?: string[];
 }
 
 export interface AIRequest {
-  type: 'reply' | 'summary' | 'action' | 'draft';
+  type: "reply" | "summary" | "action" | "draft";
   emailId?: string;
   context?: {
     to?: string;
@@ -80,7 +80,7 @@ export interface AIRequest {
 
 // Integration-related interfaces
 export interface Integration {
-  platform: 'slack' | 'telegram' | 'instagram' | 'facebook';
+  platform: "slack" | "telegram" | "instagram" | "facebook";
   connected: boolean;
   lastSync?: string;
   metrics: {
@@ -131,13 +131,13 @@ export interface SearchRequest {
   filter?: EmailFilter;
   page?: number;
   limit?: number;
-  sortBy?: 'date' | 'sender' | 'subject' | 'priority';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "date" | "sender" | "subject" | "priority";
+  sortOrder?: "asc" | "desc";
 }
 
 // User preferences and settings
 export interface UserSettings {
-  theme: 'light' | 'dark' | 'auto';
+  theme: "light" | "dark" | "auto";
   emailsPerPage: number;
   autoMarkAsRead: boolean;
   keyboardShortcuts: boolean;

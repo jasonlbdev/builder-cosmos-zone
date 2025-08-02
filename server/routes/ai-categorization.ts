@@ -3,8 +3,8 @@ import { z } from "zod";
 
 interface CategoryRule {
   id: string;
-  type: 'sender' | 'subject' | 'content' | 'domain' | 'keywords';
-  condition: 'contains' | 'equals' | 'starts_with' | 'ends_with' | 'regex';
+  type: "sender" | "subject" | "content" | "domain" | "keywords";
+  condition: "contains" | "equals" | "starts_with" | "ends_with" | "regex";
   value: string;
   category: string;
   confidence: number;
@@ -21,68 +21,68 @@ interface AICategorizationResult {
 // Built-in categorization rules
 const defaultRules: CategoryRule[] = [
   {
-    id: 'rule-1',
-    type: 'metadata',
-    condition: 'direct_to_me',
-    value: 'importance:high,direct_recipient:true',
-    category: 'To Respond',
+    id: "rule-1",
+    type: "metadata",
+    condition: "direct_to_me",
+    value: "importance:high,direct_recipient:true",
+    category: "To Respond",
     confidence: 0.95,
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'rule-2',
-    type: 'metadata',
-    condition: 'conversation_analysis',
-    value: 'sent_by_me:true,no_response:24h',
-    category: 'Awaiting Reply',
+    id: "rule-2",
+    type: "metadata",
+    condition: "conversation_analysis",
+    value: "sent_by_me:true,no_response:24h",
+    category: "Awaiting Reply",
     confidence: 0.9,
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'rule-3',
-    type: 'keywords',
-    condition: 'contains',
-    value: 'unsubscribe|newsletter|promotion|marketing|offer|deal',
-    category: 'Marketing',
+    id: "rule-3",
+    type: "keywords",
+    condition: "contains",
+    value: "unsubscribe|newsletter|promotion|marketing|offer|deal",
+    category: "Marketing",
     confidence: 0.85,
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'rule-4',
-    type: 'domain',
-    condition: 'contains',
-    value: 'noreply@|no-reply@|notifications@|updates@',
-    category: 'Updates',
+    id: "rule-4",
+    type: "domain",
+    condition: "contains",
+    value: "noreply@|no-reply@|notifications@|updates@",
+    category: "Updates",
     confidence: 0.9,
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'rule-5',
-    type: 'keywords',
-    condition: 'contains',
-    value: 'invoice|payment|receipt|billing|subscription',
-    category: 'Important',
+    id: "rule-5",
+    type: "keywords",
+    condition: "contains",
+    value: "invoice|payment|receipt|billing|subscription",
+    category: "Important",
     confidence: 0.95,
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'rule-6',
-    type: 'subject',
-    condition: 'starts_with',
-    value: 'FYI:|For your information|Just so you know',
-    category: 'FYI',
+    id: "rule-6",
+    type: "subject",
+    condition: "starts_with",
+    value: "FYI:|For your information|Just so you know",
+    category: "FYI",
     confidence: 0.8,
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'rule-7',
-    type: 'keywords',
-    condition: 'contains',
-    value: 'coupon|discount|sale|free shipping|limited time',
-    category: 'Promotions',
+    id: "rule-7",
+    type: "keywords",
+    condition: "contains",
+    value: "coupon|discount|sale|free shipping|limited time",
+    category: "Promotions",
     confidence: 0.85,
-    enabled: true
-  }
+    enabled: true,
+  },
 ];
 
 // Enhanced AI-powered categorization with metadata analysis
@@ -97,14 +97,21 @@ const categorizeEmailAI = (email: {
     isForward?: boolean;
     conversationId?: string;
     threadId?: string;
-    importance?: 'low' | 'normal' | 'high';
+    importance?: "low" | "normal" | "high";
     categories?: string[];
     hasAttachments?: boolean;
     sentToMe?: boolean;
     sentByMe?: boolean;
     messageId?: string;
     inReplyTo?: string;
-    platform?: 'outlook' | 'gmail' | 'slack' | 'telegram' | 'whatsapp' | 'instagram' | 'facebook';
+    platform?:
+      | "outlook"
+      | "gmail"
+      | "slack"
+      | "telegram"
+      | "whatsapp"
+      | "instagram"
+      | "facebook";
   };
 }): AICategorizationResult => {
   const { sender, subject, content, metadata = {} } = email;
@@ -117,14 +124,22 @@ const categorizeEmailAI = (email: {
     // Check if this is our last message in the thread and no response received
     // In production, this would query the actual conversation thread from Graph API/Gmail API
     const isLastMessageFromUs = !metadata.inReplyTo || metadata.messageId; // Simplified logic
-    const timeSinceSent = new Date().getTime() - new Date(email.metadata?.sentDateTime || '').getTime();
+    const timeSinceSent =
+      new Date().getTime() -
+      new Date(email.metadata?.sentDateTime || "").getTime();
 
-    if (isLastMessageFromUs && timeSinceSent > 24 * 60 * 60 * 1000) { // 24 hours
+    if (isLastMessageFromUs && timeSinceSent > 24 * 60 * 60 * 1000) {
+      // 24 hours
       return {
-        category: 'Awaiting Reply',
+        category: "Awaiting Reply",
         confidence: 0.95,
-        reason: 'You sent an email with no response received within 24 hours (metadata analysis)',
-        suggestedActions: ['Send follow-up', 'Set reminder', 'Mark as low priority']
+        reason:
+          "You sent an email with no response received within 24 hours (metadata analysis)",
+        suggestedActions: [
+          "Send follow-up",
+          "Set reminder",
+          "Mark as low priority",
+        ],
       };
     }
   }
@@ -132,44 +147,56 @@ const categorizeEmailAI = (email: {
   // 2. "To Respond" - Based on recipient analysis (To field) and urgency metadata
   if (metadata.sentToMe && !metadata.sentByMe) {
     // Check if email is directly TO us (not CC) using metadata
-    const isDirectRecipient = metadata.toRecipients && metadata.toRecipients.length > 0;
+    const isDirectRecipient =
+      metadata.toRecipients && metadata.toRecipients.length > 0;
     const isInCC = metadata.ccRecipients && metadata.ccRecipients.length > 0;
 
     if (isDirectRecipient && !isInCC) {
       // Use metadata importance flag first, then fallback to subject keywords
-      const hasHighImportance = metadata.importance === 'high';
-      const hasUrgentInSubject = subject.toLowerCase().includes('urgent') ||
-                                subject.toLowerCase().includes('asap') ||
-                                subject.toLowerCase().includes('deadline');
+      const hasHighImportance = metadata.importance === "high";
+      const hasUrgentInSubject =
+        subject.toLowerCase().includes("urgent") ||
+        subject.toLowerCase().includes("asap") ||
+        subject.toLowerCase().includes("deadline");
 
       if (hasHighImportance || hasUrgentInSubject) {
         return {
-          category: 'To Respond',
+          category: "To Respond",
           confidence: 0.95,
-          reason: `Direct email to you ${hasHighImportance ? 'marked as high importance' : 'with urgent subject'} (metadata analysis)`,
-          suggestedActions: ['Reply immediately', 'Set high priority', 'Add to task list']
+          reason: `Direct email to you ${hasHighImportance ? "marked as high importance" : "with urgent subject"} (metadata analysis)`,
+          suggestedActions: [
+            "Reply immediately",
+            "Set high priority",
+            "Add to task list",
+          ],
         };
       }
 
       // Even non-urgent direct emails should be "To Respond" if they're questions/requests
-      const hasQuestionOrRequest = subject.includes('?') ||
-                                 content.toLowerCase().includes('can you') ||
-                                 content.toLowerCase().includes('please') ||
-                                 content.toLowerCase().includes('need');
+      const hasQuestionOrRequest =
+        subject.includes("?") ||
+        content.toLowerCase().includes("can you") ||
+        content.toLowerCase().includes("please") ||
+        content.toLowerCase().includes("need");
 
       if (hasQuestionOrRequest) {
         return {
-          category: 'To Respond',
+          category: "To Respond",
           confidence: 0.85,
-          reason: 'Direct email containing question or request (metadata + content analysis)',
-          suggestedActions: ['Review and respond', 'Set reminder', 'Add to task list']
+          reason:
+            "Direct email containing question or request (metadata + content analysis)",
+          suggestedActions: [
+            "Review and respond",
+            "Set reminder",
+            "Add to task list",
+          ],
         };
       }
     }
   }
 
   // Re: subject analysis - distinguish between reply to us vs. reply to others
-  if (subject.toLowerCase().startsWith('re:')) {
+  if (subject.toLowerCase().startsWith("re:")) {
     if (metadata.isReply && metadata.inReplyTo) {
       // Check if the original email was sent by us
       // In production, this would check the messageId against sent emails
@@ -177,17 +204,21 @@ const categorizeEmailAI = (email: {
 
       if (originalSentByUs) {
         return {
-          category: 'Important',
-          confidence: 0.90,
-          reason: 'Reply to email you sent',
-          suggestedActions: ['Review response', 'Continue conversation', 'Archive if resolved']
+          category: "Important",
+          confidence: 0.9,
+          reason: "Reply to email you sent",
+          suggestedActions: [
+            "Review response",
+            "Continue conversation",
+            "Archive if resolved",
+          ],
         };
       } else {
         return {
-          category: 'FYI',
+          category: "FYI",
           confidence: 0.85,
-          reason: 'Reply in conversation not initiated by you',
-          suggestedActions: ['Read when convenient', 'Archive if not relevant']
+          reason: "Reply in conversation not initiated by you",
+          suggestedActions: ["Read when convenient", "Archive if not relevant"],
         };
       }
     }
@@ -196,22 +227,22 @@ const categorizeEmailAI = (email: {
   // Platform-specific categorization
   if (metadata.platform) {
     switch (metadata.platform) {
-      case 'slack':
-      case 'telegram':
-      case 'whatsapp':
+      case "slack":
+      case "telegram":
+      case "whatsapp":
         return {
-          category: 'FYI',
-          confidence: 0.80,
+          category: "FYI",
+          confidence: 0.8,
           reason: `Message from ${metadata.platform} - typically informational`,
-          suggestedActions: ['Read when convenient', 'Respond if mentioned']
+          suggestedActions: ["Read when convenient", "Respond if mentioned"],
         };
-      case 'instagram':
-      case 'facebook':
+      case "instagram":
+      case "facebook":
         return {
-          category: 'Marketing',
+          category: "Marketing",
           confidence: 0.85,
           reason: `Social media notification from ${metadata.platform}`,
-          suggestedActions: ['Review engagement', 'Respond to customers']
+          suggestedActions: ["Review engagement", "Respond to customers"],
         };
     }
   }
@@ -224,22 +255,38 @@ const categorizeEmailAI = (email: {
     const ruleValue = rule.value.toLowerCase();
 
     switch (rule.type) {
-      case 'sender':
-        matches = checkCondition(sender.toLowerCase(), ruleValue, rule.condition);
+      case "sender":
+        matches = checkCondition(
+          sender.toLowerCase(),
+          ruleValue,
+          rule.condition,
+        );
         break;
-      case 'subject':
-        matches = checkCondition(subject.toLowerCase(), ruleValue, rule.condition);
+      case "subject":
+        matches = checkCondition(
+          subject.toLowerCase(),
+          ruleValue,
+          rule.condition,
+        );
         break;
-      case 'content':
-        matches = checkCondition(content.toLowerCase(), ruleValue, rule.condition);
+      case "content":
+        matches = checkCondition(
+          content.toLowerCase(),
+          ruleValue,
+          rule.condition,
+        );
         break;
-      case 'domain':
-        const domain = sender.split('@')[1] || '';
-        matches = checkCondition(domain.toLowerCase(), ruleValue, rule.condition);
+      case "domain":
+        const domain = sender.split("@")[1] || "";
+        matches = checkCondition(
+          domain.toLowerCase(),
+          ruleValue,
+          rule.condition,
+        );
         break;
-      case 'keywords':
-        const keywords = ruleValue.split('|');
-        matches = keywords.some(keyword => text.includes(keyword));
+      case "keywords":
+        const keywords = ruleValue.split("|");
+        matches = keywords.some((keyword) => text.includes(keyword));
         break;
     }
 
@@ -248,57 +295,68 @@ const categorizeEmailAI = (email: {
         category: rule.category,
         confidence: rule.confidence,
         reason: `Matched rule: ${rule.type} ${rule.condition} "${rule.value}"`,
-        suggestedActions: getSuggestedActions(rule.category)
+        suggestedActions: getSuggestedActions(rule.category),
       };
     }
   }
 
   // Default fallback with sentiment analysis simulation
-  const urgentWords = ['urgent', 'asap', 'immediate', 'deadline', 'emergency'];
-  const isUrgent = urgentWords.some(word => text.includes(word));
-  
+  const urgentWords = ["urgent", "asap", "immediate", "deadline", "emergency"];
+  const isUrgent = urgentWords.some((word) => text.includes(word));
+
   if (isUrgent) {
     return {
-      category: 'To Respond',
+      category: "To Respond",
       confidence: 0.7,
-      reason: 'Detected urgent language in email content'
+      reason: "Detected urgent language in email content",
     };
   }
 
   // Check if it's from a known social platform
-  const socialDomains = ['linkedin.com', 'facebook.com', 'twitter.com', 'instagram.com'];
-  const senderDomain = sender.split('@')[1] || '';
-  const isSocial = socialDomains.some(domain => senderDomain.includes(domain));
-  
+  const socialDomains = [
+    "linkedin.com",
+    "facebook.com",
+    "twitter.com",
+    "instagram.com",
+  ];
+  const senderDomain = sender.split("@")[1] || "";
+  const isSocial = socialDomains.some((domain) =>
+    senderDomain.includes(domain),
+  );
+
   if (isSocial) {
     return {
-      category: 'Marketing',
+      category: "Marketing",
       confidence: 0.75,
-      reason: 'Email from social media platform'
+      reason: "Email from social media platform",
     };
   }
 
   // Default to FYI for everything else
   return {
-    category: 'FYI',
+    category: "FYI",
     confidence: 0.6,
-    reason: 'Default categorization - no specific rules matched'
+    reason: "Default categorization - no specific rules matched",
   };
 };
 
-const checkCondition = (text: string, value: string, condition: string): boolean => {
+const checkCondition = (
+  text: string,
+  value: string,
+  condition: string,
+): boolean => {
   switch (condition) {
-    case 'contains':
+    case "contains":
       return text.includes(value);
-    case 'equals':
+    case "equals":
       return text === value;
-    case 'starts_with':
+    case "starts_with":
       return text.startsWith(value);
-    case 'ends_with':
+    case "ends_with":
       return text.endsWith(value);
-    case 'regex':
+    case "regex":
       try {
-        const regex = new RegExp(value, 'i');
+        const regex = new RegExp(value, "i");
         return regex.test(text);
       } catch {
         return false;
@@ -310,18 +368,34 @@ const checkCondition = (text: string, value: string, condition: string): boolean
 
 const getSuggestedActions = (category: string): string[] => {
   switch (category) {
-    case 'To Respond':
-      return ['Reply within 24 hours', 'Set follow-up reminder', 'Mark as high priority'];
-    case 'Important':
-      return ['Review immediately', 'Add to task list', 'Archive after action'];
-    case 'Marketing':
-      return ['Unsubscribe if unwanted', 'Move to promotions', 'Auto-archive future emails'];
-    case 'Updates':
-      return ['Read when convenient', 'Auto-archive after 7 days', 'Create filter rule'];
-    case 'Promotions':
-      return ['Check if still valid', 'Save coupon codes', 'Unsubscribe if too frequent'];
+    case "To Respond":
+      return [
+        "Reply within 24 hours",
+        "Set follow-up reminder",
+        "Mark as high priority",
+      ];
+    case "Important":
+      return ["Review immediately", "Add to task list", "Archive after action"];
+    case "Marketing":
+      return [
+        "Unsubscribe if unwanted",
+        "Move to promotions",
+        "Auto-archive future emails",
+      ];
+    case "Updates":
+      return [
+        "Read when convenient",
+        "Auto-archive after 7 days",
+        "Create filter rule",
+      ];
+    case "Promotions":
+      return [
+        "Check if still valid",
+        "Save coupon codes",
+        "Unsubscribe if too frequent",
+      ];
     default:
-      return ['Review and categorize', 'Archive if not relevant'];
+      return ["Review and categorize", "Archive if not relevant"];
   }
 };
 
@@ -331,15 +405,19 @@ export const categorizeEmail: RequestHandler = (req, res) => {
   const { sender, subject, content } = req.body;
 
   if (!sender || !subject) {
-    return res.status(400).json({ error: 'Sender and subject are required' });
+    return res.status(400).json({ error: "Sender and subject are required" });
   }
 
   try {
-    const result = categorizeEmailAI({ sender, subject, content: content || '' });
+    const result = categorizeEmailAI({
+      sender,
+      subject,
+      content: content || "",
+    });
     res.json(result);
   } catch (error) {
-    console.error('Categorization error:', error);
-    res.status(500).json({ error: 'Failed to categorize email' });
+    console.error("Categorization error:", error);
+    res.status(500).json({ error: "Failed to categorize email" });
   }
 };
 
@@ -347,22 +425,22 @@ export const bulkCategorizeEmails: RequestHandler = (req, res) => {
   const { emails } = req.body;
 
   if (!Array.isArray(emails)) {
-    return res.status(400).json({ error: 'Emails must be an array' });
+    return res.status(400).json({ error: "Emails must be an array" });
   }
 
   try {
-    const results = emails.map(email => {
+    const results = emails.map((email) => {
       const categorization = categorizeEmailAI(email);
       return {
         id: email.id,
-        ...categorization
+        ...categorization,
       };
     });
 
     res.json({ results, processed: emails.length });
   } catch (error) {
-    console.error('Bulk categorization error:', error);
-    res.status(500).json({ error: 'Failed to categorize emails' });
+    console.error("Bulk categorization error:", error);
+    res.status(500).json({ error: "Failed to categorize emails" });
   }
 };
 
@@ -375,23 +453,23 @@ export const updateCategoryRule: RequestHandler = (req, res) => {
   const updates = req.body;
 
   // In production, this would update the database
-  const ruleIndex = defaultRules.findIndex(rule => rule.id === ruleId);
-  
+  const ruleIndex = defaultRules.findIndex((rule) => rule.id === ruleId);
+
   if (ruleIndex === -1) {
-    return res.status(404).json({ error: 'Rule not found' });
+    return res.status(404).json({ error: "Rule not found" });
   }
 
   defaultRules[ruleIndex] = { ...defaultRules[ruleIndex], ...updates };
-  
-  res.json({ 
-    success: true, 
-    rule: defaultRules[ruleIndex] 
+
+  res.json({
+    success: true,
+    rule: defaultRules[ruleIndex],
   });
 };
 
 export const createCategoryRule: RequestHandler = (req, res) => {
   const ruleData = req.body;
-  
+
   const newRule: CategoryRule = {
     id: `rule-${Date.now()}`,
     type: ruleData.type,
@@ -399,51 +477,51 @@ export const createCategoryRule: RequestHandler = (req, res) => {
     value: ruleData.value,
     category: ruleData.category,
     confidence: ruleData.confidence || 0.8,
-    enabled: true
+    enabled: true,
   };
 
   defaultRules.push(newRule);
 
-  res.json({ 
-    success: true, 
-    rule: newRule 
+  res.json({
+    success: true,
+    rule: newRule,
   });
 };
 
 export const deleteCategoryRule: RequestHandler = (req, res) => {
   const { ruleId } = req.params;
-  
-  const ruleIndex = defaultRules.findIndex(rule => rule.id === ruleId);
-  
+
+  const ruleIndex = defaultRules.findIndex((rule) => rule.id === ruleId);
+
   if (ruleIndex === -1) {
-    return res.status(404).json({ error: 'Rule not found' });
+    return res.status(404).json({ error: "Rule not found" });
   }
 
   defaultRules.splice(ruleIndex, 1);
-  
+
   res.json({ success: true });
 };
 
 // Smart email processing
 export const processEmailBatch: RequestHandler = async (req, res) => {
   const { emails, options = {} } = req.body;
-  
+
   try {
     const processed = emails.map((email: any) => {
       const categorization = categorizeEmailAI(email);
-      
+
       return {
         ...email,
         category: categorization.category,
         categoryColor: getCategoryColor(categorization.category),
         aiConfidence: categorization.confidence,
         aiReason: categorization.reason,
-        suggestedActions: categorization.suggestedActions
+        suggestedActions: categorization.suggestedActions,
       };
     });
 
     // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     res.json({
       success: true,
@@ -451,27 +529,26 @@ export const processEmailBatch: RequestHandler = async (req, res) => {
       emails: processed,
       stats: {
         categorized: processed.length,
-        highConfidence: processed.filter(e => e.aiConfidence > 0.8).length,
-        needsReview: processed.filter(e => e.aiConfidence < 0.7).length
-      }
+        highConfidence: processed.filter((e) => e.aiConfidence > 0.8).length,
+        needsReview: processed.filter((e) => e.aiConfidence < 0.7).length,
+      },
     });
-
   } catch (error) {
-    console.error('Email processing error:', error);
-    res.status(500).json({ error: 'Failed to process emails' });
+    console.error("Email processing error:", error);
+    res.status(500).json({ error: "Failed to process emails" });
   }
 };
 
 const getCategoryColor = (category: string): string => {
   const colorMap: Record<string, string> = {
-    'To Respond': 'bg-red-500',
-    'Awaiting Reply': 'bg-orange-500',
-    'Important': 'bg-yellow-500',
-    'FYI': 'bg-blue-500',
-    'Marketing': 'bg-purple-500',
-    'Promotions': 'bg-green-500',
-    'Updates': 'bg-indigo-500'
+    "To Respond": "bg-red-500",
+    "Awaiting Reply": "bg-orange-500",
+    Important: "bg-yellow-500",
+    FYI: "bg-blue-500",
+    Marketing: "bg-purple-500",
+    Promotions: "bg-green-500",
+    Updates: "bg-indigo-500",
   };
-  
-  return colorMap[category] || 'bg-gray-500';
+
+  return colorMap[category] || "bg-gray-500";
 };

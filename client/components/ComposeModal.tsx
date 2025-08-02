@@ -1,12 +1,27 @@
-import { useState } from 'react';
-import { X, Send, Paperclip, Smile, Bold, Italic, Underline, Link, Zap } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { useState } from "react";
+import {
+  X,
+  Send,
+  Paperclip,
+  Smile,
+  Bold,
+  Italic,
+  Underline,
+  Link,
+  Zap,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 interface ComposeModalProps {
   open: boolean;
@@ -17,51 +32,64 @@ interface ComposeModalProps {
   platformLogo?: string;
 }
 
-export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Email', platformLogo = '📧' }: ComposeModalProps) {
-  const [to, setTo] = useState(replyTo || '');
-  const [cc, setCc] = useState('');
-  const [bcc, setBcc] = useState('');
-  const [emailSubject, setEmailSubject] = useState(subject || '');
-  const [content, setContent] = useState('');
+export function ComposeModal({
+  open,
+  onClose,
+  replyTo,
+  subject,
+  platform = "Email",
+  platformLogo = "📧",
+}: ComposeModalProps) {
+  const [to, setTo] = useState(replyTo || "");
+  const [cc, setCc] = useState("");
+  const [bcc, setBcc] = useState("");
+  const [emailSubject, setEmailSubject] = useState(subject || "");
+  const [content, setContent] = useState("");
   const [showCc, setShowCc] = useState(false);
   const [showBcc, setShowBcc] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
 
-  const isEmailPlatform = ['Email', 'Outlook', 'Gmail'].includes(platform);
-  const isMessagingPlatform = ['WhatsApp', 'Slack', 'Telegram', 'Instagram', 'Facebook'].includes(platform);
+  const isEmailPlatform = ["Email", "Outlook", "Gmail"].includes(platform);
+  const isMessagingPlatform = [
+    "WhatsApp",
+    "Slack",
+    "Telegram",
+    "Instagram",
+    "Facebook",
+  ].includes(platform);
 
   const getPlaceholderText = () => {
     switch (platform) {
-      case 'WhatsApp':
-        return 'Type a message...';
-      case 'Slack':
-        return 'Message #channel or @person...';
-      case 'Telegram':
-        return 'Write a message...';
-      case 'Instagram':
-      case 'Facebook':
-        return 'Write a message...';
+      case "WhatsApp":
+        return "Type a message...";
+      case "Slack":
+        return "Message #channel or @person...";
+      case "Telegram":
+        return "Write a message...";
+      case "Instagram":
+      case "Facebook":
+        return "Write a message...";
       default:
-        return 'Compose your email...';
+        return "Compose your email...";
     }
   };
 
   const getModalTitle = () => {
     if (subject) return `Reply - ${platform}`;
-    return `New ${isEmailPlatform ? 'Email' : 'Message'} - ${platform}`;
+    return `New ${isEmailPlatform ? "Email" : "Message"} - ${platform}`;
   };
 
   const handleSend = async () => {
     try {
-      const response = await fetch('/api/emails/send', {
-        method: 'POST',
+      const response = await fetch("/api/emails/send", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: to.split(',').map(email => email.trim()),
-          cc: cc ? cc.split(',').map(email => email.trim()) : undefined,
-          bcc: bcc ? bcc.split(',').map(email => email.trim()) : undefined,
+          to: to.split(",").map((email) => email.trim()),
+          cc: cc ? cc.split(",").map((email) => email.trim()) : undefined,
+          bcc: bcc ? bcc.split(",").map((email) => email.trim()) : undefined,
           subject: emailSubject,
           content: content,
         }),
@@ -70,27 +98,27 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
       if (response.ok) {
         onClose();
         // Reset form
-        setTo('');
-        setCc('');
-        setBcc('');
-        setEmailSubject('');
-        setContent('');
+        setTo("");
+        setCc("");
+        setBcc("");
+        setEmailSubject("");
+        setContent("");
       }
     } catch (error) {
-      console.error('Failed to send email:', error);
+      console.error("Failed to send email:", error);
     }
   };
 
   const generateAIContent = async () => {
     try {
-      const response = await fetch('/api/ai/suggest', {
-        method: 'POST',
+      const response = await fetch("/api/ai/suggest", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          type: 'reply',
-          context: { to, subject: emailSubject }
+          type: "reply",
+          context: { to, subject: emailSubject },
         }),
       });
 
@@ -99,7 +127,7 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
         setContent(data.suggestion);
       }
     } catch (error) {
-      console.error('Failed to generate AI content:', error);
+      console.error("Failed to generate AI content:", error);
     }
   };
 
@@ -130,7 +158,11 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
                   id="to"
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
-                  placeholder={isEmailPlatform ? "Enter email addresses..." : `Enter ${platform} username or phone...`}
+                  placeholder={
+                    isEmailPlatform
+                      ? "Enter email addresses..."
+                      : `Enter ${platform} username or phone...`
+                  }
                   className="flex-1"
                 />
                 {isEmailPlatform && (
@@ -157,7 +189,10 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
 
               {showCc && (
                 <div className="flex items-center space-x-2">
-                  <Label htmlFor="cc" className="text-sm font-medium min-w-0 w-8">
+                  <Label
+                    htmlFor="cc"
+                    className="text-sm font-medium min-w-0 w-8"
+                  >
                     Cc:
                   </Label>
                   <Input
@@ -172,7 +207,10 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
 
               {showBcc && (
                 <div className="flex items-center space-x-2">
-                  <Label htmlFor="bcc" className="text-sm font-medium min-w-0 w-8">
+                  <Label
+                    htmlFor="bcc"
+                    className="text-sm font-medium min-w-0 w-8"
+                  >
                     Bcc:
                   </Label>
                   <Input
@@ -187,7 +225,10 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
 
               {isEmailPlatform && (
                 <div className="flex items-center space-x-2">
-                  <Label htmlFor="subject" className="text-sm font-medium min-w-0 w-8">
+                  <Label
+                    htmlFor="subject"
+                    className="text-sm font-medium min-w-0 w-8"
+                  >
                     Subject:
                   </Label>
                   <Input
@@ -225,9 +266,9 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
                 <Smile className="w-4 h-4" />
               </Button>
               <Separator orientation="vertical" className="h-6" />
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={generateAIContent}
                 className="text-primary"
               >
@@ -262,7 +303,7 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
                     key={index}
                     variant="secondary"
                     className="cursor-pointer hover:bg-secondary/80"
-                    onClick={() => setContent(content + ' ' + suggestion)}
+                    onClick={() => setContent(content + " " + suggestion)}
                   >
                     {suggestion}
                   </Badge>
@@ -286,9 +327,11 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
                 <Button variant="outline" onClick={onClose}>
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   onClick={handleSend}
-                  disabled={!to || !content || (isEmailPlatform && !emailSubject)}
+                  disabled={
+                    !to || !content || (isEmailPlatform && !emailSubject)
+                  }
                 >
                   <Send className="w-4 h-4 mr-2" />
                   Send

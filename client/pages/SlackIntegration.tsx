@@ -1,16 +1,32 @@
-import { useState, useEffect } from 'react';
-import { MessageSquare, Users, Hash, Settings, Check, ExternalLink, AlertCircle, Zap, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useState, useEffect } from "react";
+import {
+  MessageSquare,
+  Users,
+  Hash,
+  Settings,
+  Check,
+  ExternalLink,
+  AlertCircle,
+  Zap,
+  RefreshCw,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface SlackWorkspace {
   id: string;
@@ -24,7 +40,7 @@ interface SlackWorkspace {
 interface SlackChannel {
   id: string;
   name: string;
-  type: 'channel' | 'dm' | 'group';
+  type: "channel" | "dm" | "group";
   members: number;
   enabled: boolean;
   lastMessage?: string;
@@ -33,30 +49,63 @@ interface SlackChannel {
 
 const mockWorkspaces: SlackWorkspace[] = [
   {
-    id: 'ws-1',
-    name: 'Development Team',
-    domain: 'dev-team.slack.com',
+    id: "ws-1",
+    name: "Development Team",
+    domain: "dev-team.slack.com",
     connected: true,
     members: 24,
     channels: [
-      { id: 'ch-1', name: 'general', type: 'channel', members: 24, enabled: true, lastMessage: '2h ago', unreadCount: 3 },
-      { id: 'ch-2', name: 'random', type: 'channel', members: 18, enabled: false, lastMessage: '1d ago', unreadCount: 0 },
-      { id: 'ch-3', name: 'engineering', type: 'channel', members: 12, enabled: true, lastMessage: '30m ago', unreadCount: 7 },
-      { id: 'ch-4', name: 'design', type: 'channel', members: 8, enabled: true, lastMessage: '4h ago', unreadCount: 2 },
-    ]
+      {
+        id: "ch-1",
+        name: "general",
+        type: "channel",
+        members: 24,
+        enabled: true,
+        lastMessage: "2h ago",
+        unreadCount: 3,
+      },
+      {
+        id: "ch-2",
+        name: "random",
+        type: "channel",
+        members: 18,
+        enabled: false,
+        lastMessage: "1d ago",
+        unreadCount: 0,
+      },
+      {
+        id: "ch-3",
+        name: "engineering",
+        type: "channel",
+        members: 12,
+        enabled: true,
+        lastMessage: "30m ago",
+        unreadCount: 7,
+      },
+      {
+        id: "ch-4",
+        name: "design",
+        type: "channel",
+        members: 8,
+        enabled: true,
+        lastMessage: "4h ago",
+        unreadCount: 2,
+      },
+    ],
   },
   {
-    id: 'ws-2',
-    name: 'Client Projects',
-    domain: 'clients.slack.com',
+    id: "ws-2",
+    name: "Client Projects",
+    domain: "clients.slack.com",
     connected: false,
     members: 15,
-    channels: []
-  }
+    channels: [],
+  },
 ];
 
 export default function SlackIntegration() {
-  const [workspaces, setWorkspaces] = useState<SlackWorkspace[]>(mockWorkspaces);
+  const [workspaces, setWorkspaces] =
+    useState<SlackWorkspace[]>(mockWorkspaces);
   const [loading, setLoading] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
 
@@ -66,30 +115,39 @@ export default function SlackIntegration() {
     setTimeout(() => {
       setLoading(false);
       // In real implementation, this would redirect to Slack OAuth
-      window.open('https://slack.com/oauth/v2/authorize?client_id=YOUR_CLIENT_ID&scope=channels:read,chat:write,users:read', '_blank');
+      window.open(
+        "https://slack.com/oauth/v2/authorize?client_id=YOUR_CLIENT_ID&scope=channels:read,chat:write,users:read",
+        "_blank",
+      );
     }, 1000);
   };
 
-  const handleChannelToggle = (workspaceId: string, channelId: string, enabled: boolean) => {
-    setWorkspaces(prev => prev.map(ws => 
-      ws.id === workspaceId 
-        ? {
-            ...ws,
-            channels: ws.channels.map(ch => 
-              ch.id === channelId ? { ...ch, enabled } : ch
-            )
-          }
-        : ws
-    ));
+  const handleChannelToggle = (
+    workspaceId: string,
+    channelId: string,
+    enabled: boolean,
+  ) => {
+    setWorkspaces((prev) =>
+      prev.map((ws) =>
+        ws.id === workspaceId
+          ? {
+              ...ws,
+              channels: ws.channels.map((ch) =>
+                ch.id === channelId ? { ...ch, enabled } : ch,
+              ),
+            }
+          : ws,
+      ),
+    );
   };
 
   const handleSyncMessages = async (workspaceId: string) => {
     setSyncProgress(0);
     setLoading(true);
-    
+
     // Simulate progressive sync
     const interval = setInterval(() => {
-      setSyncProgress(prev => {
+      setSyncProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
           setLoading(false);
@@ -100,10 +158,20 @@ export default function SlackIntegration() {
     }, 200);
   };
 
-  const connectedWorkspaces = workspaces.filter(ws => ws.connected);
-  const totalChannels = connectedWorkspaces.reduce((acc, ws) => acc + ws.channels.length, 0);
-  const enabledChannels = connectedWorkspaces.reduce((acc, ws) => acc + ws.channels.filter(ch => ch.enabled).length, 0);
-  const totalUnread = connectedWorkspaces.reduce((acc, ws) => acc + ws.channels.reduce((chAcc, ch) => chAcc + ch.unreadCount, 0), 0);
+  const connectedWorkspaces = workspaces.filter((ws) => ws.connected);
+  const totalChannels = connectedWorkspaces.reduce(
+    (acc, ws) => acc + ws.channels.length,
+    0,
+  );
+  const enabledChannels = connectedWorkspaces.reduce(
+    (acc, ws) => acc + ws.channels.filter((ch) => ch.enabled).length,
+    0,
+  );
+  const totalUnread = connectedWorkspaces.reduce(
+    (acc, ws) =>
+      acc + ws.channels.reduce((chAcc, ch) => chAcc + ch.unreadCount, 0),
+    0,
+  );
 
   return (
     <div className="h-screen flex flex-col bg-background">
@@ -123,8 +191,14 @@ export default function SlackIntegration() {
           </div>
           <div className="flex items-center space-x-2">
             {connectedWorkspaces.length > 0 && (
-              <Button variant="outline" onClick={() => handleSyncMessages('all')} disabled={loading}>
-                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <Button
+                variant="outline"
+                onClick={() => handleSyncMessages("all")}
+                disabled={loading}
+              >
+                <RefreshCw
+                  className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
+                />
                 Sync Messages
               </Button>
             )}
@@ -146,8 +220,12 @@ export default function SlackIntegration() {
                   <div className="flex items-center space-x-2">
                     <Users className="w-4 h-4 text-muted-foreground" />
                     <div>
-                      <div className="text-2xl font-bold">{connectedWorkspaces.length}</div>
-                      <p className="text-xs text-muted-foreground">Workspaces</p>
+                      <div className="text-2xl font-bold">
+                        {connectedWorkspaces.length}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Workspaces
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -157,8 +235,12 @@ export default function SlackIntegration() {
                   <div className="flex items-center space-x-2">
                     <Hash className="w-4 h-4 text-muted-foreground" />
                     <div>
-                      <div className="text-2xl font-bold">{enabledChannels}/{totalChannels}</div>
-                      <p className="text-xs text-muted-foreground">Active Channels</p>
+                      <div className="text-2xl font-bold">
+                        {enabledChannels}/{totalChannels}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Active Channels
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -169,7 +251,9 @@ export default function SlackIntegration() {
                     <MessageSquare className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <div className="text-2xl font-bold">{totalUnread}</div>
-                      <p className="text-xs text-muted-foreground">Unread Messages</p>
+                      <p className="text-xs text-muted-foreground">
+                        Unread Messages
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -180,7 +264,9 @@ export default function SlackIntegration() {
                     <Zap className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <div className="text-2xl font-bold">95%</div>
-                      <p className="text-xs text-muted-foreground">Sync Status</p>
+                      <p className="text-xs text-muted-foreground">
+                        Sync Status
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -222,9 +308,12 @@ export default function SlackIntegration() {
                   <CardContent className="pt-6">
                     <div className="text-center py-8">
                       <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No Slack workspaces connected</h3>
+                      <h3 className="text-lg font-semibold mb-2">
+                        No Slack workspaces connected
+                      </h3>
                       <p className="text-muted-foreground mb-4">
-                        Connect your first Slack workspace to start managing messages in FlowMail
+                        Connect your first Slack workspace to start managing
+                        messages in FlowMail
                       </p>
                       <Button onClick={handleConnectWorkspace}>
                         <ExternalLink className="w-4 h-4 mr-2" />
@@ -247,7 +336,10 @@ export default function SlackIntegration() {
                               <CardTitle className="flex items-center space-x-2">
                                 <span>{workspace.name}</span>
                                 {workspace.connected && (
-                                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-green-100 text-green-800"
+                                  >
                                     <Check className="w-3 h-3 mr-1" />
                                     Connected
                                   </Badge>
@@ -265,10 +357,12 @@ export default function SlackIntegration() {
                                   <Settings className="w-4 h-4 mr-2" />
                                   Configure
                                 </Button>
-                                <Button 
-                                  variant="outline" 
+                                <Button
+                                  variant="outline"
                                   size="sm"
-                                  onClick={() => handleSyncMessages(workspace.id)}
+                                  onClick={() =>
+                                    handleSyncMessages(workspace.id)
+                                  }
                                 >
                                   <RefreshCw className="w-4 h-4 mr-2" />
                                   Sync
@@ -287,23 +381,42 @@ export default function SlackIntegration() {
                         <CardContent>
                           <div className="space-y-2">
                             <Label className="text-sm font-medium">
-                              Channels ({workspace.channels.filter(ch => ch.enabled).length}/{workspace.channels.length} active)
+                              Channels (
+                              {
+                                workspace.channels.filter((ch) => ch.enabled)
+                                  .length
+                              }
+                              /{workspace.channels.length} active)
                             </Label>
                             <div className="grid grid-cols-2 gap-2">
                               {workspace.channels.slice(0, 4).map((channel) => (
-                                <div key={channel.id} className="flex items-center justify-between p-2 bg-muted rounded">
+                                <div
+                                  key={channel.id}
+                                  className="flex items-center justify-between p-2 bg-muted rounded"
+                                >
                                   <div className="flex items-center space-x-2">
                                     <Hash className="w-3 h-3" />
-                                    <span className="text-sm">{channel.name}</span>
+                                    <span className="text-sm">
+                                      {channel.name}
+                                    </span>
                                     {channel.unreadCount > 0 && (
-                                      <Badge variant="secondary" className="text-xs">
+                                      <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                      >
                                         {channel.unreadCount}
                                       </Badge>
                                     )}
                                   </div>
-                                  <Switch 
+                                  <Switch
                                     checked={channel.enabled}
-                                    onCheckedChange={(enabled) => handleChannelToggle(workspace.id, channel.id, enabled)}
+                                    onCheckedChange={(enabled) =>
+                                      handleChannelToggle(
+                                        workspace.id,
+                                        channel.id,
+                                        enabled,
+                                      )
+                                    }
                                     size="sm"
                                   />
                                 </div>
@@ -330,7 +443,9 @@ export default function SlackIntegration() {
                   <CardContent className="pt-6">
                     <div className="text-center py-8">
                       <Hash className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No channels available</h3>
+                      <h3 className="text-lg font-semibold mb-2">
+                        No channels available
+                      </h3>
                       <p className="text-muted-foreground">
                         Connect a Slack workspace to manage channels
                       </p>
@@ -351,22 +466,34 @@ export default function SlackIntegration() {
                         <ScrollArea className="h-64">
                           <div className="space-y-2">
                             {workspace.channels.map((channel) => (
-                              <div key={channel.id} className="flex items-center justify-between p-3 border rounded">
+                              <div
+                                key={channel.id}
+                                className="flex items-center justify-between p-3 border rounded"
+                              >
                                 <div className="flex items-center space-x-3">
                                   <Hash className="w-4 h-4" />
                                   <div>
-                                    <div className="font-medium">#{channel.name}</div>
+                                    <div className="font-medium">
+                                      #{channel.name}
+                                    </div>
                                     <div className="text-sm text-muted-foreground">
-                                      {channel.members} members • Last: {channel.lastMessage}
+                                      {channel.members} members • Last:{" "}
+                                      {channel.lastMessage}
                                     </div>
                                   </div>
                                   {channel.unreadCount > 0 && (
                                     <Badge>{channel.unreadCount} unread</Badge>
                                   )}
                                 </div>
-                                <Switch 
+                                <Switch
                                   checked={channel.enabled}
-                                  onCheckedChange={(enabled) => handleChannelToggle(workspace.id, channel.id, enabled)}
+                                  onCheckedChange={(enabled) =>
+                                    handleChannelToggle(
+                                      workspace.id,
+                                      channel.id,
+                                      enabled,
+                                    )
+                                  }
                                 />
                               </div>
                             ))}
@@ -401,7 +528,9 @@ export default function SlackIntegration() {
                   <Separator />
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">Real-time notifications</Label>
+                      <Label className="text-base">
+                        Real-time notifications
+                      </Label>
                       <p className="text-sm text-muted-foreground">
                         Show desktop notifications for new Slack messages
                       </p>

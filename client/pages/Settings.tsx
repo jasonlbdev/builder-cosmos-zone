@@ -1,19 +1,52 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Trash2, Edit, Save, X, Zap, Shield, Bell, User, Palette, Mail, Bot, Filter, Tag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Slider } from '@/components/ui/slider';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import RuleCreationDialog from '@/components/RuleCreationDialog-simple';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Plus,
+  Trash2,
+  Edit,
+  Save,
+  X,
+  Zap,
+  Shield,
+  Bell,
+  User,
+  Palette,
+  Mail,
+  Bot,
+  Filter,
+  Tag,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import RuleCreationDialog from "@/components/RuleCreationDialog-simple";
 
 interface EmailCategory {
   id: string;
@@ -26,8 +59,30 @@ interface EmailCategory {
 
 interface CategoryRule {
   id: string;
-  type: 'sender' | 'subject' | 'content' | 'domain' | 'keywords' | 'toRecipients' | 'ccRecipients' | 'importance' | 'hasAttachments' | 'conversationId' | 'categories' | 'flag' | 'messageClass';
-  condition: 'contains' | 'equals' | 'starts_with' | 'ends_with' | 'regex' | 'is_null' | 'is_not_null' | 'greater_than' | 'less_than';
+  type:
+    | "sender"
+    | "subject"
+    | "content"
+    | "domain"
+    | "keywords"
+    | "toRecipients"
+    | "ccRecipients"
+    | "importance"
+    | "hasAttachments"
+    | "conversationId"
+    | "categories"
+    | "flag"
+    | "messageClass";
+  condition:
+    | "contains"
+    | "equals"
+    | "starts_with"
+    | "ends_with"
+    | "regex"
+    | "is_null"
+    | "is_not_null"
+    | "greater_than"
+    | "less_than";
   value: string;
   enabled: boolean;
   apiField?: string; // Microsoft Graph API field reference
@@ -38,7 +93,7 @@ interface AIRule {
   id: string;
   name: string;
   description: string;
-  action: 'categorize' | 'priority' | 'autoRespond' | 'archive' | 'forward';
+  action: "categorize" | "priority" | "autoRespond" | "archive" | "forward";
   conditions: string[];
   confidence: number;
   enabled: boolean;
@@ -46,310 +101,335 @@ interface AIRule {
 
 const defaultCategories: EmailCategory[] = [
   {
-    id: 'to-respond',
-    name: 'To Respond',
-    color: 'bg-red-500',
-    description: 'Emails requiring immediate response',
+    id: "to-respond",
+    name: "To Respond",
+    color: "bg-red-500",
+    description: "Emails requiring immediate response",
     rules: [
       {
-        id: '1',
-        type: 'toRecipients',
-        condition: 'contains',
-        value: 'your-email@domain.com',
+        id: "1",
+        type: "toRecipients",
+        condition: "contains",
+        value: "your-email@domain.com",
         enabled: true,
-        apiField: 'toRecipients/emailAddress/address',
-        description: 'Emails directly addressed to you (not CC)'
+        apiField: "toRecipients/emailAddress/address",
+        description: "Emails directly addressed to you (not CC)",
       },
       {
-        id: '2',
-        type: 'importance',
-        condition: 'equals',
-        value: 'high',
+        id: "2",
+        type: "importance",
+        condition: "equals",
+        value: "high",
         enabled: true,
-        apiField: 'importance',
-        description: 'Emails marked as high importance'
+        apiField: "importance",
+        description: "Emails marked as high importance",
       },
       {
-        id: '3',
-        type: 'keywords',
-        condition: 'contains',
-        value: 'urgent, ASAP, deadline',
+        id: "3",
+        type: "keywords",
+        condition: "contains",
+        value: "urgent, ASAP, deadline",
         enabled: true,
-        description: 'Keywords indicating urgency'
-      }
+        description: "Keywords indicating urgency",
+      },
     ],
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'awaiting-reply',
-    name: 'Awaiting Reply',
-    color: 'bg-orange-500',
-    description: 'Emails waiting for responses from others',
+    id: "awaiting-reply",
+    name: "Awaiting Reply",
+    color: "bg-orange-500",
+    description: "Emails waiting for responses from others",
     rules: [
       {
-        id: '4',
-        type: 'conversationId',
-        condition: 'is_not_null',
-        value: '',
+        id: "4",
+        type: "conversationId",
+        condition: "is_not_null",
+        value: "",
         enabled: true,
-        apiField: 'conversationId',
-        description: 'Part of an ongoing conversation thread'
+        apiField: "conversationId",
+        description: "Part of an ongoing conversation thread",
       },
       {
-        id: '5',
-        type: 'subject',
-        condition: 'starts_with',
-        value: 'Re:',
+        id: "5",
+        type: "subject",
+        condition: "starts_with",
+        value: "Re:",
         enabled: true,
-        apiField: 'subject',
-        description: 'Reply to a previous email'
-      }
+        apiField: "subject",
+        description: "Reply to a previous email",
+      },
     ],
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'important',
-    name: 'Important',
-    color: 'bg-yellow-500',
-    description: 'High priority emails',
+    id: "important",
+    name: "Important",
+    color: "bg-yellow-500",
+    description: "High priority emails",
     rules: [
       {
-        id: '6',
-        type: 'flag',
-        condition: 'is_not_null',
-        value: '',
+        id: "6",
+        type: "flag",
+        condition: "is_not_null",
+        value: "",
         enabled: true,
-        apiField: 'flag',
-        description: 'Emails with follow-up flags'
+        apiField: "flag",
+        description: "Emails with follow-up flags",
       },
       {
-        id: '7',
-        type: 'sender',
-        condition: 'contains',
-        value: 'ceo@, manager@, director@',
+        id: "7",
+        type: "sender",
+        condition: "contains",
+        value: "ceo@, manager@, director@",
         enabled: true,
-        apiField: 'from/emailAddress/address',
-        description: 'Emails from senior leadership'
-      }
+        apiField: "from/emailAddress/address",
+        description: "Emails from senior leadership",
+      },
     ],
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'fyi',
-    name: 'FYI',
-    color: 'bg-blue-500',
-    description: 'Informational emails for awareness',
+    id: "fyi",
+    name: "FYI",
+    color: "bg-blue-500",
+    description: "Informational emails for awareness",
     rules: [
       {
-        id: '8',
-        type: 'ccRecipients',
-        condition: 'contains',
-        value: 'your-email@domain.com',
+        id: "8",
+        type: "ccRecipients",
+        condition: "contains",
+        value: "your-email@domain.com",
         enabled: true,
-        apiField: 'ccRecipients/emailAddress/address',
-        description: 'Emails where you are CC\'d'
+        apiField: "ccRecipients/emailAddress/address",
+        description: "Emails where you are CC'd",
       },
       {
-        id: '9',
-        type: 'subject',
-        condition: 'starts_with',
-        value: 'FYI:',
+        id: "9",
+        type: "subject",
+        condition: "starts_with",
+        value: "FYI:",
         enabled: true,
-        apiField: 'subject',
-        description: 'Emails marked as FYI'
-      }
+        apiField: "subject",
+        description: "Emails marked as FYI",
+      },
     ],
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'marketing',
-    name: 'Marketing',
-    color: 'bg-purple-500',
-    description: 'Promotional and marketing emails',
+    id: "marketing",
+    name: "Marketing",
+    color: "bg-purple-500",
+    description: "Promotional and marketing emails",
     rules: [
       {
-        id: '10',
-        type: 'messageClass',
-        condition: 'equals',
-        value: 'IPM.Note.Marketing',
+        id: "10",
+        type: "messageClass",
+        condition: "equals",
+        value: "IPM.Note.Marketing",
         enabled: true,
-        apiField: 'messageClass',
-        description: 'Emails classified as marketing'
+        apiField: "messageClass",
+        description: "Emails classified as marketing",
       },
       {
-        id: '11',
-        type: 'keywords',
-        condition: 'contains',
-        value: 'unsubscribe, newsletter, promotion',
+        id: "11",
+        type: "keywords",
+        condition: "contains",
+        value: "unsubscribe, newsletter, promotion",
         enabled: true,
-        description: 'Marketing-related keywords'
-      }
+        description: "Marketing-related keywords",
+      },
     ],
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'updates',
-    name: 'Updates',
-    color: 'bg-indigo-500',
-    description: 'Product updates and notifications',
+    id: "updates",
+    name: "Updates",
+    color: "bg-indigo-500",
+    description: "Product updates and notifications",
     rules: [
       {
-        id: '12',
-        type: 'sender',
-        condition: 'contains',
-        value: 'notifications@, noreply@, no-reply@',
+        id: "12",
+        type: "sender",
+        condition: "contains",
+        value: "notifications@, noreply@, no-reply@",
         enabled: true,
-        apiField: 'from/emailAddress/address',
-        description: 'Automated notification emails'
+        apiField: "from/emailAddress/address",
+        description: "Automated notification emails",
       },
       {
-        id: '13',
-        type: 'hasAttachments',
-        condition: 'equals',
-        value: 'false',
+        id: "13",
+        type: "hasAttachments",
+        condition: "equals",
+        value: "false",
         enabled: true,
-        apiField: 'hasAttachments',
-        description: 'Notification emails typically have no attachments'
-      }
+        apiField: "hasAttachments",
+        description: "Notification emails typically have no attachments",
+      },
     ],
-    enabled: true
-  }
+    enabled: true,
+  },
 ];
 
 const defaultAIRules: AIRule[] = [
   {
-    id: 'ai-1',
-    name: 'Auto-categorize newsletters',
-    description: 'Automatically categorize newsletter emails as Marketing',
-    action: 'categorize',
-    conditions: ['Contains unsubscribe link', 'From marketing domain', 'Weekly/Monthly frequency'],
+    id: "ai-1",
+    name: "Auto-categorize newsletters",
+    description: "Automatically categorize newsletter emails as Marketing",
+    action: "categorize",
+    conditions: [
+      "Contains unsubscribe link",
+      "From marketing domain",
+      "Weekly/Monthly frequency",
+    ],
     confidence: 0.85,
-    enabled: true
+    enabled: true,
   },
   {
-    id: 'ai-2',
-    name: 'Priority urgent emails',
-    description: 'Mark emails with urgent keywords as high priority',
-    action: 'priority',
-    conditions: ['Contains urgent keywords', 'From internal domain', 'Short response time expected'],
-    confidence: 0.90,
-    enabled: true
+    id: "ai-2",
+    name: "Priority urgent emails",
+    description: "Mark emails with urgent keywords as high priority",
+    action: "priority",
+    conditions: [
+      "Contains urgent keywords",
+      "From internal domain",
+      "Short response time expected",
+    ],
+    confidence: 0.9,
+    enabled: true,
   },
   {
-    id: 'ai-3',
-    name: 'Auto-archive notifications',
-    description: 'Automatically archive system notifications after 7 days',
-    action: 'archive',
-    conditions: ['From no-reply address', 'System notification type', 'Older than 7 days'],
+    id: "ai-3",
+    name: "Auto-archive notifications",
+    description: "Automatically archive system notifications after 7 days",
+    action: "archive",
+    conditions: [
+      "From no-reply address",
+      "System notification type",
+      "Older than 7 days",
+    ],
     confidence: 0.95,
-    enabled: false
-  }
+    enabled: false,
+  },
 ];
 
 export default function Settings() {
-  const [categories, setCategories] = useState<EmailCategory[]>(defaultCategories);
+  const [categories, setCategories] =
+    useState<EmailCategory[]>(defaultCategories);
   const [aiRules, setAiRules] = useState<AIRule[]>(defaultAIRules);
   const [newCategoryDialog, setNewCategoryDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [newRuleDialog, setNewRuleDialog] = useState(false);
-  const [selectedCategoryForRule, setSelectedCategoryForRule] = useState<string | null>(null);
+  const [selectedCategoryForRule, setSelectedCategoryForRule] = useState<
+    string | null
+  >(null);
 
   // User Settings State
   const [userSettings, setUserSettings] = useState({
-    theme: 'light',
+    theme: "light",
     emailsPerPage: 50,
     autoMarkAsRead: true,
     keyboardShortcuts: true,
     notifications: {
       desktop: true,
       email: false,
-      sound: true
+      sound: true,
     },
     aiSettings: {
       autoSuggest: true,
       autoCategory: true,
-      confidence: 0.8
-    }
+      confidence: 0.8,
+    },
   });
 
-  const handleCategoryUpdate = async (categoryId: string, updates: Partial<EmailCategory>) => {
+  const handleCategoryUpdate = async (
+    categoryId: string,
+    updates: Partial<EmailCategory>,
+  ) => {
     try {
       const response = await fetch(`/api/ai/rules/${categoryId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
       });
 
       if (response.ok) {
-        setCategories(prev => prev.map(cat =>
-          cat.id === categoryId ? { ...cat, ...updates } : cat
-        ));
+        setCategories((prev) =>
+          prev.map((cat) =>
+            cat.id === categoryId ? { ...cat, ...updates } : cat,
+          ),
+        );
       }
     } catch (error) {
-      console.error('Failed to update category:', error);
+      console.error("Failed to update category:", error);
     }
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
     try {
       const response = await fetch(`/api/ai/rules/${categoryId}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
 
       if (response.ok) {
-        setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+        setCategories((prev) => prev.filter((cat) => cat.id !== categoryId));
       }
     } catch (error) {
-      console.error('Failed to delete category:', error);
+      console.error("Failed to delete category:", error);
     }
   };
 
   const handleCreateCategory = async (categoryData: Partial<EmailCategory>) => {
     try {
-      const response = await fetch('/api/ai/rules', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(categoryData)
+      const response = await fetch("/api/ai/rules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(categoryData),
       });
 
       if (response.ok) {
         const newCategory = await response.json();
-        setCategories(prev => [...prev, newCategory.rule]);
+        setCategories((prev) => [...prev, newCategory.rule]);
         setNewCategoryDialog(false);
       }
     } catch (error) {
-      console.error('Failed to create category:', error);
+      console.error("Failed to create category:", error);
     }
   };
 
-  const handleAddRule = async (categoryId: string, ruleData: Partial<CategoryRule>) => {
+  const handleAddRule = async (
+    categoryId: string,
+    ruleData: Partial<CategoryRule>,
+  ) => {
     try {
-      const response = await fetch('/api/ai/rules', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/ai/rules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...ruleData,
-          category: categoryId
-        })
+          category: categoryId,
+        }),
       });
 
       if (response.ok) {
         const newRule = await response.json();
-        setCategories(prev => prev.map(cat =>
-          cat.id === categoryId
-            ? { ...cat, rules: [...cat.rules, newRule.rule] }
-            : cat
-        ));
+        setCategories((prev) =>
+          prev.map((cat) =>
+            cat.id === categoryId
+              ? { ...cat, rules: [...cat.rules, newRule.rule] }
+              : cat,
+          ),
+        );
       }
     } catch (error) {
-      console.error('Failed to add rule:', error);
+      console.error("Failed to add rule:", error);
     }
   };
 
   const handleAIRuleToggle = (ruleId: string, enabled: boolean) => {
-    setAiRules(prev => prev.map(rule => 
-      rule.id === ruleId ? { ...rule, enabled } : rule
-    ));
+    setAiRules((prev) =>
+      prev.map((rule) => (rule.id === ruleId ? { ...rule, enabled } : rule)),
+    );
   };
 
   return (
@@ -406,42 +486,55 @@ export default function Settings() {
                 <CardHeader>
                   <CardTitle>Email Provider Integration</CardTitle>
                   <CardDescription>
-                    Configure how Dexter analyzes emails using Microsoft Graph API and Gmail API
+                    Configure how Dexter analyzes emails using Microsoft Graph
+                    API and Gmail API
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">Use Microsoft Graph API metadata</Label>
+                      <Label className="text-base">
+                        Use Microsoft Graph API metadata
+                      </Label>
                       <p className="text-sm text-muted-foreground">
-                        Analyze Outlook emails using Graph API metadata (To/CC recipients, conversation threads, importance flags)
+                        Analyze Outlook emails using Graph API metadata (To/CC
+                        recipients, conversation threads, importance flags)
                       </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">Use Gmail API metadata</Label>
+                      <Label className="text-base">
+                        Use Gmail API metadata
+                      </Label>
                       <p className="text-sm text-muted-foreground">
-                        Analyze Gmail emails using Gmail API metadata (labels, thread tracking, message references)
+                        Analyze Gmail emails using Gmail API metadata (labels,
+                        thread tracking, message references)
                       </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">Conversation thread analysis</Label>
+                      <Label className="text-base">
+                        Conversation thread analysis
+                      </Label>
                       <p className="text-sm text-muted-foreground">
-                        Track email conversations to determine "Awaiting Reply" status based on thread history
+                        Track email conversations to determine "Awaiting Reply"
+                        status based on thread history
                       </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">Recipient analysis priority</Label>
+                      <Label className="text-base">
+                        Recipient analysis priority
+                      </Label>
                       <p className="text-sm text-muted-foreground">
-                        Prioritize emails sent directly to you (To field) over CC'd emails
+                        Prioritize emails sent directly to you (To field) over
+                        CC'd emails
                       </p>
                     </div>
                     <Switch defaultChecked />
@@ -452,9 +545,15 @@ export default function Settings() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold">Email Categories</h3>
-                  <p className="text-muted-foreground">Categories are determined by email metadata first, then keyword analysis as fallback</p>
+                  <p className="text-muted-foreground">
+                    Categories are determined by email metadata first, then
+                    keyword analysis as fallback
+                  </p>
                 </div>
-                <Dialog open={newCategoryDialog} onOpenChange={setNewCategoryDialog}>
+                <Dialog
+                  open={newCategoryDialog}
+                  onOpenChange={setNewCategoryDialog}
+                >
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="w-4 h-4 mr-2" />
@@ -471,8 +570,13 @@ export default function Settings() {
                         <Input id="category-name" placeholder="e.g., Travel" />
                       </div>
                       <div>
-                        <Label htmlFor="category-description">Description</Label>
-                        <Textarea id="category-description" placeholder="Brief description of this category" />
+                        <Label htmlFor="category-description">
+                          Description
+                        </Label>
+                        <Textarea
+                          id="category-description"
+                          placeholder="Brief description of this category"
+                        />
                       </div>
                       <div>
                         <Label htmlFor="category-color">Color</Label>
@@ -492,17 +596,30 @@ export default function Settings() {
                       <div className="flex space-x-2">
                         <Button
                           className="flex-1"
-                          onClick={() => handleCreateCategory({
-                            name: (document.getElementById('category-name') as HTMLInputElement)?.value,
-                            description: (document.getElementById('category-description') as HTMLTextAreaElement)?.value,
-                            color: 'bg-blue-500',
-                            rules: [],
-                            enabled: true
-                          })}
+                          onClick={() =>
+                            handleCreateCategory({
+                              name: (
+                                document.getElementById(
+                                  "category-name",
+                                ) as HTMLInputElement
+                              )?.value,
+                              description: (
+                                document.getElementById(
+                                  "category-description",
+                                ) as HTMLTextAreaElement
+                              )?.value,
+                              color: "bg-blue-500",
+                              rules: [],
+                              enabled: true,
+                            })
+                          }
                         >
                           Create Category
                         </Button>
-                        <Button variant="outline" onClick={() => setNewCategoryDialog(false)}>
+                        <Button
+                          variant="outline"
+                          onClick={() => setNewCategoryDialog(false)}
+                        >
                           Cancel
                         </Button>
                       </div>
@@ -517,22 +634,30 @@ export default function Settings() {
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                          <div className={`w-4 h-4 rounded ${category.color}`} />
+                          <div
+                            className={`w-4 h-4 rounded ${category.color}`}
+                          />
                           <div>
-                            <CardTitle className="text-base">{category.name}</CardTitle>
-                            <CardDescription>{category.description}</CardDescription>
+                            <CardTitle className="text-base">
+                              {category.name}
+                            </CardTitle>
+                            <CardDescription>
+                              {category.description}
+                            </CardDescription>
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Switch 
+                          <Switch
                             checked={category.enabled}
-                            onCheckedChange={(enabled) => handleCategoryUpdate(category.id, { enabled })}
+                            onCheckedChange={(enabled) =>
+                              handleCategoryUpdate(category.id, { enabled })
+                            }
                           />
                           <Button variant="ghost" size="sm">
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteCategory(category.id)}
                           >
@@ -543,9 +668,14 @@ export default function Settings() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <h4 className="text-sm font-medium">Categorization Rules</h4>
+                        <h4 className="text-sm font-medium">
+                          Categorization Rules
+                        </h4>
                         {category.rules.map((rule) => (
-                          <div key={rule.id} className="flex items-center justify-between p-3 bg-muted rounded-md">
+                          <div
+                            key={rule.id}
+                            className="flex items-center justify-between p-3 bg-muted rounded-md"
+                          >
                             <div className="flex items-center space-x-2">
                               <Badge variant="outline">{rule.type}</Badge>
                               <span className="text-sm">{rule.condition}</span>
@@ -578,28 +708,37 @@ export default function Settings() {
             <TabsContent value="ai-rules" className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold">AI Automation Rules</h3>
-                <p className="text-muted-foreground">Configure intelligent email processing and automation</p>
+                <p className="text-muted-foreground">
+                  Configure intelligent email processing and automation
+                </p>
               </div>
 
               <Card>
                 <CardHeader>
                   <CardTitle>AI Configuration</CardTitle>
-                  <CardDescription>Global AI settings for email processing</CardDescription>
+                  <CardDescription>
+                    Global AI settings for email processing
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">Enable AI Categorization</Label>
+                      <Label className="text-base">
+                        Enable AI Categorization
+                      </Label>
                       <p className="text-sm text-muted-foreground">
                         Automatically categorize emails using AI
                       </p>
                     </div>
-                    <Switch 
+                    <Switch
                       checked={userSettings.aiSettings.autoCategory}
-                      onCheckedChange={(checked) => 
-                        setUserSettings(prev => ({
+                      onCheckedChange={(checked) =>
+                        setUserSettings((prev) => ({
                           ...prev,
-                          aiSettings: { ...prev.aiSettings, autoCategory: checked }
+                          aiSettings: {
+                            ...prev.aiSettings,
+                            autoCategory: checked,
+                          },
                         }))
                       }
                     />
@@ -611,24 +750,30 @@ export default function Settings() {
                         Show AI-powered response suggestions
                       </p>
                     </div>
-                    <Switch 
+                    <Switch
                       checked={userSettings.aiSettings.autoSuggest}
-                      onCheckedChange={(checked) => 
-                        setUserSettings(prev => ({
+                      onCheckedChange={(checked) =>
+                        setUserSettings((prev) => ({
                           ...prev,
-                          aiSettings: { ...prev.aiSettings, autoSuggest: checked }
+                          aiSettings: {
+                            ...prev.aiSettings,
+                            autoSuggest: checked,
+                          },
                         }))
                       }
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>AI Confidence Threshold: {Math.round(userSettings.aiSettings.confidence * 100)}%</Label>
+                    <Label>
+                      AI Confidence Threshold:{" "}
+                      {Math.round(userSettings.aiSettings.confidence * 100)}%
+                    </Label>
                     <Slider
                       value={[userSettings.aiSettings.confidence]}
-                      onValueChange={([value]) => 
-                        setUserSettings(prev => ({
+                      onValueChange={([value]) =>
+                        setUserSettings((prev) => ({
                           ...prev,
-                          aiSettings: { ...prev.aiSettings, confidence: value }
+                          aiSettings: { ...prev.aiSettings, confidence: value },
                         }))
                       }
                       max={1}
@@ -656,12 +801,16 @@ export default function Settings() {
                           <CardDescription>{rule.description}</CardDescription>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Badge variant={rule.enabled ? "default" : "secondary"}>
+                          <Badge
+                            variant={rule.enabled ? "default" : "secondary"}
+                          >
                             {rule.enabled ? "Active" : "Disabled"}
                           </Badge>
-                          <Switch 
+                          <Switch
                             checked={rule.enabled}
-                            onCheckedChange={(enabled) => handleAIRuleToggle(rule.id, enabled)}
+                            onCheckedChange={(enabled) =>
+                              handleAIRuleToggle(rule.id, enabled)
+                            }
                           />
                         </div>
                       </div>
@@ -669,7 +818,9 @@ export default function Settings() {
                     <CardContent>
                       <div className="space-y-3">
                         <div>
-                          <Label className="text-sm font-medium">Action: {rule.action}</Label>
+                          <Label className="text-sm font-medium">
+                            Action: {rule.action}
+                          </Label>
                           <div className="mt-1">
                             <Badge variant="outline">
                               Confidence: {Math.round(rule.confidence * 100)}%
@@ -677,10 +828,15 @@ export default function Settings() {
                           </div>
                         </div>
                         <div>
-                          <Label className="text-sm font-medium">Conditions:</Label>
+                          <Label className="text-sm font-medium">
+                            Conditions:
+                          </Label>
                           <div className="mt-1 space-y-1">
                             {rule.conditions.map((condition, index) => (
-                              <div key={index} className="text-sm text-muted-foreground">
+                              <div
+                                key={index}
+                                className="text-sm text-muted-foreground"
+                              >
                                 • {condition}
                               </div>
                             ))}
@@ -696,15 +852,20 @@ export default function Settings() {
             {/* Integrations Tab */}
             <TabsContent value="integrations" className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold">Integration Management</h3>
-                <p className="text-muted-foreground">Manage your connected accounts and sync settings</p>
+                <h3 className="text-lg font-semibold">
+                  Integration Management
+                </h3>
+                <p className="text-muted-foreground">
+                  Manage your connected accounts and sync settings
+                </p>
               </div>
 
               <Card>
                 <CardHeader>
                   <CardTitle>Connected Integrations</CardTitle>
                   <CardDescription>
-                    View and manage your connected email and communication platforms
+                    View and manage your connected email and communication
+                    platforms
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -717,7 +878,9 @@ export default function Settings() {
                         </div>
                         <div>
                           <h4 className="font-medium">Microsoft Outlook</h4>
-                          <p className="text-sm text-muted-foreground">user@company.com</p>
+                          <p className="text-sm text-muted-foreground">
+                            user@company.com
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -733,7 +896,9 @@ export default function Settings() {
                         </div>
                         <div>
                           <h4 className="font-medium">Gmail</h4>
-                          <p className="text-sm text-muted-foreground">user@gmail.com</p>
+                          <p className="text-sm text-muted-foreground">
+                            user@gmail.com
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -749,7 +914,9 @@ export default function Settings() {
                         </div>
                         <div>
                           <h4 className="font-medium">Slack</h4>
-                          <p className="text-sm text-muted-foreground">Development Team</p>
+                          <p className="text-sm text-muted-foreground">
+                            Development Team
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -765,7 +932,9 @@ export default function Settings() {
                         </div>
                         <div>
                           <h4 className="font-medium">WhatsApp Business</h4>
-                          <p className="text-sm text-muted-foreground">Not connected</p>
+                          <p className="text-sm text-muted-foreground">
+                            Not connected
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -802,9 +971,12 @@ export default function Settings() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">Auto-sync emails every 5 minutes</Label>
+                      <Label className="text-base">
+                        Auto-sync emails every 5 minutes
+                      </Label>
                       <p className="text-sm text-muted-foreground">
-                        Automatically fetch new emails from all connected accounts
+                        Automatically fetch new emails from all connected
+                        accounts
                       </p>
                     </div>
                     <Switch defaultChecked />
@@ -820,7 +992,9 @@ export default function Settings() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">Cross-platform categorization</Label>
+                      <Label className="text-base">
+                        Cross-platform categorization
+                      </Label>
                       <p className="text-sm text-muted-foreground">
                         Apply email categories to messages from all platforms
                       </p>
@@ -854,9 +1028,12 @@ export default function Settings() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">Store message content locally</Label>
+                      <Label className="text-base">
+                        Store message content locally
+                      </Label>
                       <p className="text-sm text-muted-foreground">
-                        Cache message content for faster search and offline access
+                        Cache message content for faster search and offline
+                        access
                       </p>
                     </div>
                     <Switch defaultChecked />
@@ -920,9 +1097,14 @@ export default function Settings() {
                     </Button>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    <p>If you're experiencing issues with any integration, try these troubleshooting steps:</p>
+                    <p>
+                      If you're experiencing issues with any integration, try
+                      these troubleshooting steps:
+                    </p>
                     <ul className="list-disc list-inside mt-2 space-y-1">
-                      <li>Test connections to verify all platforms are responding</li>
+                      <li>
+                        Test connections to verify all platforms are responding
+                      </li>
                       <li>Refresh authentication tokens if sync is failing</li>
                       <li>Check that all required permissions are granted</li>
                       <li>Reset configuration to default settings if needed</li>
@@ -936,7 +1118,9 @@ export default function Settings() {
             <TabsContent value="notifications" className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold">Notification Settings</h3>
-                <p className="text-muted-foreground">Control how and when you receive notifications</p>
+                <p className="text-muted-foreground">
+                  Control how and when you receive notifications
+                </p>
               </div>
 
               <Card>
@@ -946,36 +1130,45 @@ export default function Settings() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <Label>Enable desktop notifications</Label>
-                    <Switch 
+                    <Switch
                       checked={userSettings.notifications.desktop}
-                      onCheckedChange={(checked) => 
-                        setUserSettings(prev => ({
+                      onCheckedChange={(checked) =>
+                        setUserSettings((prev) => ({
                           ...prev,
-                          notifications: { ...prev.notifications, desktop: checked }
+                          notifications: {
+                            ...prev.notifications,
+                            desktop: checked,
+                          },
                         }))
                       }
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <Label>Email notifications</Label>
-                    <Switch 
+                    <Switch
                       checked={userSettings.notifications.email}
-                      onCheckedChange={(checked) => 
-                        setUserSettings(prev => ({
+                      onCheckedChange={(checked) =>
+                        setUserSettings((prev) => ({
                           ...prev,
-                          notifications: { ...prev.notifications, email: checked }
+                          notifications: {
+                            ...prev.notifications,
+                            email: checked,
+                          },
                         }))
                       }
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <Label>Sound notifications</Label>
-                    <Switch 
+                    <Switch
                       checked={userSettings.notifications.sound}
-                      onCheckedChange={(checked) => 
-                        setUserSettings(prev => ({
+                      onCheckedChange={(checked) =>
+                        setUserSettings((prev) => ({
                           ...prev,
-                          notifications: { ...prev.notifications, sound: checked }
+                          notifications: {
+                            ...prev.notifications,
+                            sound: checked,
+                          },
                         }))
                       }
                     />
@@ -988,7 +1181,9 @@ export default function Settings() {
             <TabsContent value="general" className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold">General Settings</h3>
-                <p className="text-muted-foreground">Basic application preferences</p>
+                <p className="text-muted-foreground">
+                  Basic application preferences
+                </p>
               </div>
 
               <Card>
@@ -998,9 +1193,12 @@ export default function Settings() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>Theme</Label>
-                    <Select value={userSettings.theme} onValueChange={(value) => 
-                      setUserSettings(prev => ({ ...prev, theme: value }))
-                    }>
+                    <Select
+                      value={userSettings.theme}
+                      onValueChange={(value) =>
+                        setUserSettings((prev) => ({ ...prev, theme: value }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -1013,9 +1211,15 @@ export default function Settings() {
                   </div>
                   <div className="space-y-2">
                     <Label>Emails per page</Label>
-                    <Select value={userSettings.emailsPerPage.toString()} onValueChange={(value) => 
-                      setUserSettings(prev => ({ ...prev, emailsPerPage: parseInt(value) }))
-                    }>
+                    <Select
+                      value={userSettings.emailsPerPage.toString()}
+                      onValueChange={(value) =>
+                        setUserSettings((prev) => ({
+                          ...prev,
+                          emailsPerPage: parseInt(value),
+                        }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -1029,19 +1233,25 @@ export default function Settings() {
                   </div>
                   <div className="flex items-center justify-between">
                     <Label>Auto-mark as read</Label>
-                    <Switch 
+                    <Switch
                       checked={userSettings.autoMarkAsRead}
-                      onCheckedChange={(checked) => 
-                        setUserSettings(prev => ({ ...prev, autoMarkAsRead: checked }))
+                      onCheckedChange={(checked) =>
+                        setUserSettings((prev) => ({
+                          ...prev,
+                          autoMarkAsRead: checked,
+                        }))
                       }
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <Label>Keyboard shortcuts</Label>
-                    <Switch 
+                    <Switch
                       checked={userSettings.keyboardShortcuts}
-                      onCheckedChange={(checked) => 
-                        setUserSettings(prev => ({ ...prev, keyboardShortcuts: checked }))
+                      onCheckedChange={(checked) =>
+                        setUserSettings((prev) => ({
+                          ...prev,
+                          keyboardShortcuts: checked,
+                        }))
                       }
                     />
                   </div>
@@ -1054,7 +1264,9 @@ export default function Settings() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold">Email Filters</h3>
-                  <p className="text-muted-foreground">Create custom rules to automatically process emails</p>
+                  <p className="text-muted-foreground">
+                    Create custom rules to automatically process emails
+                  </p>
                 </div>
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
@@ -1066,9 +1278,12 @@ export default function Settings() {
                 <CardContent className="pt-6">
                   <div className="text-center py-8">
                     <Filter className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No custom filters created</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      No custom filters created
+                    </h3>
                     <p className="text-muted-foreground mb-4">
-                      Create filters to automatically organize, forward, or delete emails based on specific criteria
+                      Create filters to automatically organize, forward, or
+                      delete emails based on specific criteria
                     </p>
                     <Button>Create Your First Filter</Button>
                   </div>

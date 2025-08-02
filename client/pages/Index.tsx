@@ -1,255 +1,373 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, Settings, Plus, Archive, Trash2, Star, Reply, Forward, MoreHorizontal, Inbox, Send, CheckCircle, Clock, AlertCircle, Users, MessageSquare, Zap, PenTool, Mail, Bot, ChevronDown, ChevronRight, Calendar, CheckSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import ComposeModal from '@/components/ComposeModal';
-import DexterAI from '@/components/DexterAI';
-import MessageView from '@/components/MessageView';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Search,
+  Settings,
+  Plus,
+  Archive,
+  Trash2,
+  Star,
+  Reply,
+  Forward,
+  MoreHorizontal,
+  Inbox,
+  Send,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Users,
+  MessageSquare,
+  Zap,
+  PenTool,
+  Mail,
+  Bot,
+  ChevronDown,
+  ChevronRight,
+  Calendar,
+  CheckSquare,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import ComposeModal from "@/components/ComposeModal";
+import DexterAI from "@/components/DexterAI";
+import MessageView from "@/components/MessageView";
+import { cn } from "@/lib/utils";
 
 const sidebarItems = [
-  { icon: Inbox, label: 'Inbox', count: 23, active: true },
-  { icon: Send, label: 'Sent', count: 156 },
-  { icon: CheckCircle, label: 'To Respond', count: 3 },
-  { icon: Clock, label: 'Awaiting Reply', count: 5 },
-  { icon: AlertCircle, label: 'Important', count: 8 },
-  { icon: Star, label: 'Starred', count: 12 },
-  { icon: Users, label: 'FYI', count: 4 },
-  { icon: MessageSquare, label: 'Marketing', count: 7 },
-  { icon: Zap, label: 'Promotions', count: 9 },
-  { icon: Settings, label: 'Updates', count: 6 },
-  { icon: Archive, label: 'Archive', count: 234 },
-  { icon: Trash2, label: 'Trash', count: 12 },
+  { icon: Inbox, label: "Inbox", count: 23, active: true },
+  { icon: Send, label: "Sent", count: 156 },
+  { icon: CheckCircle, label: "To Respond", count: 3 },
+  { icon: Clock, label: "Awaiting Reply", count: 5 },
+  { icon: AlertCircle, label: "Important", count: 8 },
+  { icon: Star, label: "Starred", count: 12 },
+  { icon: Users, label: "FYI", count: 4 },
+  { icon: MessageSquare, label: "Marketing", count: 7 },
+  { icon: Zap, label: "Promotions", count: 9 },
+  { icon: Settings, label: "Updates", count: 6 },
+  { icon: Archive, label: "Archive", count: 234 },
+  { icon: Trash2, label: "Trash", count: 12 },
 ];
 
 const integrations = {
   communication: {
-    label: 'Communication',
+    label: "Communication",
     icon: MessageSquare,
     isOpen: true,
     platforms: [
-      { icon: Mail, label: 'Outlook', color: 'bg-blue-700', logo: '📧', status: 'healthy', connected: true },
-      { icon: Mail, label: 'Gmail', color: 'bg-red-500', logo: '✉️', status: 'healthy', connected: true },
-      { icon: MessageSquare, label: 'Slack', color: 'bg-purple-500', logo: '💼', status: 'warning', connected: true },
-      { icon: MessageSquare, label: 'WhatsApp', color: 'bg-green-500', logo: '💬', status: 'disconnected', connected: false },
-      { icon: Send, label: 'Telegram', color: 'bg-blue-500', logo: '📨', status: 'disconnected', connected: false },
-      { icon: Users, label: 'Instagram', color: 'bg-pink-500', logo: '📷', status: 'disconnected', connected: false },
-      { icon: MessageSquare, label: 'Facebook', color: 'bg-blue-600', logo: '👥', status: 'disconnected', connected: false },
-    ]
+      {
+        icon: Mail,
+        label: "Outlook",
+        color: "bg-blue-700",
+        logo: "📧",
+        status: "healthy",
+        connected: true,
+      },
+      {
+        icon: Mail,
+        label: "Gmail",
+        color: "bg-red-500",
+        logo: "✉️",
+        status: "healthy",
+        connected: true,
+      },
+      {
+        icon: MessageSquare,
+        label: "Slack",
+        color: "bg-purple-500",
+        logo: "💼",
+        status: "warning",
+        connected: true,
+      },
+      {
+        icon: MessageSquare,
+        label: "WhatsApp",
+        color: "bg-green-500",
+        logo: "💬",
+        status: "disconnected",
+        connected: false,
+      },
+      {
+        icon: Send,
+        label: "Telegram",
+        color: "bg-blue-500",
+        logo: "📨",
+        status: "disconnected",
+        connected: false,
+      },
+      {
+        icon: Users,
+        label: "Instagram",
+        color: "bg-pink-500",
+        logo: "📷",
+        status: "disconnected",
+        connected: false,
+      },
+      {
+        icon: MessageSquare,
+        label: "Facebook",
+        color: "bg-blue-600",
+        logo: "👥",
+        status: "disconnected",
+        connected: false,
+      },
+    ],
   },
   fileStorage: {
-    label: 'File Storage',
+    label: "File Storage",
     icon: Users,
     isOpen: false,
     platforms: [
-      { icon: Users, label: 'OneDrive', color: 'bg-blue-600', logo: '☁️', status: 'disconnected', connected: false },
-      { icon: Users, label: 'Google Drive', color: 'bg-green-600', logo: '📁', status: 'disconnected', connected: false },
-      { icon: Users, label: 'SharePoint', color: 'bg-indigo-600', logo: '🗃️', status: 'disconnected', connected: false },
-      { icon: Users, label: 'Dropbox', color: 'bg-blue-500', logo: '📦', status: 'disconnected', connected: false },
-    ]
-  }
+      {
+        icon: Users,
+        label: "OneDrive",
+        color: "bg-blue-600",
+        logo: "☁️",
+        status: "disconnected",
+        connected: false,
+      },
+      {
+        icon: Users,
+        label: "Google Drive",
+        color: "bg-green-600",
+        logo: "📁",
+        status: "disconnected",
+        connected: false,
+      },
+      {
+        icon: Users,
+        label: "SharePoint",
+        color: "bg-indigo-600",
+        logo: "🗃️",
+        status: "disconnected",
+        connected: false,
+      },
+      {
+        icon: Users,
+        label: "Dropbox",
+        color: "bg-blue-500",
+        logo: "📦",
+        status: "disconnected",
+        connected: false,
+      },
+    ],
+  },
 };
 
 const emailsData = [
   {
     id: 1,
-    sender: 'Sarah Johnson',
-    email: 'sarah@company.com',
-    subject: 'Q4 Budget Review Meeting',
-    preview: 'Hi team, I wanted to schedule a review meeting for our Q4 budget planning. Can we...',
-    time: '2m ago',
+    sender: "Sarah Johnson",
+    email: "sarah@company.com",
+    subject: "Q4 Budget Review Meeting",
+    preview:
+      "Hi team, I wanted to schedule a review meeting for our Q4 budget planning. Can we...",
+    time: "2m ago",
     unread: true,
     important: true,
-    category: 'To Respond',
-    categoryColor: 'bg-red-500',
-    avatar: 'SJ',
-    platform: 'Outlook',
-    platformLogo: '📧',
-    platformColor: 'bg-blue-700'
+    category: "To Respond",
+    categoryColor: "bg-red-500",
+    avatar: "SJ",
+    platform: "Outlook",
+    platformLogo: "📧",
+    platformColor: "bg-blue-700",
   },
   {
     id: 2,
-    sender: 'Marcus Chen',
-    email: 'marcus@designco.com',
-    subject: 'New Design System Updates',
-    preview: 'The latest updates to our design system are now available. Please review the new...',
-    time: '15m ago',
+    sender: "Marcus Chen",
+    email: "marcus@designco.com",
+    subject: "New Design System Updates",
+    preview:
+      "The latest updates to our design system are now available. Please review the new...",
+    time: "15m ago",
     unread: true,
     important: false,
-    category: 'FYI',
-    categoryColor: 'bg-blue-500',
-    avatar: 'MC',
-    platform: 'Gmail',
-    platformLogo: '✉️',
-    platformColor: 'bg-red-500'
+    category: "FYI",
+    categoryColor: "bg-blue-500",
+    avatar: "MC",
+    platform: "Gmail",
+    platformLogo: "✉️",
+    platformColor: "bg-red-500",
   },
   {
     id: 3,
-    sender: 'LinkedIn',
-    email: 'notifications@linkedin.com',
-    subject: 'Your weekly summary is ready',
-    preview: 'See who viewed your profile this week and discover new connections in your industry...',
-    time: '1h ago',
+    sender: "LinkedIn",
+    email: "notifications@linkedin.com",
+    subject: "Your weekly summary is ready",
+    preview:
+      "See who viewed your profile this week and discover new connections in your industry...",
+    time: "1h ago",
     unread: false,
     important: false,
-    category: 'Marketing',
-    categoryColor: 'bg-purple-500',
-    avatar: 'LI',
-    platform: 'Gmail',
-    platformLogo: '✉️',
-    platformColor: 'bg-red-500'
+    category: "Marketing",
+    categoryColor: "bg-purple-500",
+    avatar: "LI",
+    platform: "Gmail",
+    platformLogo: "✉️",
+    platformColor: "bg-red-500",
   },
   {
     id: 4,
-    sender: 'Alex Rivera',
-    email: 'alex@startup.io',
-    subject: 'Collaboration Opportunity',
-    preview: 'I came across your work and would love to discuss a potential collaboration on...',
-    time: '3h ago',
+    sender: "Alex Rivera",
+    email: "alex@startup.io",
+    subject: "Collaboration Opportunity",
+    preview:
+      "I came across your work and would love to discuss a potential collaboration on...",
+    time: "3h ago",
     unread: true,
     important: true,
-    category: 'Important',
-    categoryColor: 'bg-yellow-500',
-    avatar: 'AR',
-    platform: 'Outlook',
-    platformLogo: '📧',
-    platformColor: 'bg-blue-700'
+    category: "Important",
+    categoryColor: "bg-yellow-500",
+    avatar: "AR",
+    platform: "Outlook",
+    platformLogo: "📧",
+    platformColor: "bg-blue-700",
   },
   {
     id: 5,
-    sender: 'GitHub',
-    email: 'noreply@github.com',
-    subject: 'Pull request merged: feat/new-dashboard',
-    preview: 'Your pull request has been successfully merged into the main branch. View the changes...',
-    time: '5h ago',
+    sender: "GitHub",
+    email: "noreply@github.com",
+    subject: "Pull request merged: feat/new-dashboard",
+    preview:
+      "Your pull request has been successfully merged into the main branch. View the changes...",
+    time: "5h ago",
     unread: false,
     important: false,
-    category: 'Awaiting Reply',
-    categoryColor: 'bg-orange-500',
-    avatar: 'GH',
-    platform: 'Slack',
-    platformLogo: '💼',
-    platformColor: 'bg-purple-500'
+    category: "Awaiting Reply",
+    categoryColor: "bg-orange-500",
+    avatar: "GH",
+    platform: "Slack",
+    platformLogo: "💼",
+    platformColor: "bg-purple-500",
   },
   {
     id: 6,
-    sender: 'Amazon',
-    email: 'shipment-tracking@amazon.com',
-    subject: 'Your package has been delivered',
-    preview: 'Great news! Your recent order has been delivered to your address. You can track...',
-    time: '2h ago',
+    sender: "Amazon",
+    email: "shipment-tracking@amazon.com",
+    subject: "Your package has been delivered",
+    preview:
+      "Great news! Your recent order has been delivered to your address. You can track...",
+    time: "2h ago",
     unread: true,
     important: false,
-    category: 'Promotions',
-    categoryColor: 'bg-green-500',
-    avatar: 'AM',
-    platform: 'WhatsApp',
-    platformLogo: '💬',
-    platformColor: 'bg-green-500'
+    category: "Promotions",
+    categoryColor: "bg-green-500",
+    avatar: "AM",
+    platform: "WhatsApp",
+    platformLogo: "💬",
+    platformColor: "bg-green-500",
   },
   {
     id: 7,
-    sender: 'Notion',
-    email: 'updates@notion.so',
-    subject: 'New features in Notion AI',
-    preview: 'Discover the latest AI-powered features that will supercharge your productivity...',
-    time: '4h ago',
+    sender: "Notion",
+    email: "updates@notion.so",
+    subject: "New features in Notion AI",
+    preview:
+      "Discover the latest AI-powered features that will supercharge your productivity...",
+    time: "4h ago",
     unread: true,
     important: false,
-    category: 'Updates',
-    categoryColor: 'bg-indigo-500',
-    avatar: 'NO',
-    platform: 'Telegram',
-    platformLogo: '📨',
-    platformColor: 'bg-blue-500'
+    category: "Updates",
+    categoryColor: "bg-indigo-500",
+    avatar: "NO",
+    platform: "Telegram",
+    platformLogo: "📨",
+    platformColor: "bg-blue-500",
   },
   {
     id: 8,
-    sender: 'Jessica Wong',
-    email: 'jessica@company.com',
-    subject: 'Re: Project timeline discussion',
-    preview: 'Thanks for the detailed breakdown. I have a few questions about the milestones...',
-    time: '6h ago',
+    sender: "Jessica Wong",
+    email: "jessica@company.com",
+    subject: "Re: Project timeline discussion",
+    preview:
+      "Thanks for the detailed breakdown. I have a few questions about the milestones...",
+    time: "6h ago",
     unread: false,
     important: false,
-    category: 'FYI',
-    categoryColor: 'bg-blue-500',
-    avatar: 'JW',
-    platform: 'Outlook',
-    platformLogo: '📧',
-    platformColor: 'bg-blue-700'
+    category: "FYI",
+    categoryColor: "bg-blue-500",
+    avatar: "JW",
+    platform: "Outlook",
+    platformLogo: "📧",
+    platformColor: "bg-blue-700",
   },
   {
     id: 9,
-    sender: 'Stripe',
-    email: 'notifications@stripe.com',
-    subject: 'Payment received for Invoice #1234',
-    preview: 'We received a payment of $2,500.00 for invoice #1234. The payment has been...',
-    time: '8h ago',
+    sender: "Stripe",
+    email: "notifications@stripe.com",
+    subject: "Payment received for Invoice #1234",
+    preview:
+      "We received a payment of $2,500.00 for invoice #1234. The payment has been...",
+    time: "8h ago",
     unread: false,
     important: true,
-    category: 'Important',
-    categoryColor: 'bg-yellow-500',
-    avatar: 'ST',
-    platform: 'Gmail',
-    platformLogo: '✉️',
-    platformColor: 'bg-red-500'
+    category: "Important",
+    categoryColor: "bg-yellow-500",
+    avatar: "ST",
+    platform: "Gmail",
+    platformLogo: "✉️",
+    platformColor: "bg-red-500",
   },
   {
     id: 10,
-    sender: 'Netflix',
-    email: 'info@netflix.com',
-    subject: 'New releases this week',
-    preview: 'Check out the latest movies and TV shows added to Netflix this week...',
-    time: '1d ago',
+    sender: "Netflix",
+    email: "info@netflix.com",
+    subject: "New releases this week",
+    preview:
+      "Check out the latest movies and TV shows added to Netflix this week...",
+    time: "1d ago",
     unread: false,
     important: false,
-    category: 'Marketing',
-    categoryColor: 'bg-purple-500',
-    avatar: 'NF',
-    platform: 'Instagram',
-    platformLogo: '📷',
-    platformColor: 'bg-pink-500'
+    category: "Marketing",
+    categoryColor: "bg-purple-500",
+    avatar: "NF",
+    platform: "Instagram",
+    platformLogo: "📷",
+    platformColor: "bg-pink-500",
   },
   {
     id: 11,
-    sender: 'David Kim',
-    email: 'david@clientcompany.com',
-    subject: 'Urgent: Contract review needed',
-    preview: 'Hi, we need to review the contract terms before tomorrow\'s meeting. Can you...',
-    time: '30m ago',
+    sender: "David Kim",
+    email: "david@clientcompany.com",
+    subject: "Urgent: Contract review needed",
+    preview:
+      "Hi, we need to review the contract terms before tomorrow's meeting. Can you...",
+    time: "30m ago",
     unread: true,
     important: true,
-    category: 'To Respond',
-    categoryColor: 'bg-red-500',
-    avatar: 'DK'
+    category: "To Respond",
+    categoryColor: "bg-red-500",
+    avatar: "DK",
   },
   {
     id: 12,
-    sender: 'Slack',
-    email: 'notifications@slack.com',
-    subject: 'Weekly activity summary',
-    preview: 'Here\'s your team\'s activity summary for this week in the Development workspace...',
-    time: '1d ago',
+    sender: "Slack",
+    email: "notifications@slack.com",
+    subject: "Weekly activity summary",
+    preview:
+      "Here's your team's activity summary for this week in the Development workspace...",
+    time: "1d ago",
     unread: false,
     important: false,
-    category: 'Updates',
-    categoryColor: 'bg-indigo-500',
-    avatar: 'SL'
-  }
+    category: "Updates",
+    categoryColor: "bg-indigo-500",
+    avatar: "SL",
+  },
 ];
 
 const selectedEmail = {
-  sender: 'Sarah Johnson',
-  email: 'sarah@company.com',
-  subject: 'Q4 Budget Review Meeting',
-  time: '2 minutes ago',
+  sender: "Sarah Johnson",
+  email: "sarah@company.com",
+  subject: "Q4 Budget Review Meeting",
+  time: "2 minutes ago",
   content: `Hi team,
 
 I wanted to schedule a review meeting for our Q4 budget planning. Can we find a time that works for everyone next week?
@@ -265,53 +383,59 @@ Please let me know your availability for Tuesday, Wednesday, or Thursday afterno
 
 Best regards,
 Sarah`,
-  avatar: 'SJ'
+  avatar: "SJ",
 };
 
 export default function Index() {
-  const [selectedSidebarItem, setSelectedSidebarItem] = useState('Inbox');
+  const [selectedSidebarItem, setSelectedSidebarItem] = useState("Inbox");
   const [showCompose, setShowCompose] = useState(false);
-  const [replyTo, setReplyTo] = useState<string>('');
-  const [replySubject, setReplySubject] = useState<string>('');
+  const [replyTo, setReplyTo] = useState<string>("");
+  const [replySubject, setReplySubject] = useState<string>("");
   const [selectedEmailId, setSelectedEmailId] = useState<number>(1);
-  const [selectedIntegration, setSelectedIntegration] = useState<string>('All');
+  const [selectedIntegration, setSelectedIntegration] = useState<string>("All");
   const [showDexterAI, setShowDexterAI] = useState(false);
-  const [integrationCategories, setIntegrationCategories] = useState(integrations);
+  const [integrationCategories, setIntegrationCategories] =
+    useState(integrations);
 
   // Filter emails based on selected category
   const getFilteredEmails = () => {
     switch (selectedSidebarItem) {
-      case 'Inbox':
+      case "Inbox":
         return emailsData;
-      case 'Sent':
+      case "Sent":
         return []; // Would fetch sent emails from API
-      case 'Starred':
-        return emailsData.filter(email => email.important);
-      case 'Archive':
+      case "Starred":
+        return emailsData.filter((email) => email.important);
+      case "Archive":
         return []; // Would fetch archived emails from API
-      case 'Trash':
+      case "Trash":
         return []; // Would fetch deleted emails from API
-      case 'To Respond':
-        return emailsData.filter(email => email.category === 'To Respond');
-      case 'Awaiting Reply':
-        return emailsData.filter(email => email.category === 'Awaiting Reply');
-      case 'Important':
-        return emailsData.filter(email => email.category === 'Important');
-      case 'FYI':
-        return emailsData.filter(email => email.category === 'FYI');
-      case 'Marketing':
-        return emailsData.filter(email => email.category === 'Marketing');
-      case 'Promotions':
-        return emailsData.filter(email => email.category === 'Promotions');
-      case 'Updates':
-        return emailsData.filter(email => email.category === 'Updates');
+      case "To Respond":
+        return emailsData.filter((email) => email.category === "To Respond");
+      case "Awaiting Reply":
+        return emailsData.filter(
+          (email) => email.category === "Awaiting Reply",
+        );
+      case "Important":
+        return emailsData.filter((email) => email.category === "Important");
+      case "FYI":
+        return emailsData.filter((email) => email.category === "FYI");
+      case "Marketing":
+        return emailsData.filter((email) => email.category === "Marketing");
+      case "Promotions":
+        return emailsData.filter((email) => email.category === "Promotions");
+      case "Updates":
+        return emailsData.filter((email) => email.category === "Updates");
       default:
-        return emailsData.filter(email => email.category === selectedSidebarItem);
+        return emailsData.filter(
+          (email) => email.category === selectedSidebarItem,
+        );
     }
   };
 
   const filteredEmails = getFilteredEmails();
-  const selectedEmail = emailsData.find(email => email.id === selectedEmailId) || emailsData[0];
+  const selectedEmail =
+    emailsData.find((email) => email.id === selectedEmailId) || emailsData[0];
 
   const handleReply = () => {
     setReplyTo(selectedEmail.email);
@@ -319,23 +443,30 @@ export default function Index() {
     setShowCompose(true);
   };
 
-  const toggleIntegrationCategory = (categoryKey: keyof typeof integrations) => {
-    setIntegrationCategories(prev => ({
+  const toggleIntegrationCategory = (
+    categoryKey: keyof typeof integrations,
+  ) => {
+    setIntegrationCategories((prev) => ({
       ...prev,
       [categoryKey]: {
         ...prev[categoryKey],
-        isOpen: !prev[categoryKey].isOpen
-      }
+        isOpen: !prev[categoryKey].isOpen,
+      },
     }));
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'bg-green-500';
-      case 'warning': return 'bg-yellow-500';
-      case 'error': return 'bg-red-500';
-      case 'disconnected': return 'bg-gray-300';
-      default: return 'bg-gray-300';
+      case "healthy":
+        return "bg-green-500";
+      case "warning":
+        return "bg-yellow-500";
+      case "error":
+        return "bg-red-500";
+      case "disconnected":
+        return "bg-gray-300";
+      default:
+        return "bg-gray-300";
     }
   };
 
@@ -348,7 +479,7 @@ export default function Index() {
             <Zap className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-bold">Dexter</h1>
           </div>
-          
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
@@ -357,7 +488,7 @@ export default function Index() {
             />
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <Button
             onClick={() => setShowCompose(true)}
@@ -384,7 +515,11 @@ export default function Index() {
                   {sidebarItems.map((item) => (
                     <Button
                       key={item.label}
-                      variant={selectedSidebarItem === item.label ? "secondary" : "ghost"}
+                      variant={
+                        selectedSidebarItem === item.label
+                          ? "secondary"
+                          : "ghost"
+                      }
                       className="w-full justify-start"
                       onClick={() => setSelectedSidebarItem(item.label)}
                     >
@@ -402,7 +537,9 @@ export default function Index() {
                 <Separator className="my-4" />
 
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-muted-foreground px-2">Productivity</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground px-2">
+                    Productivity
+                  </h3>
                   <Button
                     variant="ghost"
                     className="w-full justify-start"
@@ -428,40 +565,62 @@ export default function Index() {
                 <Separator className="my-4" />
 
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-muted-foreground px-2">Integrations</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground px-2">
+                    Integrations
+                  </h3>
 
-                  {Object.entries(integrationCategories).map(([categoryKey, category]) => (
-                    <div key={categoryKey} className="space-y-1">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start text-xs font-medium text-muted-foreground hover:text-foreground"
-                        onClick={() => toggleIntegrationCategory(categoryKey as keyof typeof integrations)}
-                      >
-                        <category.icon className="w-3 h-3 mr-2" />
-                        <span className="flex-1 text-left">{category.label}</span>
-                        {category.isOpen ? (
-                          <ChevronDown className="w-3 h-3" />
-                        ) : (
-                          <ChevronRight className="w-3 h-3" />
-                        )}
-                      </Button>
-
-                      {category.isOpen && category.platforms.map((platform) => (
+                  {Object.entries(integrationCategories).map(
+                    ([categoryKey, category]) => (
+                      <div key={categoryKey} className="space-y-1">
                         <Button
-                          key={platform.label}
                           variant="ghost"
-                          className="w-full justify-start pl-6 text-xs"
-                          asChild
+                          className="w-full justify-start text-xs font-medium text-muted-foreground hover:text-foreground"
+                          onClick={() =>
+                            toggleIntegrationCategory(
+                              categoryKey as keyof typeof integrations,
+                            )
+                          }
                         >
-                          <Link to={`/integrations/${platform.label.toLowerCase().replace(' ', '-')}`}>
-                            <div className={cn("w-2 h-2 rounded-full mr-2", getStatusColor(platform.status))} />
-                            <span className="mr-2 text-sm">{platform.logo}</span>
-                            <span className="flex-1 text-left">{platform.label}</span>
-                          </Link>
+                          <category.icon className="w-3 h-3 mr-2" />
+                          <span className="flex-1 text-left">
+                            {category.label}
+                          </span>
+                          {category.isOpen ? (
+                            <ChevronDown className="w-3 h-3" />
+                          ) : (
+                            <ChevronRight className="w-3 h-3" />
+                          )}
                         </Button>
-                      ))}
-                    </div>
-                  ))}
+
+                        {category.isOpen &&
+                          category.platforms.map((platform) => (
+                            <Button
+                              key={platform.label}
+                              variant="ghost"
+                              className="w-full justify-start pl-6 text-xs"
+                              asChild
+                            >
+                              <Link
+                                to={`/integrations/${platform.label.toLowerCase().replace(" ", "-")}`}
+                              >
+                                <div
+                                  className={cn(
+                                    "w-2 h-2 rounded-full mr-2",
+                                    getStatusColor(platform.status),
+                                  )}
+                                />
+                                <span className="mr-2 text-sm">
+                                  {platform.logo}
+                                </span>
+                                <span className="flex-1 text-left">
+                                  {platform.label}
+                                </span>
+                              </Link>
+                            </Button>
+                          ))}
+                      </div>
+                    ),
+                  )}
 
                   <Button
                     variant="ghost"
@@ -486,7 +645,9 @@ export default function Index() {
               <div className="p-4 border-b border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <h2 className="text-lg font-semibold">{selectedSidebarItem}</h2>
+                    <h2 className="text-lg font-semibold">
+                      {selectedSidebarItem}
+                    </h2>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm text-muted-foreground">•</span>
                       <select
@@ -495,11 +656,13 @@ export default function Index() {
                         className="text-sm bg-transparent border-none focus:outline-none text-muted-foreground"
                       >
                         <option value="All">All Platforms</option>
-                        {integrationCategories.communication.platforms.map(platform => (
-                          <option key={platform.label} value={platform.label}>
-                            {platform.label}
-                          </option>
-                        ))}
+                        {integrationCategories.communication.platforms.map(
+                          (platform) => (
+                            <option key={platform.label} value={platform.label}>
+                              {platform.label}
+                            </option>
+                          ),
+                        )}
                       </select>
                     </div>
                   </div>
@@ -525,7 +688,8 @@ export default function Index() {
                       className={cn(
                         "p-4 hover:bg-muted/50 cursor-pointer transition-colors",
                         email.unread && "bg-muted/30",
-                        selectedEmailId === email.id && "bg-accent/30 border-l-2 border-primary"
+                        selectedEmailId === email.id &&
+                          "bg-accent/30 border-l-2 border-primary",
                       )}
                       onClick={() => setSelectedEmailId(email.id)}
                     >
@@ -535,14 +699,18 @@ export default function Index() {
                             {email.avatar}
                           </AvatarFallback>
                         </Avatar>
-                        
+
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
                             <div className="flex items-center space-x-2">
-                              <span className={cn(
-                                "text-sm",
-                                email.unread ? "font-semibold" : "font-normal"
-                              )}>
+                              <span
+                                className={cn(
+                                  "text-sm",
+                                  email.unread
+                                    ? "font-semibold"
+                                    : "font-normal",
+                                )}
+                              >
                                 {email.sender}
                               </span>
                               {email.important && (
@@ -553,32 +721,36 @@ export default function Index() {
                               {email.time}
                             </span>
                           </div>
-                          
+
                           <div className="flex items-center space-x-2 mb-1">
                             <Badge
                               variant="secondary"
-                              className={cn("text-xs text-white", email.categoryColor)}
+                              className={cn(
+                                "text-xs text-white",
+                                email.categoryColor,
+                              )}
                             >
                               {email.category}
                             </Badge>
                             {(email as any).platform && (
-                              <Badge
-                                variant="outline"
-                                className="text-xs"
-                              >
-                                <span className="mr-1">{(email as any).platformLogo}</span>
+                              <Badge variant="outline" className="text-xs">
+                                <span className="mr-1">
+                                  {(email as any).platformLogo}
+                                </span>
                                 {(email as any).platform}
                               </Badge>
                             )}
                           </div>
-                          
-                          <h3 className={cn(
-                            "text-sm mb-1 truncate",
-                            email.unread ? "font-medium" : "font-normal"
-                          )}>
+
+                          <h3
+                            className={cn(
+                              "text-sm mb-1 truncate",
+                              email.unread ? "font-medium" : "font-normal",
+                            )}
+                          >
                             {email.subject}
                           </h3>
-                          
+
                           <p className="text-xs text-muted-foreground line-clamp-2">
                             {email.preview}
                           </p>
@@ -604,8 +776,8 @@ export default function Index() {
         open={showCompose}
         onClose={() => {
           setShowCompose(false);
-          setReplyTo('');
-          setReplySubject('');
+          setReplyTo("");
+          setReplySubject("");
         }}
         replyTo={replyTo}
         subject={replySubject}
@@ -613,10 +785,7 @@ export default function Index() {
         platformLogo={selectedEmail.platformLogo}
       />
 
-      <DexterAI
-        open={showDexterAI}
-        onClose={() => setShowDexterAI(false)}
-      />
+      <DexterAI open={showDexterAI} onClose={() => setShowDexterAI(false)} />
 
       {/* Dexter AI Floating Button */}
       <Button

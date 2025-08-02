@@ -7,18 +7,22 @@ This document outlines the AI integration architecture for the email management 
 ## Current Development Setup
 
 ### Local AI Integration
+
 - **Frontend**: Direct API calls to `/api/ai/categorization` endpoints
 - **Backend**: Express.js routes in `server/routes/ai-categorization.ts`
 - **Processing**: Uses Microsoft Graph API and Gmail API metadata for categorization
 - **Storage**: In-memory state management with mock data
 
 ### Key Components
+
 1. **AI Categorization Engine** (`server/routes/ai-categorization.ts`)
+
    - Analyzes email metadata (sender, recipients, subject, conversation threads)
    - Uses pattern matching and rule-based categorization
    - Returns confidence scores for categorization decisions
 
 2. **Category Management** (`client/pages/Settings.tsx`)
+
    - User-defined categories with customizable rules
    - Integration with Microsoft Graph API field references
    - Real-time category rule updates
@@ -53,11 +57,12 @@ This document outlines the AI integration architecture for the email management 
 ### Master API Components
 
 #### 1. Customer Instance Manager
+
 ```typescript
 interface CustomerInstance {
   customerId: string;
   apiKey: string;
-  subscription: 'free' | 'pro' | 'enterprise';
+  subscription: "free" | "pro" | "enterprise";
   limits: {
     requestsPerHour: number;
     categoriesPerMonth: number;
@@ -72,11 +77,12 @@ interface CustomerInstance {
 ```
 
 #### 2. AI Processing Pipeline
+
 ```typescript
 interface AIProcessingRequest {
   customerId: string;
   emailData: EmailMetadata;
-  processingType: 'categorize' | 'suggest' | 'summarize' | 'priority';
+  processingType: "categorize" | "suggest" | "summarize" | "priority";
   userContext: UserPreferences;
 }
 
@@ -90,10 +96,11 @@ interface AIProcessingResponse {
 ```
 
 #### 3. Model Management
+
 ```typescript
 interface ModelConfig {
   modelId: string;
-  type: 'categorization' | 'sentiment' | 'summary' | 'reply';
+  type: "categorization" | "sentiment" | "summary" | "reply";
   customerId?: string; // null for shared models
   trainingData: TrainingDataConfig;
   performance: ModelMetrics;
@@ -105,45 +112,48 @@ interface ModelConfig {
 Each customer instance runs independently with:
 
 #### 1. Local AI Proxy
+
 ```typescript
 class AIProxy {
   private masterApiUrl: string;
   private apiKey: string;
   private cache: Map<string, CachedResult>;
-  
+
   async processEmail(email: EmailData): Promise<AIResult> {
     // Check local cache first
     const cached = this.cache.get(email.hash);
     if (cached && !this.isExpired(cached)) {
       return cached.result;
     }
-    
+
     // Call master API
     const result = await this.callMasterAPI({
       customerId: this.customerId,
       emailData: email.metadata,
-      processingType: 'categorize'
+      processingType: "categorize",
     });
-    
+
     // Cache result
     this.cache.set(email.hash, {
       result,
       timestamp: Date.now(),
-      ttl: 3600000 // 1 hour
+      ttl: 3600000, // 1 hour
     });
-    
+
     return result;
   }
 }
 ```
 
 #### 2. Data Isolation
+
 - Each customer's data is completely isolated
 - No cross-customer data leakage
 - Separate encryption keys per customer
 - Individual backup and recovery
 
 #### 3. Configuration Management
+
 ```typescript
 interface CustomerConfig {
   aiSettings: {
@@ -168,13 +178,16 @@ interface CustomerConfig {
 ## Implementation Strategy
 
 ### Phase 1: Master API Development (4-6 weeks)
+
 1. **Core Infrastructure**
+
    - Multi-tenant API gateway
    - Customer authentication & authorization
    - Rate limiting and resource management
    - Usage tracking and billing hooks
 
 2. **AI Processing Engine**
+
    - Centralized categorization models
    - Email metadata processing pipeline
    - Response caching and optimization
@@ -187,7 +200,9 @@ interface CustomerConfig {
    - Backup and disaster recovery
 
 ### Phase 2: Customer Instance Updates (2-3 weeks)
+
 1. **AI Proxy Implementation**
+
    - Replace direct AI processing with proxy calls
    - Implement local caching layer
    - Add fallback mechanisms
@@ -200,7 +215,9 @@ interface CustomerConfig {
    - Performance optimization
 
 ### Phase 3: Production Deployment (2-3 weeks)
+
 1. **Infrastructure Setup**
+
    - Deploy master API servers
    - Configure load balancing
    - Set up monitoring and logging
@@ -215,18 +232,21 @@ interface CustomerConfig {
 ## Security & Compliance
 
 ### Data Protection
+
 - End-to-end encryption for all customer data
 - Zero-trust architecture
 - Regular security audits
 - Compliance with GDPR, HIPAA, SOC2
 
 ### Access Control
+
 - Customer-specific API keys
 - Role-based access control (RBAC)
 - Audit logging for all API calls
 - Automatic key rotation
 
 ### Privacy
+
 - No cross-customer data sharing
 - Minimal data retention policies
 - Right to be forgotten compliance
@@ -235,18 +255,21 @@ interface CustomerConfig {
 ## Monitoring & Analytics
 
 ### Performance Metrics
+
 - API response times
 - Model accuracy scores
 - Customer satisfaction ratings
 - System resource utilization
 
 ### Business Metrics
+
 - Customer usage patterns
 - Feature adoption rates
 - Billing and revenue tracking
 - Support ticket volumes
 
 ### Operational Metrics
+
 - System uptime and availability
 - Error rates and types
 - Capacity planning data
@@ -255,12 +278,14 @@ interface CustomerConfig {
 ## Cost Management
 
 ### Resource Optimization
+
 - Shared model infrastructure
 - Efficient caching strategies
 - Auto-scaling based on demand
 - Cost-effective storage solutions
 
 ### Billing Models
+
 - **Free Tier**: 1,000 AI requests/month
 - **Pro Tier**: $29/month, 10,000 requests
 - **Enterprise**: Custom pricing, unlimited requests
@@ -269,18 +294,21 @@ interface CustomerConfig {
 ## Future Enhancements
 
 ### Advanced AI Features
+
 - Custom model training per customer
 - Industry-specific categorization models
 - Advanced sentiment analysis
 - Predictive email prioritization
 
 ### Integration Expansions
+
 - Additional email providers
 - CRM system integrations
 - Calendar and task management
 - Advanced workflow automation
 
 ### Analytics & Insights
+
 - Email pattern analysis
 - Productivity metrics
 - Team collaboration insights
@@ -289,6 +317,7 @@ interface CustomerConfig {
 ## Technical Specifications
 
 ### API Endpoints
+
 ```
 POST /api/v1/ai/categorize
 POST /api/v1/ai/suggest
@@ -300,6 +329,7 @@ GET  /api/v1/customer/usage
 ```
 
 ### Response Format
+
 ```typescript
 interface APIResponse<T> {
   success: boolean;
@@ -319,8 +349,9 @@ interface APIResponse<T> {
 ```
 
 ### Rate Limiting
+
 - Free tier: 100 requests/hour
-- Pro tier: 1000 requests/hour  
+- Pro tier: 1000 requests/hour
 - Enterprise: 10000 requests/hour
 - Burst allowance: 2x rate limit for 5 minutes
 
