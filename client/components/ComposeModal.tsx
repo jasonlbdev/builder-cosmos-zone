@@ -288,7 +288,7 @@ export function ComposeModal({ open, onClose, replyTo, subject, platform = 'Emai
                 </Button>
                 <Button 
                   onClick={handleSend}
-                  disabled={!to || !emailSubject || !content}
+                  disabled={!to || !content || (isEmailPlatform && !emailSubject)}
                 >
                   <Send className="w-4 h-4 mr-2" />
                   Send
