@@ -194,7 +194,11 @@ export default function Integrations() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center space-x-2">
                     <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", platform.color)}>
-                      <platform.icon className="w-4 h-4 text-white" />
+                      {platform.logo ? (
+                        <span className="text-sm">{platform.logo}</span>
+                      ) : (
+                        <platform.icon className="w-4 h-4 text-white" />
+                      )}
                     </div>
                     <div>
                       <CardTitle className="text-sm">{platform.name}</CardTitle>
