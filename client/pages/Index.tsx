@@ -41,7 +41,7 @@ import ComposeModal from "@/components/ComposeModal";
 import DexterAI from "@/components/DexterAI";
 import MessageView from "@/components/MessageView";
 import { cn } from "@/lib/utils";
-import { getEmails, type Email } from "../../shared/data/mockData";
+import { getEmails, getSentEmails, getArchivedEmails, getDeletedEmails, type Email } from "../../shared/data/mockData";
 
 const sidebarItemsTemplate = [
   { icon: Inbox, label: "Inbox", active: true },
@@ -119,6 +119,7 @@ export default function Index() {
   const [integrationCategories, setIntegrationCategories] = useState(integrations);
   const [emails, setEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Load emails from centralized API on component mount
   useEffect(() => {
@@ -140,38 +141,67 @@ export default function Index() {
     loadEmails();
   }, [selectedEmailId]);
 
-  // Filter emails based on selected category
+  // Filter emails based on selected category and search query
   const getFilteredEmails = () => {
     if (loading) return [];
     
+    let categoryEmails: Email[] = [];
+    
     switch (selectedSidebarItem) {
       case "Inbox":
-        return emails;
+        categoryEmails = emails;
+        break;
       case "Sent":
-        return []; // Would fetch sent emails from API
+        categoryEmails = getSentEmails();
+        break;
       case "Starred":
-        return emails.filter((email) => email.important);
+        categoryEmails = emails.filter((email) => email.important);
+        break;
       case "Archive":
-        return []; // Would fetch archived emails from API
+        categoryEmails = getArchivedEmails();
+        break;
       case "Trash":
-        return []; // Would fetch deleted emails from API
+        categoryEmails = getDeletedEmails();
+        break;
       case "To Respond":
-        return emails.filter((email) => email.category === "To Respond");
+        categoryEmails = emails.filter((email) => email.category === "To Respond");
+        break;
       case "Awaiting Reply":
-        return emails.filter((email) => email.category === "Awaiting Reply");
+        categoryEmails = emails.filter((email) => email.category === "Awaiting Reply");
+        break;
       case "Important":
-        return emails.filter((email) => email.category === "Important");
+        categoryEmails = emails.filter((email) => email.category === "Important");
+        break;
       case "FYI":
-        return emails.filter((email) => email.category === "FYI");
+        categoryEmails = emails.filter((email) => email.category === "FYI");
+        break;
       case "Marketing":
-        return emails.filter((email) => email.category === "Marketing");
+        categoryEmails = emails.filter((email) => email.category === "Marketing");
+        break;
       case "Promotions":
-        return emails.filter((email) => email.category === "Promotions");
+        categoryEmails = emails.filter((email) => email.category === "Promotions");
+        break;
       case "Updates":
-        return emails.filter((email) => email.category === "Updates");
+        categoryEmails = emails.filter((email) => email.category === "Updates");
+        break;
       default:
-        return emails;
+        categoryEmails = emails;
     }
+    
+    // Apply search filter if search query exists
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      return categoryEmails.filter((email) =>
+        email.sender.toLowerCase().includes(query) ||
+        email.subject.toLowerCase().includes(query) ||
+        email.preview.toLowerCase().includes(query) ||
+        email.content?.toLowerCase().includes(query) ||
+        email.email.toLowerCase().includes(query) ||
+        email.labels.some(label => label.toLowerCase().includes(query))
+      );
+    }
+    
+    return categoryEmails;
   };
 
   const filteredEmails = getFilteredEmails();
@@ -189,7 +219,7 @@ export default function Index() {
           count = emails.length;
           break;
         case "Sent":
-          count = 0; // Would be actual sent emails count
+          count = getSentEmails().length;
           break;
         case "To Respond":
           count = emails.filter(email => email.category === "To Respond").length;
@@ -216,10 +246,10 @@ export default function Index() {
           count = emails.filter(email => email.category === "Updates").length;
           break;
         case "Archive":
-          count = 0; // Would be actual archived emails count
+          count = getArchivedEmails().length;
           break;
         case "Trash":
-          count = 0; // Would be actual deleted emails count
+          count = getDeletedEmails().length;
           break;
         default:
           count = 0;
@@ -260,6 +290,57 @@ export default function Index() {
       if (nextEmail) {
         setSelectedEmailId(nextEmail.id);
       }
+    }
+  };
+
+  const handleStar = () => {
+    if (selectedEmail) {
+      console.log('Toggling star for email:', selectedEmail.id);
+      // Toggle the star/important status
+      setEmails(prev => prev.map(email => 
+        email.id === selectedEmail.id 
+          ? { ...email, important: !email.important }
+          : email
+      ));
+    }
+  };
+
+  const handleDelete = () => {
+    if (selectedEmail) {
+      console.log('Deleting email:', selectedEmail.id);
+      // In production, would call API to delete email
+      setEmails(prev => prev.filter(email => email.id !== selectedEmail.id));
+      // Select next email
+      const currentIndex = filteredEmails.findIndex(email => email.id === selectedEmail.id);
+      const nextEmail = filteredEmails[currentIndex + 1] || filteredEmails[currentIndex - 1];
+      if (nextEmail) {
+        setSelectedEmailId(nextEmail.id);
+      }
+    }
+  };
+
+  const handleMarkAsRead = () => {
+    if (selectedEmail) {
+      console.log('Toggling read status for email:', selectedEmail.id);
+      setEmails(prev => prev.map(email => 
+        email.id === selectedEmail.id 
+          ? { ...email, unread: !email.unread }
+          : email
+      ));
+    }
+  };
+
+  const handleAddLabel = () => {
+    if (selectedEmail) {
+      console.log('Adding label to email:', selectedEmail.id);
+      // In production, would open label selection dialog
+    }
+  };
+
+  const handleSnooze = () => {
+    if (selectedEmail) {
+      console.log('Snoozing email:', selectedEmail.id);
+      // In production, would open snooze options dialog
     }
   };
 
@@ -314,6 +395,8 @@ export default function Index() {
             <Input
               placeholder="Search emails, contacts, or commands..."
               className="pl-10 w-96"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
@@ -553,6 +636,11 @@ export default function Index() {
               onReply={handleReply}
               onForward={handleForward}
               onArchive={handleArchive}
+              onStar={handleStar}
+              onDelete={handleDelete}
+              onMarkAsRead={handleMarkAsRead}
+              onAddLabel={handleAddLabel}
+              onSnooze={handleSnooze}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

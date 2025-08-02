@@ -322,6 +322,178 @@ export const mockEmails: Email[] = [
   },
 ];
 
+// Sent Emails Mock Data
+export const mockSentEmails: Email[] = [
+  {
+    id: "sent_1",
+    sender: "You",
+    email: "john.doe@gmail.com",
+    subject: "Re: Budget Review Meeting",
+    content: "Thanks for the update, Sarah. I'll review the documents and get back to you by tomorrow.",
+    preview: "Thanks for the update, Sarah. I'll review the documents and get back to you by tomorrow...",
+    time: "10m ago",
+    unread: false,
+    important: false,
+    category: "Sent",
+    categoryColor: "bg-blue-500",
+    avatar: "ME",
+    labels: ["work", "budget", "reply"],
+    platform: "Gmail",
+    platformLogo: "📧",
+    platformColor: "bg-red-500",
+  },
+  {
+    id: "sent_2",
+    sender: "You",
+    email: "j.doe.work@gmail.com",
+    subject: "Project Status Update",
+    content: "Hi team, here's the weekly status update for our current projects...",
+    preview: "Hi team, here's the weekly status update for our current projects. Overall progress is good...",
+    time: "2h ago",
+    unread: false,
+    important: false,
+    category: "Sent",
+    categoryColor: "bg-blue-500",
+    avatar: "ME",
+    labels: ["work", "update", "team"],
+    platform: "Gmail",
+    platformLogo: "📧",
+    platformColor: "bg-red-500",
+  },
+  {
+    id: "sent_3",
+    sender: "You",
+    email: "john.doe@company.com",
+    subject: "Meeting Confirmation",
+    content: "Confirming our meeting tomorrow at 2 PM. Looking forward to our discussion.",
+    preview: "Confirming our meeting tomorrow at 2 PM. Looking forward to our discussion about the new...",
+    time: "1d ago",
+    unread: false,
+    important: false,
+    category: "Sent",
+    categoryColor: "bg-blue-500",
+    avatar: "ME",
+    labels: ["meeting", "confirmation"],
+    platform: "Outlook",
+    platformLogo: "📨",
+    platformColor: "bg-blue-700",
+  },
+];
+
+// Archived Emails Mock Data
+export const mockArchivedEmails: Email[] = [
+  {
+    id: "archived_1",
+    sender: "Netflix",
+    email: "info@netflix.com",
+    subject: "Your Monthly Recap",
+    content: "Here's what you watched this month on Netflix...",
+    preview: "Here's what you watched this month on Netflix. You spent 23 hours watching...",
+    time: "1w ago",
+    unread: false,
+    important: false,
+    category: "Marketing",
+    categoryColor: "bg-purple-500",
+    avatar: "NF",
+    labels: ["entertainment", "monthly"],
+    platform: "Gmail",
+    platformLogo: "📧",
+    platformColor: "bg-red-500",
+  },
+  {
+    id: "archived_2",
+    sender: "Adobe",
+    email: "offers@adobe.com",
+    subject: "Creative Cloud Special Offer",
+    content: "Limited time offer: Get 3 months free with Creative Cloud subscription...",
+    preview: "Limited time offer: Get 3 months free with Creative Cloud subscription. Perfect for...",
+    time: "2w ago",
+    unread: false,
+    important: false,
+    category: "Promotions",
+    categoryColor: "bg-green-500",
+    avatar: "AD",
+    labels: ["software", "promotion", "creative"],
+    platform: "Gmail",
+    platformLogo: "📧",
+    platformColor: "bg-red-500",
+  },
+  {
+    id: "archived_3",
+    sender: "GitHub",
+    email: "noreply@github.com",
+    subject: "Security Alert",
+    content: "We detected a new login to your GitHub account from a new device...",
+    preview: "We detected a new login to your GitHub account from a new device. If this was you...",
+    time: "3w ago",
+    unread: false,
+    important: false,
+    category: "Important",
+    categoryColor: "bg-yellow-500",
+    avatar: "GH",
+    labels: ["security", "github", "alert"],
+    platform: "Gmail",
+    platformLogo: "📧",
+    platformColor: "bg-red-500",
+  },
+];
+
+// Deleted/Trash Emails Mock Data
+export const mockDeletedEmails: Email[] = [
+  {
+    id: "deleted_1",
+    sender: "Spam Sender",
+    email: "noreply@spamsite.com",
+    subject: "Win $1000 Now!!!",
+    content: "You've won our amazing lottery! Click here to claim your prize...",
+    preview: "You've won our amazing lottery! Click here to claim your prize of $1000...",
+    time: "3d ago",
+    unread: false,
+    important: false,
+    category: "Spam",
+    categoryColor: "bg-red-600",
+    avatar: "SP",
+    labels: ["spam", "lottery", "suspicious"],
+    platform: "Gmail",
+    platformLogo: "📧",
+    platformColor: "bg-red-500",
+  },
+  {
+    id: "deleted_2",
+    sender: "Old Newsletter",
+    email: "newsletter@oldservice.com",
+    subject: "Weekly Updates You Don't Need",
+    content: "Here are updates for a service you haven't used in years...",
+    preview: "Here are updates for a service you haven't used in years. We keep sending these...",
+    time: "1w ago",
+    unread: false,
+    important: false,
+    category: "Marketing",
+    categoryColor: "bg-purple-500",
+    avatar: "ON",
+    labels: ["newsletter", "unused", "old"],
+    platform: "Gmail",
+    platformLogo: "📧",
+    platformColor: "bg-red-500",
+  },
+];
+
+// Helper functions for different email types
+export const getSentEmails = (): Email[] => {
+  if (!DEV_MODE) return [];
+  return mockSentEmails;
+};
+
+export const getArchivedEmails = (): Email[] => {
+  if (!DEV_MODE) return [];
+  return mockArchivedEmails;
+};
+
+export const getDeletedEmails = (): Email[] => {
+  if (!DEV_MODE) return [];
+  return mockDeletedEmails;
+};
+
 // Task Mock Data
 export interface Task {
   id: string;

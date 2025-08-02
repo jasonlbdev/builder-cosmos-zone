@@ -7,6 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Reply,
   Forward,
   Archive,
@@ -21,6 +28,12 @@ import {
   ArrowLeft,
   ArrowRight,
   MessageCircle,
+  Trash,
+  Tag,
+  Clock,
+  Flag,
+  Copy,
+  Share,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -58,6 +71,7 @@ interface MessageViewProps {
   onReply?: () => void;
   onForward?: () => void;
   onArchive?: () => void;
+  onStar?: () => void;
 }
 
 const isMessagingPlatform = (platform: string) => {
@@ -94,12 +108,22 @@ const EmailMessageView = ({
   message, 
   onReply, 
   onForward, 
-  onArchive 
+  onArchive,
+  onStar,
+  onDelete,
+  onMarkAsRead,
+  onAddLabel,
+  onSnooze
 }: { 
   message: Message;
   onReply?: () => void;
   onForward?: () => void;
   onArchive?: () => void;
+  onStar?: () => void;
+  onDelete?: () => void;
+  onMarkAsRead?: () => void;
+  onAddLabel?: () => void;
+  onSnooze?: () => void;
 }) => {
   return (
     <>
@@ -140,9 +164,51 @@ const EmailMessageView = ({
             <Archive className="w-4 h-4 mr-2" />
             Archive
           </Button>
-          <Button size="sm" variant="outline">
-            <Star className="w-4 h-4" />
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={onStar}
+            className={message.important ? "text-yellow-500" : ""}
+          >
+            <Star className={`w-4 h-4 ${message.important ? 'fill-current' : ''}`} />
           </Button>
+          
+          {/* More Actions Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="outline">
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onMarkAsRead}>
+                <Clock className="w-4 h-4 mr-2" />
+                {message.unread ? "Mark as Read" : "Mark as Unread"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onAddLabel}>
+                <Tag className="w-4 h-4 mr-2" />
+                Add Label
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onSnooze}>
+                <Clock className="w-4 h-4 mr-2" />
+                Snooze
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(message.content || message.preview)}>
+                <Copy className="w-4 h-4 mr-2" />
+                Copy Content
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => console.log('Sharing email:', message.subject)}>
+                <Share className="w-4 h-4 mr-2" />
+                Share
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onDelete} className="text-red-600">
+                <Trash className="w-4 h-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -526,7 +592,12 @@ export default function MessageView({
   className, 
   onReply, 
   onForward, 
-  onArchive 
+  onArchive,
+  onStar,
+  onDelete,
+  onMarkAsRead,
+  onAddLabel,
+  onSnooze
 }: MessageViewProps) {
   if (isMessagingPlatform(message.platform)) {
     return (
@@ -544,6 +615,11 @@ export default function MessageView({
           onReply={onReply}
           onForward={onForward}
           onArchive={onArchive}
+          onStar={onStar}
+          onDelete={onDelete}
+          onMarkAsRead={onMarkAsRead}
+          onAddLabel={onAddLabel}
+          onSnooze={onSnooze}
         />
       </div>
     );
