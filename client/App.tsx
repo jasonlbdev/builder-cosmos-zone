@@ -19,6 +19,8 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/integrations" element={<Integrations />} />
           <Route path="/integrations/slack" element={<SlackIntegration />} />
+          <Route path="/integrations/management" element={<IntegrationManagement />} />
+          <Route path="/integrations/:platform" element={<IntegrationManagement />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
