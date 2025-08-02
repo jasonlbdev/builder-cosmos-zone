@@ -22,20 +22,20 @@ interface AICategorizationResult {
 const defaultRules: CategoryRule[] = [
   {
     id: 'rule-1',
-    type: 'keywords',
-    condition: 'contains',
-    value: 'urgent|ASAP|deadline|immediate|emergency',
+    type: 'metadata',
+    condition: 'direct_to_me',
+    value: 'importance:high,direct_recipient:true',
     category: 'To Respond',
-    confidence: 0.9,
+    confidence: 0.95,
     enabled: true
   },
   {
     id: 'rule-2',
-    type: 'subject',
-    condition: 'starts_with',
-    value: 'Re:|Fwd:',
+    type: 'metadata',
+    condition: 'conversation_analysis',
+    value: 'sent_by_me:true,no_response:24h',
     category: 'Awaiting Reply',
-    confidence: 0.8,
+    confidence: 0.9,
     enabled: true
   },
   {
