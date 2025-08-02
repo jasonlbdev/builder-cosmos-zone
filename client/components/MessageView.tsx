@@ -72,6 +72,10 @@ interface MessageViewProps {
   onForward?: () => void;
   onArchive?: () => void;
   onStar?: () => void;
+  onDelete?: () => void;
+  onMarkAsRead?: () => void;
+  onAddLabel?: () => void;
+  onSnooze?: () => void;
 }
 
 const isMessagingPlatform = (platform: string) => {
