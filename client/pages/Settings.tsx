@@ -1079,8 +1079,8 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Rule Creation Dialog - Temporarily commented out */}
-      {/* <RuleCreationDialog
+      {/* Rule Creation Dialog */}
+      <RuleCreationDialog
         open={newRuleDialog}
         onOpenChange={setNewRuleDialog}
         onCreateRule={(ruleData) => {
@@ -1088,7 +1088,7 @@ export default function Settings() {
             handleAddRule(selectedCategoryForRule, ruleData);
           }
         }}
-      /> */}
+      />
     </div>
   );
 }
