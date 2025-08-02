@@ -97,7 +97,10 @@ const emailsData = [
     important: true,
     category: 'Important',
     categoryColor: 'bg-yellow-500',
-    avatar: 'AR'
+    avatar: 'AR',
+    platform: 'Outlook',
+    platformLogo: '📧',
+    platformColor: 'bg-blue-700'
   },
   {
     id: 5,
