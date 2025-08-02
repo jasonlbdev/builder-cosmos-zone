@@ -47,7 +47,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import RuleCreationDialog from "@/components/RuleCreationDialog-simple";
+import RuleCreationDialog from "@/components/RuleCreationDialog";
 
 
 
