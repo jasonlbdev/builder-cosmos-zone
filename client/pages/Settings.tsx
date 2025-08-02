@@ -438,7 +438,16 @@ export default function Settings() {
                             <Switch checked={rule.enabled} />
                           </div>
                         ))}
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleAddRule(category.id, {
+                            type: 'keywords',
+                            condition: 'contains',
+                            value: 'new rule',
+                            enabled: true
+                          })}
+                        >
                           <Plus className="w-3 h-3 mr-1" />
                           Add Rule
                         </Button>
