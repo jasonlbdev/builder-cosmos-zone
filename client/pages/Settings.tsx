@@ -49,8 +49,32 @@ const defaultCategories: EmailCategory[] = [
     color: 'bg-red-500',
     description: 'Emails requiring immediate response',
     rules: [
-      { id: '1', type: 'keywords', condition: 'contains', value: 'urgent, ASAP, deadline', enabled: true },
-      { id: '2', type: 'subject', condition: 'contains', value: 'meeting', enabled: true }
+      {
+        id: '1',
+        type: 'toRecipients',
+        condition: 'contains',
+        value: 'your-email@domain.com',
+        enabled: true,
+        apiField: 'toRecipients/emailAddress/address',
+        description: 'Emails directly addressed to you (not CC)'
+      },
+      {
+        id: '2',
+        type: 'importance',
+        condition: 'equals',
+        value: 'high',
+        enabled: true,
+        apiField: 'importance',
+        description: 'Emails marked as high importance'
+      },
+      {
+        id: '3',
+        type: 'keywords',
+        condition: 'contains',
+        value: 'urgent, ASAP, deadline',
+        enabled: true,
+        description: 'Keywords indicating urgency'
+      }
     ],
     enabled: true
   },
@@ -60,7 +84,24 @@ const defaultCategories: EmailCategory[] = [
     color: 'bg-orange-500',
     description: 'Emails waiting for responses from others',
     rules: [
-      { id: '3', type: 'subject', condition: 'starts_with', value: 'Re:', enabled: true }
+      {
+        id: '4',
+        type: 'conversationId',
+        condition: 'is_not_null',
+        value: '',
+        enabled: true,
+        apiField: 'conversationId',
+        description: 'Part of an ongoing conversation thread'
+      },
+      {
+        id: '5',
+        type: 'subject',
+        condition: 'starts_with',
+        value: 'Re:',
+        enabled: true,
+        apiField: 'subject',
+        description: 'Reply to a previous email'
+      }
     ],
     enabled: true
   },
@@ -70,7 +111,24 @@ const defaultCategories: EmailCategory[] = [
     color: 'bg-yellow-500',
     description: 'High priority emails',
     rules: [
-      { id: '4', type: 'sender', condition: 'contains', value: 'ceo@, manager@', enabled: true }
+      {
+        id: '6',
+        type: 'flag',
+        condition: 'is_not_null',
+        value: '',
+        enabled: true,
+        apiField: 'flag',
+        description: 'Emails with follow-up flags'
+      },
+      {
+        id: '7',
+        type: 'sender',
+        condition: 'contains',
+        value: 'ceo@, manager@, director@',
+        enabled: true,
+        apiField: 'from/emailAddress/address',
+        description: 'Emails from senior leadership'
+      }
     ],
     enabled: true
   },
@@ -80,7 +138,24 @@ const defaultCategories: EmailCategory[] = [
     color: 'bg-blue-500',
     description: 'Informational emails for awareness',
     rules: [
-      { id: '5', type: 'subject', condition: 'starts_with', value: 'FYI:', enabled: true }
+      {
+        id: '8',
+        type: 'ccRecipients',
+        condition: 'contains',
+        value: 'your-email@domain.com',
+        enabled: true,
+        apiField: 'ccRecipients/emailAddress/address',
+        description: 'Emails where you are CC\'d'
+      },
+      {
+        id: '9',
+        type: 'subject',
+        condition: 'starts_with',
+        value: 'FYI:',
+        enabled: true,
+        apiField: 'subject',
+        description: 'Emails marked as FYI'
+      }
     ],
     enabled: true
   },
@@ -90,7 +165,23 @@ const defaultCategories: EmailCategory[] = [
     color: 'bg-purple-500',
     description: 'Promotional and marketing emails',
     rules: [
-      { id: '6', type: 'keywords', condition: 'contains', value: 'unsubscribe, newsletter, promotion', enabled: true }
+      {
+        id: '10',
+        type: 'messageClass',
+        condition: 'equals',
+        value: 'IPM.Note.Marketing',
+        enabled: true,
+        apiField: 'messageClass',
+        description: 'Emails classified as marketing'
+      },
+      {
+        id: '11',
+        type: 'keywords',
+        condition: 'contains',
+        value: 'unsubscribe, newsletter, promotion',
+        enabled: true,
+        description: 'Marketing-related keywords'
+      }
     ],
     enabled: true
   },
@@ -100,7 +191,24 @@ const defaultCategories: EmailCategory[] = [
     color: 'bg-indigo-500',
     description: 'Product updates and notifications',
     rules: [
-      { id: '7', type: 'domain', condition: 'contains', value: 'notifications@, noreply@', enabled: true }
+      {
+        id: '12',
+        type: 'sender',
+        condition: 'contains',
+        value: 'notifications@, noreply@, no-reply@',
+        enabled: true,
+        apiField: 'from/emailAddress/address',
+        description: 'Automated notification emails'
+      },
+      {
+        id: '13',
+        type: 'hasAttachments',
+        condition: 'equals',
+        value: 'false',
+        enabled: true,
+        apiField: 'hasAttachments',
+        description: 'Notification emails typically have no attachments'
+      }
     ],
     enabled: true
   }
