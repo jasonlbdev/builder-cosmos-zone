@@ -57,6 +57,13 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        email: {
+          "to-respond": "hsl(0 84.2% 60.2%)",
+          "fyi": "hsl(221.2 83.2% 53.3%)",
+          "important": "hsl(45.4 93.4% 47.5%)",
+          "awaiting": "hsl(24.6 95% 53.1%)",
+          "marketing": "hsl(262.1 83.3% 57.8%)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
