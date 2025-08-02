@@ -215,6 +215,15 @@ export default function IntegrationManagement() {
               </AlertDescription>
             </Alert>
           )}
+
+          {/* Success Display */}
+          {success && (
+            <Alert className="border-green-200 bg-green-50">
+              <AlertDescription className="text-green-800">
+                {success}
+              </AlertDescription>
+            </Alert>
+          )}
           {/* Connected Accounts */}
           <div>
             <h2 className="text-lg font-semibold mb-4">Connected Accounts</h2>
