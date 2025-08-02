@@ -337,8 +337,9 @@ export default function Index() {
                       key={integration.label}
                       variant="ghost"
                       className="w-full justify-start"
+                      onClick={() => setSelectedIntegration(integration.label)}
                     >
-                      <div className={cn("w-3 h-3 rounded-full mr-3", integration.color)} />
+                      <span className="mr-3 text-sm">{integration.logo}</span>
                       {integration.label}
                     </Button>
                   ))}
@@ -513,7 +514,7 @@ export default function Index() {
                     📝 Summarize
                   </Button>
                   <Button size="sm" variant="outline" className="text-xs">
-                    📅 Schedule Meeting
+                    ���� Schedule Meeting
                   </Button>
                   <Button size="sm" variant="outline" className="text-xs">
                     🔖 Add to Task
