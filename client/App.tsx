@@ -4,6 +4,8 @@ import Integrations from "./pages/Integrations";
 import SlackIntegration from "./pages/SlackIntegration";
 import IntegrationManagement from "./pages/IntegrationManagement";
 import Settings from "./pages/Settings";
+import Calendar from "./pages/Calendar";
+import Tasks from "./pages/Tasks";
 import NotFound from "./pages/NotFound";
 import Breadcrumb from "./components/Breadcrumb";
 import { Toaster } from "@/components/ui/sonner";
