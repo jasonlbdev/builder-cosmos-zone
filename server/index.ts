@@ -82,5 +82,14 @@ export function createServer() {
   app.delete("/api/integrations/:platform/:id", disconnectIntegration);
   app.post("/api/integrations/:platform/:id/sync", syncIntegration);
 
+  // AI categorization routes
+  app.post("/api/ai/categorize", categorizeEmail);
+  app.post("/api/ai/categorize/bulk", bulkCategorizeEmails);
+  app.post("/api/ai/process-batch", processEmailBatch);
+  app.get("/api/ai/rules", getCategoryRules);
+  app.post("/api/ai/rules", createCategoryRule);
+  app.patch("/api/ai/rules/:ruleId", updateCategoryRule);
+  app.delete("/api/ai/rules/:ruleId", deleteCategoryRule);
+
   return app;
 }
