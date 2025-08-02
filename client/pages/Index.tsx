@@ -11,14 +11,18 @@ import { ComposeModal } from '@/components/ComposeModal';
 import { cn } from '@/lib/utils';
 
 const sidebarItems = [
-  { icon: Inbox, label: 'Inbox', count: 12, active: true },
-  { icon: Send, label: 'Sent', count: 0 },
+  { icon: Inbox, label: 'Inbox', count: 23, active: true },
+  { icon: Send, label: 'Sent', count: 156 },
   { icon: CheckCircle, label: 'To Respond', count: 3 },
   { icon: Clock, label: 'Awaiting Reply', count: 5 },
-  { icon: AlertCircle, label: 'Important', count: 2 },
-  { icon: Star, label: 'Starred', count: 7 },
-  { icon: Archive, label: 'Archive', count: 0 },
-  { icon: Trash2, label: 'Trash', count: 0 },
+  { icon: AlertCircle, label: 'Important', count: 8 },
+  { icon: Star, label: 'Starred', count: 12 },
+  { icon: Users, label: 'FYI', count: 4 },
+  { icon: MessageSquare, label: 'Marketing', count: 7 },
+  { icon: Zap, label: 'Promotions', count: 9 },
+  { icon: Settings, label: 'Updates', count: 6 },
+  { icon: Archive, label: 'Archive', count: 234 },
+  { icon: Trash2, label: 'Trash', count: 12 },
 ];
 
 const integrations = [
