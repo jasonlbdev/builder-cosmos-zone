@@ -64,7 +64,7 @@ export default function IntegrationManagement() {
   const handleConnect = async (platform: string) => {
     try {
       let authUrl: string;
-      
+
       switch (platform.toLowerCase()) {
         case 'outlook':
           const outlookResponse = await fetch('/api/email-providers/outlook/auth');
@@ -81,13 +81,71 @@ export default function IntegrationManagement() {
           const slackData = await slackResponse.json();
           authUrl = slackData.authUrl;
           break;
+        case 'whatsapp':
+          const whatsappResponse = await fetch('/api/integrations/whatsapp/auth');
+          if (whatsappResponse.ok) {
+            const whatsappData = await whatsappResponse.json();
+            authUrl = whatsappData.authUrl;
+          } else {
+            // Fallback for WhatsApp - show instructions
+            alert('WhatsApp Business integration requires manual setup. Please contact support for WhatsApp Business API access.');
+            return;
+          }
+          break;
+        case 'telegram':
+          const telegramResponse = await fetch('/api/integrations/telegram/auth');
+          if (telegramResponse.ok) {
+            const telegramData = await telegramResponse.json();
+            authUrl = telegramData.authUrl;
+          } else {
+            // Fallback for Telegram - show bot token input
+            const botToken = prompt('Enter your Telegram Bot Token:');
+            if (botToken) {
+              const connectResponse = await fetch('/api/integrations/telegram/connect', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ botToken })
+              });
+              if (connectResponse.ok) {
+                alert('Telegram bot connected successfully!');
+                // Refresh the page or update state
+                window.location.reload();
+              } else {
+                alert('Failed to connect Telegram bot. Please check your token.');
+              }
+            }
+            return;
+          }
+          break;
+        case 'instagram':
+          const instagramResponse = await fetch('/api/integrations/instagram/auth');
+          if (instagramResponse.ok) {
+            const instagramData = await instagramResponse.json();
+            authUrl = instagramData.authUrl;
+          } else {
+            alert('Instagram integration is coming soon. Please check back later.');
+            return;
+          }
+          break;
+        case 'facebook':
+          const facebookResponse = await fetch('/api/integrations/facebook/auth');
+          if (facebookResponse.ok) {
+            const facebookData = await facebookResponse.json();
+            authUrl = facebookData.authUrl;
+          } else {
+            alert('Facebook integration is coming soon. Please check back later.');
+            return;
+          }
+          break;
         default:
-          throw new Error('Platform not supported yet');
+          alert(`${platform} integration is not yet available. Please check back later or contact support.`);
+          return;
       }
-      
+
       window.open(authUrl, '_blank', 'width=600,height=700');
     } catch (error) {
       console.error('Connection error:', error);
+      alert(`Failed to connect ${platform}. Please try again or contact support if the problem persists.`);
     }
   };
 
