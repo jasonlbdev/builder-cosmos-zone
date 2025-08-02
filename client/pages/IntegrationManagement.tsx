@@ -204,6 +204,14 @@ export default function IntegrationManagement() {
 
       <div className="flex-1 p-6 space-y-6">
         <div className="max-w-4xl mx-auto space-y-6">
+          {/* Error Display */}
+          {error && (
+            <Alert className="border-red-200 bg-red-50">
+              <AlertDescription className="text-red-800">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
           {/* Connected Accounts */}
           <div>
             <h2 className="text-lg font-semibold mb-4">Connected Accounts</h2>
