@@ -2,14 +2,33 @@ import { RequestHandler } from "express";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 
-// Initialize AI clients
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialize AI clients to avoid startup errors without API keys
+let openai: OpenAI | null = null;
+let anthropic: Anthropic | null = null;
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const getOpenAIClient = (): OpenAI => {
+  if (!openai && process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  if (!openai) {
+    throw new Error("OpenAI client not available - API key missing");
+  }
+  return openai;
+};
+
+const getAnthropicClient = (): Anthropic => {
+  if (!anthropic && process.env.ANTHROPIC_API_KEY) {
+    anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
+  }
+  if (!anthropic) {
+    throw new Error("Anthropic client not available - API key missing");
+  }
+  return anthropic;
+};
 
 // Email categorization prompts
 const EMAIL_CATEGORIZATION_PROMPT = `You are an expert email categorization AI. Analyze the given email and categorize it into one of these categories:
@@ -126,7 +145,8 @@ const getAIProvider = () => {
 
 async function callOpenAI(prompt: string, systemPrompt?: string): Promise<string> {
   try {
-    const response = await openai.chat.completions.create({
+    const client = getOpenAIClient();
+    const response = await client.chat.completions.create({
       model: "gpt-4-turbo-preview",
       messages: [
         ...(systemPrompt ? [{ role: "system", content: systemPrompt }] : []),
@@ -145,7 +165,8 @@ async function callOpenAI(prompt: string, systemPrompt?: string): Promise<string
 
 async function callAnthropic(prompt: string, systemPrompt?: string): Promise<string> {
   try {
-    const response = await anthropic.messages.create({
+    const client = getAnthropicClient();
+    const response = await client.messages.create({
       model: "claude-3-sonnet-20240229",
       max_tokens: 1000,
       temperature: 0.1,
@@ -228,6 +249,49 @@ export const categorizeEmailAI: RequestHandler = async (req, res) => {
     }
   } catch (error) {
     console.error("[AI] Email categorization failed:", error);
+    
+    // Fallback to rule-based categorization if AI is unavailable
+    if (error.message.includes("API key missing") || error.message.includes("No AI API keys")) {
+      const fallbackResult = {
+        category: "FYI",
+        confidence: 0.6,
+        reasoning: "Rule-based categorization (AI unavailable)",
+        urgency: "medium",
+        suggestedActions: ["Review when convenient"],
+        keywords: [],
+        fallback: true
+      };
+      
+      // Basic rule-based logic
+      const text = `${sender} ${subject} ${content}`.toLowerCase();
+      if (text.includes("urgent") || text.includes("asap") || text.includes("deadline")) {
+        fallbackResult.category = "To Respond";
+        fallbackResult.urgency = "high";
+        fallbackResult.confidence = 0.8;
+        fallbackResult.reasoning = "Detected urgent keywords";
+      } else if (text.includes("invoice") || text.includes("payment") || text.includes("billing")) {
+        fallbackResult.category = "Important";
+        fallbackResult.urgency = "high";
+        fallbackResult.confidence = 0.9;
+        fallbackResult.reasoning = "Financial/billing related";
+      } else if (text.includes("newsletter") || text.includes("unsubscribe") || text.includes("promotion")) {
+        fallbackResult.category = "Marketing";
+        fallbackResult.urgency = "low";
+        fallbackResult.confidence = 0.7;
+        fallbackResult.reasoning = "Marketing/promotional content";
+      }
+
+      return res.json({
+        success: true,
+        categorization: fallbackResult,
+        metadata: {
+          provider: "rule_based_fallback",
+          processingTime: Date.now(),
+          inputLength: content.length,
+        }
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: "AI categorization failed",
@@ -273,11 +337,27 @@ export const generateEmailReply: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("[AI] Reply generation failed:", error);
+    
+    // Provide better fallback if AI is unavailable
+    let fallbackReply = "Thank you for your email. I'll review this and get back to you soon.";
+    
+    if (error.message.includes("API key missing") || error.message.includes("No AI API keys")) {
+      // Generate a more contextual fallback based on subject
+      if (subject.toLowerCase().includes("meeting")) {
+        fallbackReply = "Thank you for the meeting request. I'll check my calendar and get back to you with my availability.";
+      } else if (subject.toLowerCase().includes("urgent")) {
+        fallbackReply = "I've received your urgent message and will prioritize reviewing it. I'll respond as soon as possible.";
+      } else if (subject.toLowerCase().includes("question")) {
+        fallbackReply = "Thank you for your question. I'll look into this and provide you with a detailed response shortly.";
+      }
+    }
+
     res.status(500).json({
       success: false,
       error: "AI reply generation failed",
       message: error.message,
-      fallback: "Thank you for your email. I'll review this and get back to you soon."
+      fallback: fallbackReply,
+      note: "AI service unavailable - using template response"
     });
   }
 };

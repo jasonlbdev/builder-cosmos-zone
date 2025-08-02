@@ -148,8 +148,8 @@ export function createServer() {
   app.delete("/api/integrations/:platform/:id", disconnectIntegration);
   app.post("/api/integrations/:platform/:id/sync", syncIntegration);
 
-  // AI categorization routes
-  app.post("/api/ai/categorize", categorizeEmail);
+  // AI categorization routes (rule-based, legacy)
+  app.post("/api/ai/categorize/legacy", categorizeEmail);
   app.post("/api/ai/categorize/bulk", bulkCategorizeEmails);
   app.post("/api/ai/process-batch", processEmailBatch);
   app.get("/api/ai/rules", getCategoryRules);
