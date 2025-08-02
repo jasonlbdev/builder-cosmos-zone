@@ -23,6 +23,8 @@ import {
   handleFacebookCallback,
   disconnectIntegration,
   syncIntegration,
+  checkWhatsAppStatus,
+  initiateWhatsAppConnection,
 } from "./routes/integrations";
 import {
   categorizeEmail,
@@ -102,11 +104,8 @@ export function createServer() {
   app.post("/api/integrations/facebook/callback", handleFacebookCallback);
 
   // WhatsApp integration routes
-  app.get("/api/integrations/whatsapp/auth", (req, res) => {
-    res
-      .status(501)
-      .json({ error: "WhatsApp Business API requires manual setup" });
-  });
+  app.get("/api/integrations/whatsapp/auth", initiateWhatsAppConnection);
+  app.post("/api/integrations/whatsapp/status", checkWhatsAppStatus);
 
   // Generic integration management
   app.delete("/api/integrations/:platform/:id", disconnectIntegration);

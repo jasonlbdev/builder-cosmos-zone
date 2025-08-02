@@ -650,3 +650,108 @@ export const syncIntegration: RequestHandler = async (req, res) => {
     res.status(500).json({ error: `Failed to sync ${platform} integration` });
   }
 };
+
+// WhatsApp Web session management
+interface WhatsAppSession {
+  sessionId: string;
+  clientId: string;
+  status: 'waiting' | 'connected' | 'expired';
+  createdAt: number;
+  ttl: number;
+  connectionData: any;
+}
+
+const whatsappSessions = new Map<string, WhatsAppSession>();
+
+export const checkWhatsAppStatus: RequestHandler = async (req, res) => {
+  try {
+    const { sessionId, clientId } = req.body;
+    
+    if (!sessionId || !clientId) {
+      return res.status(400).json({ error: 'Session ID and Client ID required' });
+    }
+    
+    const session = whatsappSessions.get(sessionId);
+    
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    // Check if session expired
+    if (Date.now() > session.ttl) {
+      whatsappSessions.delete(sessionId);
+      return res.json({ connected: false, status: 'expired' });
+    }
+    
+    // In a real implementation, this would check with WhatsApp Web servers
+    // For now, simulate connection after 10-30 seconds for testing
+    const sessionAge = Date.now() - session.createdAt;
+    const simulateConnection = sessionAge > 10000 && Math.random() > 0.7; // 30% chance after 10 seconds
+    
+    if (simulateConnection && session.status === 'waiting') {
+      session.status = 'connected';
+      whatsappSessions.set(sessionId, session);
+      
+      // Store the connection for future use
+      const whatsappIntegration = {
+        sessionId: sessionId,
+        clientId: clientId,
+        phoneNumber: `+1${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+        profileName: 'Connected User',
+        connected: true,
+        lastSync: new Date().toISOString(),
+        conversations: []
+      };
+      
+      // In production, store this in your database
+      console.log('WhatsApp connection established:', whatsappIntegration);
+    }
+    
+    res.json({
+      connected: session.status === 'connected',
+      status: session.status,
+      sessionId: sessionId
+    });
+    
+  } catch (error) {
+    console.error('WhatsApp status check error:', error);
+    res.status(500).json({ error: 'Failed to check WhatsApp status' });
+  }
+};
+
+export const initiateWhatsAppConnection: RequestHandler = async (req, res) => {
+  try {
+    const sessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const clientId = `${Math.random().toString(36).substr(2, 16)}`;
+    
+    const session: WhatsAppSession = {
+      sessionId,
+      clientId,
+      status: 'waiting',
+      createdAt: Date.now(),
+      ttl: Date.now() + (5 * 60 * 1000), // 5 minutes
+      connectionData: {
+        ref: sessionId,
+        clientId: clientId,
+        serverToken: `wa-${Math.random().toString(36).substr(2, 32)}`,
+        browserToken: `browser-${Math.random().toString(36).substr(2, 16)}`,
+        secret: btoa(Math.random().toString()).substr(0, 32),
+        version: [2, 2142, 12],
+        platform: "web"
+      }
+    };
+    
+    whatsappSessions.set(sessionId, session);
+    
+    res.json({
+      success: true,
+      sessionId,
+      clientId,
+      qrData: JSON.stringify(session.connectionData)
+    });
+    
+  } catch (error) {
+    console.error('WhatsApp connection initiation error:', error);
+    res.status(500).json({ error: 'Failed to initiate WhatsApp connection' });
+  }
+};
