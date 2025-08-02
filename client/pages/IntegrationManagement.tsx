@@ -150,7 +150,9 @@ export default function IntegrationManagement() {
       window.open(authUrl, '_blank', 'width=600,height=700');
     } catch (error) {
       console.error('Connection error:', error);
-      alert(`Failed to connect ${platform}. Please try again or contact support if the problem persists.`);
+      setError(`Failed to connect ${platform}. Please try again or contact support if the problem persists.`);
+    } finally {
+      setLoading(null);
     }
   };
 
