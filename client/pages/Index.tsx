@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Settings, Plus, Archive, Trash2, Star, Reply, Forward, MoreHorizontal, Inbox, Send, CheckCircle, Clock, AlertCircle, Users, MessageSquare, Zap, PenTool, Mail, Bot } from 'lucide-react';
+import { Search, Settings, Plus, Archive, Trash2, Star, Reply, Forward, MoreHorizontal, Inbox, Send, CheckCircle, Clock, AlertCircle, Users, MessageSquare, Zap, PenTool, Mail, Bot, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
