@@ -692,6 +692,245 @@ export default function Settings() {
               </div>
             </TabsContent>
 
+            {/* Integrations Tab */}
+            <TabsContent value="integrations" className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold">Integration Management</h3>
+                <p className="text-muted-foreground">Manage your connected accounts and sync settings</p>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Connected Integrations</CardTitle>
+                  <CardDescription>
+                    View and manage your connected email and communication platforms
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Mock connected integrations */}
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
+                          <span className="text-sm">📧</span>
+                        </div>
+                        <div>
+                          <h4 className="font-medium">Microsoft Outlook</h4>
+                          <p className="text-sm text-muted-foreground">user@company.com</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <Switch defaultChecked />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                          <span className="text-sm">✉️</span>
+                        </div>
+                        <div>
+                          <h4 className="font-medium">Gmail</h4>
+                          <p className="text-sm text-muted-foreground">user@gmail.com</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <Switch defaultChecked />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                          <span className="text-sm">💼</span>
+                        </div>
+                        <div>
+                          <h4 className="font-medium">Slack</h4>
+                          <p className="text-sm text-muted-foreground">Development Team</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                        <Switch defaultChecked />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                          <span className="text-sm">💬</span>
+                        </div>
+                        <div>
+                          <h4 className="font-medium">WhatsApp Business</h4>
+                          <p className="text-sm text-muted-foreground">Not connected</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-gray-300 rounded-full" />
+                        <Switch />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between pt-4">
+                    <Button variant="outline" asChild>
+                      <Link to="/integrations">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Integration
+                      </Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link to="/integrations/management">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Manage All
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sync Preferences</CardTitle>
+                  <CardDescription>
+                    Configure how your integrations synchronize data
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Auto-sync emails every 5 minutes</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically fetch new emails from all connected accounts
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Sync message history</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Import historical messages when connecting new accounts
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Cross-platform categorization</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Apply email categories to messages from all platforms
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Sync frequency for messaging platforms</Label>
+                    <Select defaultValue="real-time">
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="real-time">Real-time</SelectItem>
+                        <SelectItem value="1min">Every minute</SelectItem>
+                        <SelectItem value="5min">Every 5 minutes</SelectItem>
+                        <SelectItem value="15min">Every 15 minutes</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Data & Privacy</CardTitle>
+                  <CardDescription>
+                    Control how your integration data is handled
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Store message content locally</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Cache message content for faster search and offline access
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Share usage analytics</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Help improve Dexter by sharing anonymous usage data
+                      </p>
+                    </div>
+                    <Switch />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Data retention period</Label>
+                    <Select defaultValue="1year">
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30days">30 days</SelectItem>
+                        <SelectItem value="3months">3 months</SelectItem>
+                        <SelectItem value="6months">6 months</SelectItem>
+                        <SelectItem value="1year">1 year</SelectItem>
+                        <SelectItem value="forever">Forever</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="pt-4">
+                    <Button variant="destructive" size="sm">
+                      Clear All Cached Data
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Troubleshooting</CardTitle>
+                  <CardDescription>
+                    Tools to diagnose and fix integration issues
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button variant="outline" size="sm">
+                      <Zap className="w-4 h-4 mr-2" />
+                      Test All Connections
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Shield className="w-4 h-4 mr-2" />
+                      Refresh Tokens
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Bell className="w-4 h-4 mr-2" />
+                      Check Permissions
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Palette className="w-4 h-4 mr-2" />
+                      Reset Configuration
+                    </Button>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    <p>If you're experiencing issues with any integration, try these troubleshooting steps:</p>
+                    <ul className="list-disc list-inside mt-2 space-y-1">
+                      <li>Test connections to verify all platforms are responding</li>
+                      <li>Refresh authentication tokens if sync is failing</li>
+                      <li>Check that all required permissions are granted</li>
+                      <li>Reset configuration to default settings if needed</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             {/* Notifications Tab */}
             <TabsContent value="notifications" className="space-y-6">
               <div>
