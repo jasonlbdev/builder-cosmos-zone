@@ -27,10 +27,13 @@ const sidebarItems = [
 ];
 
 const integrations = [
-  { icon: MessageSquare, label: 'Slack', color: 'bg-purple-500' },
-  { icon: Send, label: 'Telegram', color: 'bg-blue-500' },
-  { icon: Users, label: 'Instagram', color: 'bg-pink-500' },
-  { icon: MessageSquare, label: 'Facebook', color: 'bg-blue-600' },
+  { icon: MessageSquare, label: 'Slack', color: 'bg-purple-500', logo: '💬' },
+  { icon: Send, label: 'Telegram', color: 'bg-blue-500', logo: '📨' },
+  { icon: Users, label: 'Instagram', color: 'bg-pink-500', logo: '📷' },
+  { icon: MessageSquare, label: 'Facebook', color: 'bg-blue-600', logo: '👥' },
+  { icon: Mail, label: 'Outlook', color: 'bg-blue-700', logo: '📧' },
+  { icon: Mail, label: 'Gmail', color: 'bg-red-500', logo: '✉️' },
+  { icon: MessageSquare, label: 'WhatsApp', color: 'bg-green-500', logo: '💬' },
 ];
 
 const emailsData = [
@@ -485,7 +488,7 @@ export default function Index() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <Button size="sm" variant="outline" className="text-xs">
-                    �� Generate Reply
+                    ✨ Generate Reply
                   </Button>
                   <Button size="sm" variant="outline" className="text-xs">
                     📝 Summarize
