@@ -60,7 +60,9 @@ export default function IntegrationManagement() {
     { name: 'WhatsApp', logo: '💬', color: 'bg-green-500', description: 'Business messaging' },
     { name: 'Telegram', logo: '📨', color: 'bg-blue-500', description: 'Chat integration' },
     { name: 'Instagram', logo: '📷', color: 'bg-pink-500', description: 'Direct messages' },
-    { name: 'Facebook', logo: '👥', color: 'bg-blue-600', description: 'Page messaging' }
+    { name: 'Facebook', logo: '👥', color: 'bg-blue-600', description: 'Page messaging' },
+    { name: 'Outlook', logo: '📧', color: 'bg-blue-700', description: 'Email management' },
+    { name: 'Gmail', logo: '✉️', color: 'bg-red-500', description: 'Email processing' }
   ]);
 
   const handleConnect = async (platform: string) => {
