@@ -19,8 +19,11 @@ interface IntegrationPlatform {
     channels?: number;
     chats?: number;
     conversations?: number;
+    folders?: number;
+    labels?: number;
   };
   features: string[];
+  logo?: string;
 }
 
 const platforms: IntegrationPlatform[] = [
