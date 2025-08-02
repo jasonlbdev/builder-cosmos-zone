@@ -21,6 +21,8 @@ interface ConnectedAccount {
 }
 
 export default function IntegrationManagement() {
+  const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccount[]>([
     {
       id: '1',
