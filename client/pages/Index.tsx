@@ -129,7 +129,10 @@ const emailsData = [
     important: false,
     category: 'Promotions',
     categoryColor: 'bg-green-500',
-    avatar: 'AM'
+    avatar: 'AM',
+    platform: 'WhatsApp',
+    platformLogo: '💬',
+    platformColor: 'bg-green-500'
   },
   {
     id: 7,
@@ -142,7 +145,10 @@ const emailsData = [
     important: false,
     category: 'Updates',
     categoryColor: 'bg-indigo-500',
-    avatar: 'NO'
+    avatar: 'NO',
+    platform: 'Telegram',
+    platformLogo: '📨',
+    platformColor: 'bg-blue-500'
   },
   {
     id: 8,
@@ -155,7 +161,10 @@ const emailsData = [
     important: false,
     category: 'FYI',
     categoryColor: 'bg-blue-500',
-    avatar: 'JW'
+    avatar: 'JW',
+    platform: 'Outlook',
+    platformLogo: '📧',
+    platformColor: 'bg-blue-700'
   },
   {
     id: 9,
@@ -168,7 +177,10 @@ const emailsData = [
     important: true,
     category: 'Important',
     categoryColor: 'bg-yellow-500',
-    avatar: 'ST'
+    avatar: 'ST',
+    platform: 'Gmail',
+    platformLogo: '✉️',
+    platformColor: 'bg-red-500'
   },
   {
     id: 10,
@@ -181,7 +193,10 @@ const emailsData = [
     important: false,
     category: 'Marketing',
     categoryColor: 'bg-purple-500',
-    avatar: 'NF'
+    avatar: 'NF',
+    platform: 'Instagram',
+    platformLogo: '📷',
+    platformColor: 'bg-pink-500'
   },
   {
     id: 11,
@@ -374,7 +389,7 @@ export default function Index() {
                   <div className="flex items-center space-x-3">
                     <h2 className="text-lg font-semibold">{selectedSidebarItem}</h2>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-muted-foreground">•</span>
+                      <span className="text-sm text-muted-foreground">��</span>
                       <select
                         value={selectedIntegration}
                         onChange={(e) => setSelectedIntegration(e.target.value)}
