@@ -28,15 +28,33 @@ const sidebarItems = [
   { icon: Trash2, label: 'Trash', count: 12 },
 ];
 
-const integrations = [
-  { icon: MessageSquare, label: 'Slack', color: 'bg-purple-500', logo: '💬' },
-  { icon: Send, label: 'Telegram', color: 'bg-blue-500', logo: '📨' },
-  { icon: Users, label: 'Instagram', color: 'bg-pink-500', logo: '📷' },
-  { icon: MessageSquare, label: 'Facebook', color: 'bg-blue-600', logo: '👥' },
-  { icon: Mail, label: 'Outlook', color: 'bg-blue-700', logo: '📧' },
-  { icon: Mail, label: 'Gmail', color: 'bg-red-500', logo: '✉️' },
-  { icon: MessageSquare, label: 'WhatsApp', color: 'bg-green-500', logo: '💬' },
-];
+const integrations = {
+  communication: {
+    label: 'Communication',
+    icon: MessageSquare,
+    isOpen: true,
+    platforms: [
+      { icon: Mail, label: 'Outlook', color: 'bg-blue-700', logo: '📧', status: 'healthy', connected: true },
+      { icon: Mail, label: 'Gmail', color: 'bg-red-500', logo: '✉️', status: 'healthy', connected: true },
+      { icon: MessageSquare, label: 'Slack', color: 'bg-purple-500', logo: '💼', status: 'warning', connected: true },
+      { icon: MessageSquare, label: 'WhatsApp', color: 'bg-green-500', logo: '💬', status: 'disconnected', connected: false },
+      { icon: Send, label: 'Telegram', color: 'bg-blue-500', logo: '📨', status: 'disconnected', connected: false },
+      { icon: Users, label: 'Instagram', color: 'bg-pink-500', logo: '📷', status: 'disconnected', connected: false },
+      { icon: MessageSquare, label: 'Facebook', color: 'bg-blue-600', logo: '👥', status: 'disconnected', connected: false },
+    ]
+  },
+  fileStorage: {
+    label: 'File Storage',
+    icon: Users,
+    isOpen: false,
+    platforms: [
+      { icon: Users, label: 'OneDrive', color: 'bg-blue-600', logo: '☁️', status: 'disconnected', connected: false },
+      { icon: Users, label: 'Google Drive', color: 'bg-green-600', logo: '📁', status: 'disconnected', connected: false },
+      { icon: Users, label: 'SharePoint', color: 'bg-indigo-600', logo: '🗃️', status: 'disconnected', connected: false },
+      { icon: Users, label: 'Dropbox', color: 'bg-blue-500', logo: '📦', status: 'disconnected', connected: false },
+    ]
+  }
+};
 
 const emailsData = [
   {
