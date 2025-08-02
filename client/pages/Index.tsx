@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Settings, Plus, Archive, Trash2, Star, Reply, Forward, MoreHorizontal, Inbox, Send, CheckCircle, Clock, AlertCircle, Users, MessageSquare, Zap, PenTool } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
