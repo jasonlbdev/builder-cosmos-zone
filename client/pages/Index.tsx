@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ComposeModal } from '@/components/ComposeModal';
+import { DexterAI } from '@/components/DexterAI';
 import { cn } from '@/lib/utils';
 
 const sidebarItems = [
@@ -514,7 +515,7 @@ export default function Index() {
                     📝 Summarize
                   </Button>
                   <Button size="sm" variant="outline" className="text-xs">
-                    ���� Schedule Meeting
+                    📅 Schedule Meeting
                   </Button>
                   <Button size="sm" variant="outline" className="text-xs">
                     🔖 Add to Task
