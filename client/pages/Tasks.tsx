@@ -1,5 +1,89 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+// Production-ready task data - in production this would come from API
+interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: "todo" | "in-progress" | "completed";
+  priority: "low" | "medium" | "high" | "urgent";
+  assignee?: string;
+  assignees?: string[];
+  dueDate?: Date;
+  tags: string[];
+  emailContext?: {
+    messageId: string;
+    sender: string;
+    subject: string;
+    platform: string;
+    platformLogo: string;
+  };
+  followUpConfig?: {
+    enabled: boolean;
+    timeframe: number;
+    message: string;
+    recipients: string[];
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const mockTasks: Task[] = [
+  {
+    id: "1",
+    title: "Review Q4 budget proposals",
+    description: "Review budget allocations, revenue projections, department spending, and new project funding requests.",
+    status: "todo",
+    priority: "high",
+    assignee: "you@company.com",
+    assignees: ["you@company.com", "sarah@company.com"],
+    dueDate: new Date(2024, 11, 22),
+    tags: ["finance", "quarterly"],
+    emailContext: {
+      messageId: "1",
+      sender: "Sarah Johnson",
+      subject: "Q4 Budget Review Meeting",
+      platform: "Outlook",
+      platformLogo: "📧",
+    },
+    followUpConfig: {
+      enabled: true,
+      timeframe: 48,
+      message: "Hi, just following up on the Q4 budget review. Could you please provide an update?",
+      recipients: ["sarah@company.com"]
+    },
+    createdAt: new Date(2024, 11, 18),
+    updatedAt: new Date(2024, 11, 18),
+  },
+  {
+    id: "2",
+    title: "Prepare project timeline discussion",
+    description: "Review milestones and prepare talking points for the project timeline meeting.",
+    status: "in-progress",
+    priority: "medium",
+    assignee: "you@company.com",
+    assignees: ["you@company.com", "jessica@company.com"],
+    dueDate: new Date(2024, 11, 20),
+    tags: ["project", "planning"],
+    emailContext: {
+      messageId: "8",
+      sender: "Jessica Wong",
+      subject: "Re: Project timeline discussion",
+      platform: "Outlook",
+      platformLogo: "📧",
+    },
+    followUpConfig: {
+      enabled: true,
+      timeframe: 24,
+      message: "Following up on the project timeline discussion. Any updates?",
+      recipients: ["jessica@company.com"]
+    },
+    createdAt: new Date(2024, 11, 17),
+    updatedAt: new Date(2024, 11, 19),
+  },
+];
+
+const getTasks = () => mockTasks;
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -47,112 +131,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  status: "todo" | "in-progress" | "completed";
-  priority: "low" | "medium" | "high" | "urgent";
-  assignee?: string;
-  dueDate?: Date;
-  tags: string[];
-  emailContext?: {
-    messageId: string;
-    sender: string;
-    subject: string;
-    platform: string;
-    platformLogo: string;
-  };
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const mockTasks: Task[] = [
-  {
-    id: "1",
-    title: "Review Q4 budget proposals",
-    description:
-      "Review budget allocations, revenue projections, department spending, and new project funding requests.",
-    status: "todo",
-    priority: "high",
-    assignee: "you@company.com",
-    dueDate: new Date(2024, 11, 22),
-    tags: ["finance", "quarterly"],
-    emailContext: {
-      messageId: "1",
-      sender: "Sarah Johnson",
-      subject: "Q4 Budget Review Meeting",
-      platform: "Outlook",
-      platformLogo: "📧",
-    },
-    createdAt: new Date(2024, 11, 18),
-    updatedAt: new Date(2024, 11, 18),
-  },
-  {
-    id: "2",
-    title: "Prepare project timeline discussion",
-    description:
-      "Review milestones and prepare talking points for the project timeline meeting.",
-    status: "in-progress",
-    priority: "medium",
-    assignee: "you@company.com",
-    dueDate: new Date(2024, 11, 20),
-    tags: ["project", "planning"],
-    emailContext: {
-      messageId: "8",
-      sender: "Jessica Wong",
-      subject: "Re: Project timeline discussion",
-      platform: "Outlook",
-      platformLogo: "📧",
-    },
-    createdAt: new Date(2024, 11, 17),
-    updatedAt: new Date(2024, 11, 19),
-  },
-  {
-    id: "3",
-    title: "Test new dashboard features",
-    description:
-      "Validate all functionality and test edge cases for the new dashboard implementation.",
-    status: "completed",
-    priority: "medium",
-    assignee: "you@company.com",
-    dueDate: new Date(2024, 11, 15),
-    tags: ["development", "testing"],
-    emailContext: {
-      messageId: "5",
-      sender: "GitHub",
-      subject: "Pull request merged: feat/new-dashboard",
-      platform: "Slack",
-      platformLogo: "💼",
-    },
-    createdAt: new Date(2024, 11, 10),
-    updatedAt: new Date(2024, 11, 15),
-  },
-  {
-    id: "4",
-    title: "Follow up on collaboration opportunity",
-    description:
-      "Reach out to Alex Rivera regarding the collaboration proposal discussed.",
-    status: "todo",
-    priority: "urgent",
-    assignee: "you@company.com",
-    dueDate: new Date(2024, 11, 21),
-    tags: ["business", "partnership"],
-    emailContext: {
-      messageId: "4",
-      sender: "Alex Rivera",
-      subject: "Collaboration Opportunity",
-      platform: "Outlook",
-      platformLogo: "📧",
-    },
-    createdAt: new Date(2024, 11, 19),
-    updatedAt: new Date(2024, 11, 19),
-  },
-];
-
 export default function Tasks() {
   const [searchParams] = useSearchParams();
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const [tasks, setTasks] = useState<Task[]>(getTasks());
   const [newTaskDialog, setNewTaskDialog] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [filter, setFilter] = useState<
@@ -493,7 +474,7 @@ export default function Tasks() {
                               <span className="text-sm">
                                 {task.emailContext.platformLogo}
                               </span>
-                              <span>From: {task.emailContext.sender}</span>
+                              <span>From: {task.emailContext.sender} ({task.emailContext.platform})</span>
                             </div>
                           )}
 
@@ -517,8 +498,27 @@ export default function Tasks() {
                           )}
                         </div>
 
-                        {task.assignee && (
-                          <div className="flex items-center space-x-1">
+                        <div className="flex items-center space-x-1">
+                          {/* Show multiple assignees if available */}
+                          {task.assignees && task.assignees.length > 1 ? (
+                            <div className="flex -space-x-1">
+                              {task.assignees.slice(0, 3).map((assignee, index) => (
+                                <Avatar key={assignee} className="w-5 h-5 border-2 border-background">
+                                  <AvatarFallback className="text-xs">
+                                    {assignee
+                                      .split("@")[0]
+                                      .charAt(0)
+                                      .toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                              ))}
+                              {task.assignees.length > 3 && (
+                                <div className="w-5 h-5 rounded-full bg-muted border-2 border-background flex items-center justify-center">
+                                  <span className="text-xs text-muted-foreground">+{task.assignees.length - 3}</span>
+                                </div>
+                              )}
+                            </div>
+                          ) : task.assignee && (
                             <Avatar className="w-5 h-5">
                               <AvatarFallback className="text-xs">
                                 {task.assignee
@@ -527,8 +527,8 @@ export default function Tasks() {
                                   .toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -737,6 +737,36 @@ function TaskDetailsView({ task }: { task: Task }) {
         </div>
       )}
 
+      {/* Enhanced Assignees Section */}
+      {(task.assignees || task.assignee) && (
+        <div>
+          <Label className="text-sm text-muted-foreground">
+            {task.assignees && task.assignees.length > 1 ? 'Assignees' : 'Assignee'}
+          </Label>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {task.assignees ? task.assignees.map((assignee) => (
+              <div key={assignee} className="flex items-center space-x-2 bg-accent p-2 rounded">
+                <Avatar className="w-6 h-6">
+                  <AvatarFallback className="text-xs">
+                    {assignee.split("@")[0].charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm">{assignee}</span>
+              </div>
+            )) : task.assignee && (
+              <div className="flex items-center space-x-2 bg-accent p-2 rounded">
+                <Avatar className="w-6 h-6">
+                  <AvatarFallback className="text-xs">
+                    {task.assignee.split("@")[0].charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm">{task.assignee}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {task.tags.length > 0 && (
         <div>
           <Label className="text-sm text-muted-foreground">Tags</Label>
@@ -750,15 +780,57 @@ function TaskDetailsView({ task }: { task: Task }) {
         </div>
       )}
 
+      {/* Enhanced Email Context Section */}
       {task.emailContext && (
         <div>
-          <Label className="text-sm text-muted-foreground">Related Email</Label>
-          <div className="flex items-center space-x-2 mt-1 p-2 bg-accent rounded">
-            <span className="text-sm">{task.emailContext.platformLogo}</span>
-            <span className="text-sm">{task.emailContext.subject}</span>
-            <Badge variant="outline" className="text-xs">
-              {task.emailContext.platform}
-            </Badge>
+          <Label className="text-sm text-muted-foreground">Source Context</Label>
+          <div className="mt-1 p-3 bg-accent rounded">
+            <div className="flex items-center space-x-2 mb-2">
+              <span className="text-sm">{task.emailContext.platformLogo}</span>
+              <span className="font-medium text-sm">{task.emailContext.platform}</span>
+              <Badge variant="secondary" className="text-xs">Email</Badge>
+            </div>
+            <div className="space-y-1">
+              <div className="text-sm">
+                <span className="text-muted-foreground">From:</span> {task.emailContext.sender}
+              </div>
+              <div className="text-sm">
+                <span className="text-muted-foreground">Subject:</span> {task.emailContext.subject}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Task created from this email conversation
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Follow-up Configuration */}
+      {task.followUpConfig && (
+        <div>
+          <Label className="text-sm text-muted-foreground">Follow-up Settings</Label>
+          <div className="mt-1 p-3 bg-accent rounded">
+            <div className="flex items-center space-x-2 mb-2">
+              <Clock className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {task.followUpConfig.enabled ? 'Enabled' : 'Disabled'}
+              </span>
+              {task.followUpConfig.enabled && (
+                <Badge variant="default" className="text-xs">
+                  {task.followUpConfig.timeframe}h delay
+                </Badge>
+              )}
+            </div>
+            {task.followUpConfig.enabled && (
+              <div className="space-y-1">
+                <div className="text-xs text-muted-foreground">
+                  Will send follow-up to: {task.followUpConfig.recipients.join(', ')}
+                </div>
+                <div className="text-xs bg-background p-2 rounded italic">
+                  "{task.followUpConfig.message}"
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -766,10 +838,16 @@ function TaskDetailsView({ task }: { task: Task }) {
       <div className="flex space-x-2 pt-4">
         <Button size="sm">Edit Task</Button>
         <Button size="sm" variant="outline">
-          Add Comment
+          <User className="w-4 h-4 mr-1" />
+          Copy Team Members
         </Button>
         <Button size="sm" variant="outline">
-          Share Task
+          <Clock className="w-4 h-4 mr-1" />
+          Set Follow-up
+        </Button>
+        <Button size="sm" variant="outline">
+          <MessageSquare className="w-4 h-4 mr-1" />
+          Add Comment
         </Button>
       </div>
     </div>

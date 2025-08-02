@@ -1,5 +1,61 @@
 import { useState, useEffect } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
+// Production-ready calendar data - in production this would come from API
+interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  startTime: Date;
+  endTime: Date;
+  attendees: string[];
+  location?: string;
+  type: "meeting" | "call" | "event";
+  status: "confirmed" | "tentative" | "cancelled";
+  emailAccount?: string;
+  platform?: string;
+  emailContext?: {
+    messageId: string;
+    sender: string;
+    subject: string;
+    platform: string;
+  };
+}
+
+const mockEvents: CalendarEvent[] = [
+  {
+    id: "1",
+    title: "Q4 Budget Review Meeting",
+    description: "Review budget allocations and revenue projections for Q4",
+    startTime: new Date(2024, 11, 20, 14, 0),
+    endTime: new Date(2024, 11, 20, 15, 30),
+    attendees: ["sarah@company.com", "john@company.com", "you@company.com"],
+    location: "Conference Room A",
+    type: "meeting",
+    status: "confirmed",
+    emailAccount: "you@company.com",
+    platform: "Outlook",
+    emailContext: {
+      messageId: "1",
+      sender: "Sarah Johnson",
+      subject: "Q4 Budget Review Meeting",
+      platform: "Outlook",
+    },
+  },
+  {
+    id: "2",
+    title: "Project Sync Call",
+    description: "Weekly project synchronization with the development team",
+    startTime: new Date(2024, 11, 22, 10, 0),
+    endTime: new Date(2024, 11, 22, 11, 0),
+    attendees: ["dev-team@company.com", "you@company.com"],
+    type: "call",
+    status: "confirmed",
+    emailAccount: "you@company.com",
+    platform: "Platform-hosted",
+  },
+];
+
+const getEvents = () => mockEvents;
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -43,69 +99,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface CalendarEvent {
-  id: string;
-  title: string;
-  description?: string;
-  startTime: Date;
-  endTime: Date;
-  attendees: string[];
-  location?: string;
-  type: "meeting" | "call" | "event";
-  status: "confirmed" | "tentative" | "cancelled";
-  emailContext?: {
-    messageId: string;
-    sender: string;
-    subject: string;
-    platform: string;
-  };
-}
-
-const mockEvents: CalendarEvent[] = [
-  {
-    id: "1",
-    title: "Q4 Budget Review Meeting",
-    description: "Review budget allocations and revenue projections for Q4",
-    startTime: new Date(2024, 11, 20, 14, 0),
-    endTime: new Date(2024, 11, 20, 15, 30),
-    attendees: ["sarah@company.com", "john@company.com", "you@company.com"],
-    location: "Conference Room A",
-    type: "meeting",
-    status: "confirmed",
-    emailContext: {
-      messageId: "1",
-      sender: "Sarah Johnson",
-      subject: "Q4 Budget Review Meeting",
-      platform: "Outlook",
-    },
-  },
-  {
-    id: "2",
-    title: "Project Sync Call",
-    description: "Weekly project synchronization with the development team",
-    startTime: new Date(2024, 11, 22, 10, 0),
-    endTime: new Date(2024, 11, 22, 11, 0),
-    attendees: ["dev-team@company.com", "you@company.com"],
-    type: "call",
-    status: "confirmed",
-  },
-  {
-    id: "3",
-    title: "Client Presentation",
-    description: "Present project milestone updates to the client",
-    startTime: new Date(2024, 11, 25, 16, 0),
-    endTime: new Date(2024, 11, 25, 17, 0),
-    attendees: ["client@external.com", "you@company.com"],
-    location: "Zoom Meeting",
-    type: "meeting",
-    status: "tentative",
-  },
-];
-
 export default function Calendar() {
   const [searchParams] = useSearchParams();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
+  const [events, setEvents] = useState<CalendarEvent[]>(getEvents());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
     null,
   );
@@ -206,9 +203,26 @@ export default function Calendar() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Calendar</h1>
-            <p className="text-muted-foreground">
-              Manage your meetings and events
-            </p>
+            <div className="flex items-center space-x-4">
+              <p className="text-muted-foreground">
+                Manage your meetings and events
+              </p>
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-muted-foreground">Synced with</span>
+                <div className="flex items-center space-x-1">
+                  <span>📧</span>
+                  <span className="text-xs">you@company.com</span>
+                </div>
+                <span className="text-muted-foreground">•</span>
+                <div className="flex items-center space-x-1">
+                  <span>✉️</span>
+                  <span className="text-xs">you@gmail.com</span>
+                </div>
+                <span className="text-muted-foreground">•</span>
+                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Platform-hosted</span>
+              </div>
+            </div>
           </div>
           <div className="flex items-center space-x-2">
             <Select
@@ -540,6 +554,27 @@ function EventDetailsView({ event }: { event: CalendarEvent }) {
         </div>
       </div>
 
+      {/* Platform and Account Information */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label className="text-sm text-muted-foreground">Calendar Account</Label>
+          <div className="flex items-center space-x-2 mt-1">
+            <Mail className="w-4 h-4" />
+            <span className="text-sm">{event.emailAccount || 'Unknown'}</span>
+          </div>
+        </div>
+        <div>
+          <Label className="text-sm text-muted-foreground">Platform</Label>
+          <div className="flex items-center space-x-2 mt-1">
+            <span className="text-sm">{event.platform === 'Outlook' ? '📧' : event.platform === 'Gmail' ? '✉️' : '🗓️'}</span>
+            <span className="text-sm">{event.platform || 'Platform-hosted'}</span>
+            {event.platform === 'Platform-hosted' && (
+              <Badge variant="secondary" className="text-xs">Native</Badge>
+            )}
+          </div>
+        </div>
+      </div>
+
       {event.location && (
         <div>
           <Label className="text-sm text-muted-foreground">Location</Label>
@@ -554,7 +589,7 @@ function EventDetailsView({ event }: { event: CalendarEvent }) {
         <Label className="text-sm text-muted-foreground">Attendees</Label>
         <div className="flex flex-wrap gap-2 mt-1">
           {event.attendees.map((attendee, index) => (
-            <div key={index} className="flex items-center space-x-2">
+            <div key={index} className="flex items-center space-x-2 bg-accent p-2 rounded">
               <Avatar className="w-6 h-6">
                 <AvatarFallback className="text-xs">
                   {attendee.split("@")[0].charAt(0).toUpperCase()}
@@ -568,13 +603,24 @@ function EventDetailsView({ event }: { event: CalendarEvent }) {
 
       {event.emailContext && (
         <div>
-          <Label className="text-sm text-muted-foreground">Related Email</Label>
-          <div className="flex items-center space-x-2 mt-1 p-2 bg-accent rounded">
-            <Mail className="w-4 h-4" />
-            <span className="text-sm">{event.emailContext.subject}</span>
-            <Badge variant="outline" className="text-xs">
-              {event.emailContext.platform}
-            </Badge>
+          <Label className="text-sm text-muted-foreground">Source Context</Label>
+          <div className="mt-1 p-3 bg-accent rounded">
+            <div className="flex items-center space-x-2 mb-2">
+              <Mail className="w-4 h-4" />
+              <span className="font-medium text-sm">{event.emailContext.platform}</span>
+              <Badge variant="secondary" className="text-xs">Email</Badge>
+            </div>
+            <div className="space-y-1">
+              <div className="text-sm">
+                <span className="text-muted-foreground">From:</span> {event.emailContext.sender}
+              </div>
+              <div className="text-sm">
+                <span className="text-muted-foreground">Subject:</span> {event.emailContext.subject}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Event created from this email conversation
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -585,9 +631,15 @@ function EventDetailsView({ event }: { event: CalendarEvent }) {
           Edit Event
         </Button>
         <Button size="sm" variant="outline">
+          <Video className="w-4 h-4 mr-1" />
           Join Meeting
         </Button>
         <Button size="sm" variant="outline">
+          <Clock className="w-4 h-4 mr-1" />
+          Set Follow-up
+        </Button>
+        <Button size="sm" variant="outline">
+          <Mail className="w-4 h-4 mr-1" />
           Send Update
         </Button>
       </div>

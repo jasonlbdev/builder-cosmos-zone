@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-
+// Mock conversation data - in production this would come from database
 interface ConversationMessage {
   id: string;
   sender: string;
@@ -10,14 +10,12 @@ interface ConversationMessage {
   status?: "sent" | "delivered" | "read";
 }
 
-// Mock conversation data by platform and message ID
 const conversationData: Record<string, ConversationMessage[]> = {
   whatsapp_6: [
     {
       id: "1",
       sender: "Amazon Support",
-      content:
-        "Hello! Your package #AMZ123456 has been shipped and is on its way.",
+      content: "Hello! Your package #AMZ123456 has been shipped and is on its way.",
       time: "2h ago",
       isMe: false,
       avatar: "AS",
@@ -30,24 +28,6 @@ const conversationData: Record<string, ConversationMessage[]> = {
       isMe: true,
       avatar: "YU",
       status: "read",
-    },
-    {
-      id: "3",
-      sender: "Amazon Support",
-      content:
-        "Your package will be delivered today between 2-6 PM. You can track it here: [tracking link]",
-      time: "1h ago",
-      isMe: false,
-      avatar: "AS",
-    },
-    {
-      id: "4",
-      sender: "Amazon Support",
-      content:
-        "Great news! Your recent order has been delivered to your address. You can track your order history in your account.",
-      time: "30m ago",
-      isMe: false,
-      avatar: "AS",
     },
   ],
   slack_5: [
@@ -68,36 +48,10 @@ const conversationData: Record<string, ConversationMessage[]> = {
       avatar: "YU",
       status: "delivered",
     },
-    {
-      id: "3",
-      sender: "GitHub Bot",
-      content:
-        "Yes, all tests passed. The deployment has been triggered automatically.",
-      time: "4h ago",
-      isMe: false,
-      avatar: "GB",
-    },
-  ],
-  telegram_7: [
-    {
-      id: "1",
-      sender: "Notion Updates",
-      content: "New features in Notion AI",
-      time: "4h ago",
-      isMe: false,
-      avatar: "NO",
-    },
-    {
-      id: "2",
-      sender: "Notion Updates",
-      content:
-        "Discover the latest AI-powered features that will supercharge your productivity and help you work smarter, not harder.",
-      time: "4h ago",
-      isMe: false,
-      avatar: "NO",
-    },
   ],
 };
+
+const getConversations = () => conversationData;
 
 export const getConversationMessages = async (req: Request, res: Response) => {
   try {
@@ -112,6 +66,7 @@ export const getConversationMessages = async (req: Request, res: Response) => {
     }
 
     const conversationKey = `${(platform as string).toLowerCase()}_${messageId}`;
+    const conversationData = getConversations();
     const messages = conversationData[conversationKey] || [];
 
     // In production, this would fetch from the actual platform APIs:
@@ -173,6 +128,7 @@ export const sendMessage = async (req: Request, res: Response) => {
 
     // Add to conversation data for demo purposes
     const conversationKey = `${(platform as string).toLowerCase()}_${messageId}`;
+    const conversationData = getConversations();
     if (conversationData[conversationKey]) {
       conversationData[conversationKey].push(newMessage);
     }

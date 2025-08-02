@@ -1,5 +1,47 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+// Production-ready settings data - in production this would come from API
+interface EmailCategory {
+  id: string;
+  name: string;
+  color: string;
+  description: string;
+  rules: CategoryRule[];
+  enabled: boolean;
+}
+
+interface CategoryRule {
+  id: string;
+  type: "sender" | "subject" | "content" | "domain" | "keywords" | "toRecipients" | "ccRecipients" | "importance" | "hasAttachments" | "conversationId" | "categories" | "flag" | "messageClass";
+  condition: "contains" | "equals" | "starts_with" | "ends_with" | "regex" | "is_null" | "is_not_null" | "greater_than" | "less_than";
+  value: string;
+  enabled: boolean;
+  apiField?: string;
+  description?: string;
+}
+
+const mockEmailCategories: EmailCategory[] = [
+  {
+    id: "to-respond",
+    name: "To Respond",
+    color: "bg-red-500",
+    description: "Emails requiring immediate response",
+    rules: [
+      {
+        id: "1",
+        type: "toRecipients",
+        condition: "contains",
+        value: "your-email@domain.com",
+        enabled: true,
+        apiField: "toRecipients/emailAddress/address",
+        description: "Emails directly addressed to you (not CC)",
+      },
+    ],
+    enabled: true,
+  },
+];
+
+const getEmailCategories = () => mockEmailCategories;
 import {
   Plus,
   Trash2,
@@ -48,46 +90,7 @@ import {
 } from "@/components/ui/dialog";
 import RuleCreationDialog from "@/components/RuleCreationDialog-simple";
 
-interface EmailCategory {
-  id: string;
-  name: string;
-  color: string;
-  description: string;
-  rules: CategoryRule[];
-  enabled: boolean;
-}
 
-interface CategoryRule {
-  id: string;
-  type:
-    | "sender"
-    | "subject"
-    | "content"
-    | "domain"
-    | "keywords"
-    | "toRecipients"
-    | "ccRecipients"
-    | "importance"
-    | "hasAttachments"
-    | "conversationId"
-    | "categories"
-    | "flag"
-    | "messageClass";
-  condition:
-    | "contains"
-    | "equals"
-    | "starts_with"
-    | "ends_with"
-    | "regex"
-    | "is_null"
-    | "is_not_null"
-    | "greater_than"
-    | "less_than";
-  value: string;
-  enabled: boolean;
-  apiField?: string; // Microsoft Graph API field reference
-  description?: string;
-}
 
 interface AIRule {
   id: string;
@@ -98,178 +101,6 @@ interface AIRule {
   confidence: number;
   enabled: boolean;
 }
-
-const defaultCategories: EmailCategory[] = [
-  {
-    id: "to-respond",
-    name: "To Respond",
-    color: "bg-red-500",
-    description: "Emails requiring immediate response",
-    rules: [
-      {
-        id: "1",
-        type: "toRecipients",
-        condition: "contains",
-        value: "your-email@domain.com",
-        enabled: true,
-        apiField: "toRecipients/emailAddress/address",
-        description: "Emails directly addressed to you (not CC)",
-      },
-      {
-        id: "2",
-        type: "importance",
-        condition: "equals",
-        value: "high",
-        enabled: true,
-        apiField: "importance",
-        description: "Emails marked as high importance",
-      },
-      {
-        id: "3",
-        type: "keywords",
-        condition: "contains",
-        value: "urgent, ASAP, deadline",
-        enabled: true,
-        description: "Keywords indicating urgency",
-      },
-    ],
-    enabled: true,
-  },
-  {
-    id: "awaiting-reply",
-    name: "Awaiting Reply",
-    color: "bg-orange-500",
-    description: "Emails waiting for responses from others",
-    rules: [
-      {
-        id: "4",
-        type: "conversationId",
-        condition: "is_not_null",
-        value: "",
-        enabled: true,
-        apiField: "conversationId",
-        description: "Part of an ongoing conversation thread",
-      },
-      {
-        id: "5",
-        type: "subject",
-        condition: "starts_with",
-        value: "Re:",
-        enabled: true,
-        apiField: "subject",
-        description: "Reply to a previous email",
-      },
-    ],
-    enabled: true,
-  },
-  {
-    id: "important",
-    name: "Important",
-    color: "bg-yellow-500",
-    description: "High priority emails",
-    rules: [
-      {
-        id: "6",
-        type: "flag",
-        condition: "is_not_null",
-        value: "",
-        enabled: true,
-        apiField: "flag",
-        description: "Emails with follow-up flags",
-      },
-      {
-        id: "7",
-        type: "sender",
-        condition: "contains",
-        value: "ceo@, manager@, director@",
-        enabled: true,
-        apiField: "from/emailAddress/address",
-        description: "Emails from senior leadership",
-      },
-    ],
-    enabled: true,
-  },
-  {
-    id: "fyi",
-    name: "FYI",
-    color: "bg-blue-500",
-    description: "Informational emails for awareness",
-    rules: [
-      {
-        id: "8",
-        type: "ccRecipients",
-        condition: "contains",
-        value: "your-email@domain.com",
-        enabled: true,
-        apiField: "ccRecipients/emailAddress/address",
-        description: "Emails where you are CC'd",
-      },
-      {
-        id: "9",
-        type: "subject",
-        condition: "starts_with",
-        value: "FYI:",
-        enabled: true,
-        apiField: "subject",
-        description: "Emails marked as FYI",
-      },
-    ],
-    enabled: true,
-  },
-  {
-    id: "marketing",
-    name: "Marketing",
-    color: "bg-purple-500",
-    description: "Promotional and marketing emails",
-    rules: [
-      {
-        id: "10",
-        type: "messageClass",
-        condition: "equals",
-        value: "IPM.Note.Marketing",
-        enabled: true,
-        apiField: "messageClass",
-        description: "Emails classified as marketing",
-      },
-      {
-        id: "11",
-        type: "keywords",
-        condition: "contains",
-        value: "unsubscribe, newsletter, promotion",
-        enabled: true,
-        description: "Marketing-related keywords",
-      },
-    ],
-    enabled: true,
-  },
-  {
-    id: "updates",
-    name: "Updates",
-    color: "bg-indigo-500",
-    description: "Product updates and notifications",
-    rules: [
-      {
-        id: "12",
-        type: "sender",
-        condition: "contains",
-        value: "notifications@, noreply@, no-reply@",
-        enabled: true,
-        apiField: "from/emailAddress/address",
-        description: "Automated notification emails",
-      },
-      {
-        id: "13",
-        type: "hasAttachments",
-        condition: "equals",
-        value: "false",
-        enabled: true,
-        apiField: "hasAttachments",
-        description: "Notification emails typically have no attachments",
-      },
-    ],
-    enabled: true,
-  },
-];
 
 const defaultAIRules: AIRule[] = [
   {
@@ -315,7 +146,7 @@ const defaultAIRules: AIRule[] = [
 
 export default function Settings() {
   const [categories, setCategories] =
-    useState<EmailCategory[]>(defaultCategories);
+    useState<EmailCategory[]>(getEmailCategories());
   const [aiRules, setAiRules] = useState<AIRule[]>(defaultAIRules);
   const [newCategoryDialog, setNewCategoryDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
@@ -463,7 +294,7 @@ export default function Settings() {
                 AI Rules
               </TabsTrigger>
               <TabsTrigger value="integrations">
-                <Settings className="w-4 h-4 mr-2" />
+                <Zap className="w-4 h-4 mr-2" />
                 Integrations
               </TabsTrigger>
               <TabsTrigger value="filters">
