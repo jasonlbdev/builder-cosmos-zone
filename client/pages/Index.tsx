@@ -469,13 +469,11 @@ export default function Index() {
                         className="text-sm bg-transparent border-none focus:outline-none text-muted-foreground"
                       >
                         <option value="All">All Platforms</option>
-                        {Object.values(integrationCategories).flatMap(category =>
-                          category.platforms.map(platform => (
-                            <option key={platform.label} value={platform.label}>
-                              {platform.label}
-                            </option>
-                          ))
-                        )}
+                        {integrationCategories.communication.platforms.map(platform => (
+                          <option key={platform.label} value={platform.label}>
+                            {platform.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
