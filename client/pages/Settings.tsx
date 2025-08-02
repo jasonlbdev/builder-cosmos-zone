@@ -158,14 +158,78 @@ export default function Settings() {
     }
   });
 
-  const handleCategoryUpdate = (categoryId: string, updates: Partial<EmailCategory>) => {
-    setCategories(prev => prev.map(cat => 
-      cat.id === categoryId ? { ...cat, ...updates } : cat
-    ));
+  const handleCategoryUpdate = async (categoryId: string, updates: Partial<EmailCategory>) => {
+    try {
+      const response = await fetch(`/api/ai/rules/${categoryId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+
+      if (response.ok) {
+        setCategories(prev => prev.map(cat =>
+          cat.id === categoryId ? { ...cat, ...updates } : cat
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to update category:', error);
+    }
   };
 
-  const handleDeleteCategory = (categoryId: string) => {
-    setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+  const handleDeleteCategory = async (categoryId: string) => {
+    try {
+      const response = await fetch(`/api/ai/rules/${categoryId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+      }
+    } catch (error) {
+      console.error('Failed to delete category:', error);
+    }
+  };
+
+  const handleCreateCategory = async (categoryData: Partial<EmailCategory>) => {
+    try {
+      const response = await fetch('/api/ai/rules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(categoryData)
+      });
+
+      if (response.ok) {
+        const newCategory = await response.json();
+        setCategories(prev => [...prev, newCategory.rule]);
+        setNewCategoryDialog(false);
+      }
+    } catch (error) {
+      console.error('Failed to create category:', error);
+    }
+  };
+
+  const handleAddRule = async (categoryId: string, ruleData: Partial<CategoryRule>) => {
+    try {
+      const response = await fetch('/api/ai/rules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...ruleData,
+          category: categoryId
+        })
+      });
+
+      if (response.ok) {
+        const newRule = await response.json();
+        setCategories(prev => prev.map(cat =>
+          cat.id === categoryId
+            ? { ...cat, rules: [...cat.rules, newRule.rule] }
+            : cat
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to add rule:', error);
+    }
   };
 
   const handleAIRuleToggle = (ruleId: string, enabled: boolean) => {
