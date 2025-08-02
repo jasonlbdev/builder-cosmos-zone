@@ -2,6 +2,16 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  getEmails,
+  getEmailById,
+  sendEmail,
+  markAsRead,
+  archiveEmail,
+  getAISuggestion,
+  getIntegrationStatus,
+  connectIntegration
+} from "./routes/emails";
 
 export function createServer() {
   const app = express();
@@ -18,6 +28,18 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Email API routes
+  app.get("/api/emails", getEmails);
+  app.get("/api/emails/:id", getEmailById);
+  app.post("/api/emails/send", sendEmail);
+  app.patch("/api/emails/:id/read", markAsRead);
+  app.patch("/api/emails/:id/archive", archiveEmail);
+  app.post("/api/ai/suggest", getAISuggestion);
+
+  // Integration routes
+  app.get("/api/integrations", getIntegrationStatus);
+  app.post("/api/integrations/connect", connectIntegration);
 
   return app;
 }
