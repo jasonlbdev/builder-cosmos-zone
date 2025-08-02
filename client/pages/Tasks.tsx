@@ -45,7 +45,21 @@ import {
   Circle,
   AlertCircle,
   MessageSquare,
+  Grid3X3,
+  Table,
+  Kanban,
+  ArrowUpDown,
+  SortAsc,
+  SortDesc,
 } from "lucide-react";
+import {
+  Table as UITable,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
 export default function Tasks() {
@@ -57,6 +71,9 @@ export default function Tasks() {
     "all" | "todo" | "in-progress" | "completed"
   >("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [viewMode, setViewMode] = useState<"tiles" | "table" | "kanban">("tiles");
+  const [sortBy, setSortBy] = useState<"deadline" | "priority" | "status" | "title">("deadline");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   // Handle email context from URL parameters
   useEffect(() => {
@@ -73,16 +90,47 @@ export default function Tasks() {
     }
   }, [searchParams]);
 
-  const filteredTasks = tasks.filter((task) => {
-    const matchesFilter = filter === "all" || task.status === filter;
-    const matchesSearch =
-      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.tags.some((tag) =>
-        tag.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
-    return matchesFilter && matchesSearch;
-  });
+  const filteredAndSortedTasks = tasks
+    .filter((task) => {
+      const matchesFilter = filter === "all" || task.status === filter;
+      const matchesSearch =
+        task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.tags.some((tag) =>
+          tag.toLowerCase().includes(searchTerm.toLowerCase()),
+        );
+      return matchesFilter && matchesSearch;
+    })
+    .sort((a, b) => {
+      let aValue: any, bValue: any;
+      
+      switch (sortBy) {
+        case "deadline":
+          aValue = new Date(a.dueDate || "2099-12-31");
+          bValue = new Date(b.dueDate || "2099-12-31");
+          break;
+        case "priority":
+          const priorityOrder = { "urgent": 4, "high": 3, "medium": 2, "low": 1 };
+          aValue = priorityOrder[a.priority as keyof typeof priorityOrder] || 0;
+          bValue = priorityOrder[b.priority as keyof typeof priorityOrder] || 0;
+          break;
+        case "status":
+          const statusOrder = { "todo": 1, "in-progress": 2, "completed": 3 };
+          aValue = statusOrder[a.status as keyof typeof statusOrder] || 0;
+          bValue = statusOrder[b.status as keyof typeof statusOrder] || 0;
+          break;
+        case "title":
+          aValue = a.title.toLowerCase();
+          bValue = b.title.toLowerCase();
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -211,6 +259,56 @@ export default function Tasks() {
                 <SelectItem value="completed">Completed</SelectItem>
               </SelectContent>
             </Select>
+            
+            {/* View Mode Controls */}
+            <div className="flex items-center border rounded-lg">
+              <Button
+                variant={viewMode === "tiles" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("tiles")}
+                className="rounded-r-none border-r"
+              >
+                <Grid3X3 className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === "table" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("table")}
+                className="rounded-none border-r"
+              >
+                <Table className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === "kanban" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("kanban")}
+                className="rounded-l-none"
+              >
+                <Kanban className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Sort Controls */}
+            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="deadline">Deadline</SelectItem>
+                <SelectItem value="priority">Priority</SelectItem>
+                <SelectItem value="status">Status</SelectItem>
+                <SelectItem value="title">Title</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            >
+              {sortOrder === "asc" ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />}
+            </Button>
+            
             <Dialog open={newTaskDialog} onOpenChange={setNewTaskDialog}>
               <DialogTrigger asChild>
                 <Button>
@@ -312,161 +410,10 @@ export default function Tasks() {
             </Card>
           </div>
 
-          {/* Tasks List */}
-          <div className="space-y-3">
-            {filteredTasks.map((task) => (
-              <Card
-                key={task.id}
-                className={cn(
-                  "cursor-pointer hover:shadow-md transition-shadow",
-                  task.status === "completed" && "opacity-75",
-                )}
-                onClick={() => setSelectedTask(task)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-4">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleTaskStatus(task.id);
-                      }}
-                      className="mt-1"
-                    >
-                      {getStatusIcon(task.status)}
-                    </button>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h3
-                            className={cn(
-                              "font-medium text-sm",
-                              task.status === "completed" &&
-                                "line-through text-muted-foreground",
-                            )}
-                          >
-                            {task.title}
-                          </h3>
-                          {task.description && (
-                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                              {task.description}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex items-center space-x-2 ml-4">
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              "text-xs",
-                              getPriorityColor(task.priority),
-                            )}
-                          >
-                            {getPriorityIcon(task.priority)}
-                            <span className="ml-1 capitalize">
-                              {task.priority}
-                            </span>
-                          </Badge>
-
-                          {task.dueDate && (
-                            <Badge
-                              variant={
-                                isOverdue(task.dueDate)
-                                  ? "destructive"
-                                  : "secondary"
-                              }
-                              className="text-xs"
-                            >
-                              <Calendar className="w-3 h-3 mr-1" />
-                              {formatDate(task.dueDate)}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          {task.emailContext && (
-                            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-                              <span className="text-sm">
-                                {task.emailContext.platformLogo}
-                              </span>
-                              <span>From: {task.emailContext.sender} ({task.emailContext.platform})</span>
-                            </div>
-                          )}
-
-                          {task.tags.length > 0 && (
-                            <div className="flex space-x-1">
-                              {task.tags.slice(0, 2).map((tag) => (
-                                <Badge
-                                  key={tag}
-                                  variant="outline"
-                                  className="text-xs"
-                                >
-                                  {tag}
-                                </Badge>
-                              ))}
-                              {task.tags.length > 2 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{task.tags.length - 2}
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex items-center space-x-1">
-                          {/* Show multiple assignees if available */}
-                          {task.assignees && task.assignees.length > 1 ? (
-                            <div className="flex -space-x-1">
-                              {task.assignees.slice(0, 3).map((assignee, index) => (
-                                <Avatar key={assignee} className="w-5 h-5 border-2 border-background">
-                                  <AvatarFallback className="text-xs">
-                                    {assignee
-                                      .split("@")[0]
-                                      .charAt(0)
-                                      .toUpperCase()}
-                                  </AvatarFallback>
-                                </Avatar>
-                              ))}
-                              {task.assignees.length > 3 && (
-                                <div className="w-5 h-5 rounded-full bg-muted border-2 border-background flex items-center justify-center">
-                                  <span className="text-xs text-muted-foreground">+{task.assignees.length - 3}</span>
-                                </div>
-                              )}
-                            </div>
-                          ) : task.assignee && (
-                            <Avatar className="w-5 h-5">
-                              <AvatarFallback className="text-xs">
-                                {task.assignee
-                                  .split("@")[0]
-                                  .charAt(0)
-                                  .toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {filteredTasks.length === 0 && (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No tasks found</h3>
-                  <p className="text-muted-foreground">
-                    {searchTerm
-                      ? "Try adjusting your search terms"
-                      : "Create your first task to get started"}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          {/* Tasks Views */}
+          {viewMode === "tiles" && <TilesView tasks={filteredAndSortedTasks} onTaskClick={setSelectedTask} onTaskToggle={toggleTaskStatus} />}
+          {viewMode === "table" && <TableView tasks={filteredAndSortedTasks} onTaskClick={setSelectedTask} onTaskToggle={toggleTaskStatus} />}
+          {viewMode === "kanban" && <KanbanView tasks={filteredAndSortedTasks} onTaskClick={setSelectedTask} onTaskToggle={toggleTaskStatus} />}
         </div>
       </div>
 
@@ -780,4 +727,400 @@ function TaskDetailsView({ task }: { task: Task }) {
         return <Circle className="w-4 h-4 text-muted-foreground" />;
     }
   }
+}
+
+// View Components
+
+interface TaskViewProps {
+  tasks: Task[];
+  onTaskClick: (task: Task) => void;
+  onTaskToggle: (taskId: string) => void;
+}
+
+function TilesView({ tasks, onTaskClick, onTaskToggle }: TaskViewProps) {
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+      case "in-progress":
+        return <Clock className="w-4 h-4 text-blue-500" />;
+      default:
+        return <Circle className="w-4 h-4 text-muted-foreground" />;
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "urgent":
+        return "text-red-500 bg-red-50 border-red-200";
+      case "high":
+        return "text-orange-500 bg-orange-50 border-orange-200";
+      case "medium":
+        return "text-yellow-500 bg-yellow-50 border-yellow-200";
+      case "low":
+        return "text-green-500 bg-green-50 border-green-200";
+      default:
+        return "text-gray-500 bg-gray-50 border-gray-200";
+    }
+  };
+
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case "urgent":
+        return <AlertCircle className="w-3 h-3" />;
+      case "high":
+        return <Flag className="w-3 h-3" />;
+      default:
+        return <Flag className="w-3 h-3" />;
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
+    });
+  };
+
+  const isOverdue = (dueDate: Date | undefined) => {
+    if (!dueDate) return false;
+    return dueDate < new Date() && dueDate.toDateString() !== new Date().toDateString();
+  };
+
+  if (tasks.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No tasks found</h3>
+          <p className="text-muted-foreground">Create your first task to get started</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {tasks.map((task) => (
+        <Card
+          key={task.id}
+          className={cn(
+            "cursor-pointer hover:shadow-md transition-shadow",
+            task.status === "completed" && "opacity-75",
+          )}
+          onClick={() => onTaskClick(task)}
+        >
+          <CardContent className="p-4">
+            <div className="flex items-start space-x-4">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTaskToggle(task.id);
+                }}
+                className="mt-1"
+              >
+                {getStatusIcon(task.status)}
+              </button>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <h3
+                      className={cn(
+                        "font-medium text-sm",
+                        task.status === "completed" &&
+                          "line-through text-muted-foreground",
+                      )}
+                    >
+                      {task.title}
+                    </h3>
+                    {task.description && (
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                        {task.description}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center space-x-2 ml-4">
+                    <Badge
+                      variant="outline"
+                      className={cn("text-xs", getPriorityColor(task.priority))}
+                    >
+                      {getPriorityIcon(task.priority)}
+                      <span className="ml-1 capitalize">{task.priority}</span>
+                    </Badge>
+
+                    {task.dueDate && (
+                      <Badge
+                        variant={isOverdue(task.dueDate) ? "destructive" : "secondary"}
+                        className="text-xs"
+                      >
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {formatDate(task.dueDate)}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    {task.tags.length > 0 && (
+                      <div className="flex space-x-1">
+                        {task.tags.slice(0, 2).map((tag) => (
+                          <Badge key={tag} variant="outline" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                        {task.tags.length > 2 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{task.tags.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+                    {task.assignee && (
+                      <Avatar className="w-5 h-5">
+                        <AvatarFallback className="text-xs">
+                          {task.assignee.split("@")[0].charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function TableView({ tasks, onTaskClick, onTaskToggle }: TaskViewProps) {
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+      case "in-progress":
+        return <Clock className="w-4 h-4 text-blue-500" />;
+      default:
+        return <Circle className="w-4 h-4 text-muted-foreground" />;
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
+    });
+  };
+
+  if (tasks.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No tasks found</h3>
+          <p className="text-muted-foreground">Create your first task to get started</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-0">
+        <UITable>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">Status</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Due Date</TableHead>
+              <TableHead>Assignee</TableHead>
+              <TableHead>Tags</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tasks.map((task) => (
+              <TableRow
+                key={task.id}
+                className="cursor-pointer hover:bg-accent"
+                onClick={() => onTaskClick(task)}
+              >
+                <TableCell>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTaskToggle(task.id);
+                    }}
+                  >
+                    {getStatusIcon(task.status)}
+                  </button>
+                </TableCell>
+                <TableCell>
+                  <div>
+                    <div
+                      className={cn(
+                        "font-medium",
+                        task.status === "completed" && "line-through text-muted-foreground"
+                      )}
+                    >
+                      {task.title}
+                    </div>
+                    {task.description && (
+                      <div className="text-sm text-muted-foreground truncate">
+                        {task.description}
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="capitalize">
+                    {task.priority}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {task.dueDate ? formatDate(task.dueDate) : "-"}
+                </TableCell>
+                <TableCell>
+                  {task.assignee ? (
+                    <div className="flex items-center space-x-2">
+                      <Avatar className="w-6 h-6">
+                        <AvatarFallback className="text-xs">
+                          {task.assignee.split("@")[0].charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">{task.assignee.split("@")[0]}</span>
+                    </div>
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
+                <TableCell>
+                  <div className="flex space-x-1">
+                    {task.tags.slice(0, 2).map((tag) => (
+                      <Badge key={tag} variant="outline" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {task.tags.length > 2 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{task.tags.length - 2}
+                      </Badge>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </UITable>
+      </CardContent>
+    </Card>
+  );
+}
+
+function KanbanView({ tasks, onTaskClick, onTaskToggle }: TaskViewProps) {
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+      case "in-progress":
+        return <Clock className="w-4 h-4 text-blue-500" />;
+      default:
+        return <Circle className="w-4 h-4 text-muted-foreground" />;
+    }
+  };
+
+  const columns = [
+    { id: "todo", title: "To Do", status: "todo" },
+    { id: "in-progress", title: "In Progress", status: "in-progress" },
+    { id: "completed", title: "Completed", status: "completed" },
+  ];
+
+  const tasksByStatus = tasks.reduce((acc, task) => {
+    if (!acc[task.status]) acc[task.status] = [];
+    acc[task.status].push(task);
+    return acc;
+  }, {} as Record<string, Task[]>);
+
+  return (
+    <div className="grid grid-cols-3 gap-6">
+      {columns.map((column) => (
+        <div key={column.id} className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm">{column.title}</h3>
+            <Badge variant="secondary" className="text-xs">
+              {tasksByStatus[column.status]?.length || 0}
+            </Badge>
+          </div>
+
+          <div className="space-y-3">
+            {(tasksByStatus[column.status] || []).map((task) => (
+              <Card
+                key={task.id}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => onTaskClick(task)}
+              >
+                <CardContent className="p-3">
+                  <div className="flex items-start justify-between mb-2">
+                    <h4 className="text-sm font-medium">{task.title}</h4>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onTaskToggle(task.id);
+                      }}
+                    >
+                      {getStatusIcon(task.status)}
+                    </button>
+                  </div>
+
+                  {task.description && (
+                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                      {task.description}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex space-x-1">
+                      <Badge variant="outline" className="text-xs capitalize">
+                        {task.priority}
+                      </Badge>
+                      {task.dueDate && (
+                        <Badge variant="secondary" className="text-xs">
+                          {task.dueDate.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {task.assignee && (
+                      <Avatar className="w-5 h-5">
+                        <AvatarFallback className="text-xs">
+                          {task.assignee.split("@")[0].charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {(!tasksByStatus[column.status] || tasksByStatus[column.status].length === 0) && (
+              <div className="p-4 border-2 border-dashed border-muted rounded-lg text-center">
+                <p className="text-sm text-muted-foreground">No {column.title.toLowerCase()} tasks</p>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }

@@ -140,51 +140,29 @@ export default function IntegrationManagement() {
           authUrl = slackData.authUrl;
           break;
         case "whatsapp":
-          const whatsappResponse = await fetch(
-            "/api/integrations/whatsapp/auth",
-          );
-          if (whatsappResponse.ok) {
-            const whatsappData = await whatsappResponse.json();
-            authUrl = whatsappData.authUrl;
-          } else {
-            // Fallback for WhatsApp - show instructions
-            alert(
-              "WhatsApp Business integration requires manual setup. Please contact support for WhatsApp Business API access.",
-            );
-            return;
-          }
+          // For WhatsApp, we'll use QR code scanning method
+          const whatsappModal = document.createElement('div');
+          whatsappModal.innerHTML = `
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+              <div style="background: white; padding: 2rem; border-radius: 1rem; max-width: 500px; text-align: center;">
+                <h3 style="margin-bottom: 1rem; color: #25D366;">Connect WhatsApp</h3>
+                <div style="width: 200px; height: 200px; background: #f0f0f0; margin: 0 auto 1rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 4rem;">📱</div>
+                <p style="margin-bottom: 1rem; color: #666;">1. Open WhatsApp on your phone</p>
+                <p style="margin-bottom: 1rem; color: #666;">2. Go to Settings > Linked Devices</p>
+                <p style="margin-bottom: 1rem; color: #666;">3. Tap "Link a Device"</p>
+                <p style="margin-bottom: 1.5rem; color: #666;">4. Scan this QR code</p>
+                <button onclick="this.parentElement.parentElement.remove()" style="background: #25D366; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Close</button>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(whatsappModal);
+          return;
           break;
         case "telegram":
-          const telegramResponse = await fetch(
-            "/api/integrations/telegram/auth",
-          );
-          if (telegramResponse.ok) {
-            const telegramData = await telegramResponse.json();
-            authUrl = telegramData.authUrl;
-          } else {
-            // Fallback for Telegram - show bot token input
-            const botToken = prompt("Enter your Telegram Bot Token:");
-            if (botToken) {
-              const connectResponse = await fetch(
-                "/api/integrations/telegram/connect",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ botToken }),
-                },
-              );
-              if (connectResponse.ok) {
-                alert("Telegram bot connected successfully!");
-                // Refresh the page or update state
-                window.location.reload();
-              } else {
-                alert(
-                  "Failed to connect Telegram bot. Please check your token.",
-                );
-              }
-            }
-            return;
-          }
+          // Use Telegram's official OAuth flow for user accounts
+          const telegramClientId = process.env.REACT_APP_TELEGRAM_CLIENT_ID || 'demo_client_id';
+          const redirectUri = `${window.location.origin}/integrations/telegram/callback`;
+          authUrl = `https://oauth.telegram.org/auth?origin=${encodeURIComponent(window.location.origin)}&embed=1&request_access=write&return_to=${encodeURIComponent(redirectUri)}`;
           break;
         case "instagram":
           const instagramResponse = await fetch(

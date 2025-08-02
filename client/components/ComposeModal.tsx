@@ -568,10 +568,29 @@ export function ComposeModal({
           <div className="p-6 pt-4 border-t">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    console.log('Saving draft:', { to, emailSubject, content, selectedPlatform });
+                    // In production, would save to backend
+                    alert('Draft saved successfully!');
+                  }}
+                >
                   Save Draft
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    const scheduleTime = prompt('Schedule send time (e.g., "2024-01-15 09:00"):', new Date(Date.now() + 3600000).toISOString().slice(0, 16).replace('T', ' '));
+                    if (scheduleTime) {
+                      console.log('Scheduling message:', { to, emailSubject, content, scheduleTime, selectedPlatform });
+                      // In production, would schedule via backend
+                      alert(`Message scheduled for ${scheduleTime}`);
+                    }
+                  }}
+                >
                   Schedule Send
                 </Button>
               </div>

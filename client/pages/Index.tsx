@@ -576,6 +576,12 @@ export default function Index() {
                               variant="ghost"
                               className="w-full justify-start text-xs p-1"
                               onClick={() => {
+                                // If not connected, redirect to integration setup
+                                if (item.status === 'disconnected' || item.status === 'error') {
+                                  window.location.href = `/integrations?setup=${item.name.toLowerCase()}`;
+                                  return;
+                                }
+                                // Otherwise show integration details modal
                                 setSelectedIntegration(item.name);
                                 setSelectedIntegrationData(item);
                                 setShowIntegrationModal(true);
