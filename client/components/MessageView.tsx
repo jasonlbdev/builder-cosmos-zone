@@ -65,42 +65,20 @@ const isEmailPlatform = (platform: string) => {
   return ['Outlook', 'Gmail'].includes(platform);
 };
 
-// Mock conversation data for messaging platforms
-const mockConversation: ConversationMessage[] = [
-  {
-    id: '1',
-    sender: 'Amazon Support',
-    content: 'Hello! Your package #AMZ123456 has been shipped and is on its way.',
-    time: '2h ago',
-    isMe: false,
-    avatar: 'AS'
-  },
-  {
-    id: '2',
-    sender: 'You',
-    content: 'Great! Can you provide an estimated delivery time?',
-    time: '2h ago',
-    isMe: true,
-    avatar: 'YU',
-    status: 'read'
-  },
-  {
-    id: '3',
-    sender: 'Amazon Support',
-    content: 'Your package will be delivered today between 2-6 PM. You can track it here: [tracking link]',
-    time: '1h ago',
-    isMe: false,
-    avatar: 'AS'
-  },
-  {
-    id: '4',
-    sender: 'Amazon Support',
-    content: 'Great news! Your recent order has been delivered to your address. You can track your order history in your account.',
-    time: '30m ago',
-    isMe: false,
-    avatar: 'AS'
+// Fetch conversation messages for messaging platforms
+const fetchConversationMessages = async (messageId: string, platform: string): Promise<ConversationMessage[]> => {
+  try {
+    const response = await fetch(`/api/messages/${messageId}/conversation?platform=${platform}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch conversation');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching conversation:', error);
+    // Fallback to current message only
+    return [];
   }
-];
+};
 
 const EmailMessageView = ({ message }: { message: Message }) => {
   return (
