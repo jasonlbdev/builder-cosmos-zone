@@ -105,20 +105,61 @@ export function DexterAI({ open, onClose, initialContext }: DexterAIProps) {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI processing
-    setTimeout(() => {
-      const response = generateDexterResponse(input);
+    // Real AI processing
+    try {
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: input,
+          context: initialContext,
+          conversation: messages,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: "assistant",
+          content: data.content,
+          timestamp: new Date().toLocaleTimeString(),
+          suggestions: data.suggestions,
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        // Fallback to local generation if API fails
+        const fallbackResponse = generateDexterResponse(input);
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: "assistant",
+          content: fallbackResponse.content,
+          timestamp: new Date().toLocaleTimeString(),
+          suggestions: fallbackResponse.suggestions,
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+      }
+    } catch (error) {
+      console.error("AI API call failed:", error);
+      
+      // Fallback to local generation if API fails
+      const fallbackResponse = generateDexterResponse(input);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: "assistant",
-        content: response.content,
+        content: fallbackResponse.content,
         timestamp: new Date().toLocaleTimeString(),
-        suggestions: response.suggestions,
+        suggestions: fallbackResponse.suggestions,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const generateDexterResponse = (

@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/components/ui/use-toast";
 import { getUserAccounts, getContacts, getFrequentContacts, type UserAccount, type Contact } from "../../shared/data/mockData";
 
 interface ComposeModalProps {
@@ -88,6 +89,14 @@ export function ComposeModal({
   const [showCc, setShowCc] = useState(false);
   const [showBcc, setShowBcc] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  
+  // Schedule modal state
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleTime, setScheduleTime] = useState("");
+  
+  // Toast for notifications
+  const { toast } = useToast();
 
   // Load user accounts and contacts when platform changes
   useEffect(() => {
@@ -199,6 +208,104 @@ export function ComposeModal({
       }
     } catch (error) {
       console.error("Failed to generate AI content:", error);
+    }
+  };
+
+  const saveDraft = async () => {
+    try {
+      const response = await fetch("/api/drafts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: to.split(",").map((email) => email.trim()),
+          cc: cc ? cc.split(",").map((email) => email.trim()) : undefined,
+          bcc: bcc ? bcc.split(",").map((email) => email.trim()) : undefined,
+          subject: emailSubject,
+          content: content,
+          platform: selectedPlatform,
+          fromAccount: selectedFromAccount?.id,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Draft Saved",
+          description: "Your draft has been saved successfully.",
+          variant: "default",
+        });
+      } else {
+        throw new Error("Failed to save draft");
+      }
+    } catch (error) {
+      console.error("Failed to save draft:", error);
+      toast({
+        title: "Save Failed",
+        description: "Could not save draft. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleScheduleSend = async () => {
+    if (!scheduleDate || !scheduleTime) {
+      toast({
+        title: "Schedule Required",
+        description: "Please select both date and time for scheduling.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const scheduleDateTime = new Date(`${scheduleDate}T${scheduleTime}`);
+    if (scheduleDateTime <= new Date()) {
+      toast({
+        title: "Invalid Schedule",
+        description: "Please select a future date and time.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/emails/schedule", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: to.split(",").map((email) => email.trim()),
+          cc: cc ? cc.split(",").map((email) => email.trim()) : undefined,
+          bcc: bcc ? bcc.split(",").map((email) => email.trim()) : undefined,
+          subject: emailSubject,
+          content: content,
+          platform: selectedPlatform,
+          fromAccount: selectedFromAccount?.id,
+          scheduledFor: scheduleDateTime.toISOString(),
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Message Scheduled",
+          description: `Your message will be sent on ${scheduleDateTime.toLocaleDateString()} at ${scheduleDateTime.toLocaleTimeString()}.`,
+          variant: "default",
+        });
+        setShowScheduleModal(false);
+        setScheduleDate("");
+        setScheduleTime("");
+        onClose();
+      } else {
+        throw new Error("Failed to schedule message");
+      }
+    } catch (error) {
+      console.error("Failed to schedule message:", error);
+      toast({
+        title: "Schedule Failed",
+        description: "Could not schedule message. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -571,25 +678,14 @@ export function ComposeModal({
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => {
-                    console.log('Saving draft:', { to, emailSubject, content, selectedPlatform });
-                    // In production, would save to backend
-                    alert('Draft saved successfully!');
-                  }}
+                  onClick={saveDraft}
                 >
                   Save Draft
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => {
-                    const scheduleTime = prompt('Schedule send time (e.g., "2024-01-15 09:00"):', new Date(Date.now() + 3600000).toISOString().slice(0, 16).replace('T', ' '));
-                    if (scheduleTime) {
-                      console.log('Scheduling message:', { to, emailSubject, content, scheduleTime, selectedPlatform });
-                      // In production, would schedule via backend
-                      alert(`Message scheduled for ${scheduleTime}`);
-                    }
-                  }}
+                  onClick={() => setShowScheduleModal(true)}
                 >
                   Schedule Send
                 </Button>
@@ -609,6 +705,44 @@ export function ComposeModal({
                 </Button>
               </div>
             </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Schedule Modal */}
+    <Dialog open={showScheduleModal} onOpenChange={setShowScheduleModal}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Schedule Message</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="schedule-date">Date</Label>
+            <Input
+              id="schedule-date"
+              type="date"
+              value={scheduleDate}
+              onChange={(e) => setScheduleDate(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="schedule-time">Time</Label>
+            <Input
+              id="schedule-time"
+              type="time"
+              value={scheduleTime}
+              onChange={(e) => setScheduleTime(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setShowScheduleModal(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleScheduleSend}>
+              Schedule Message
+            </Button>
           </div>
         </div>
       </DialogContent>

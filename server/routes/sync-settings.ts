@@ -26,41 +26,35 @@ export const updateSyncSettings = async (req: Request, res: Response) => {
     // Handle immediate actions
     if (settings.autoSync !== undefined) {
       if (settings.autoSync) {
-        console.log(
-          `Enabling auto-sync for customer ${customerId} with interval ${settings.interval || 5} minutes`,
-        );
+        console.info(`[SYNC] Enabling auto-sync for customer ${customerId} with interval ${settings.interval || 5} minutes`);
         // In production: Set up recurring sync job
         triggerImmediateSync(customerId);
       } else {
-        console.log(`Disabling auto-sync for customer ${customerId}`);
+        console.info(`[SYNC] Disabling auto-sync for customer ${customerId}`);
         // In production: Cancel recurring sync job
       }
     }
 
     if (settings.realTimeNotifications !== undefined) {
       if (settings.realTimeNotifications) {
-        console.log(
-          `Enabling real-time notifications for customer ${customerId}`,
-        );
+        console.info(`[SYNC] Enabling real-time notifications for customer ${customerId}`);
         // In production: Set up WebSocket connections or push notifications
       } else {
-        console.log(
-          `Disabling real-time notifications for customer ${customerId}`,
-        );
+        console.info(`[SYNC] Disabling real-time notifications for customer ${customerId}`);
       }
     }
 
     if (settings.backgroundSync !== undefined) {
       if (settings.backgroundSync) {
-        console.log(`Enabling background sync for customer ${customerId}`);
+        console.info(`[SYNC] Enabling background sync for customer ${customerId}`);
         // In production: Register service worker sync events
       } else {
-        console.log(`Disabling background sync for customer ${customerId}`);
+        console.info(`[SYNC] Disabling background sync for customer ${customerId}`);
       }
     }
 
     if (settings.forceRefresh) {
-      console.log(`Force refresh requested for customer ${customerId}`);
+      console.info(`[SYNC] Force refresh requested for customer ${customerId}`);
       await forceRefreshAllIntegrations(customerId);
     }
 
@@ -103,7 +97,7 @@ export const getSyncSettings = async (req: Request, res: Response) => {
 
 const triggerImmediateSync = async (customerId: string) => {
   try {
-    console.log(`Triggering immediate sync for customer ${customerId}`);
+    console.info(`[SYNC] Triggering immediate sync for customer ${customerId}`);
 
     // Get all connected integrations for this customer
     const integrations = await getCustomerIntegrations(customerId);
@@ -117,7 +111,7 @@ const triggerImmediateSync = async (customerId: string) => {
       }
     }
 
-    console.log(`Immediate sync completed for customer ${customerId}`);
+    console.info(`[SYNC] Immediate sync completed for customer ${customerId}`);
   } catch (error) {
     console.error("Immediate sync error:", error);
   }
@@ -125,7 +119,7 @@ const triggerImmediateSync = async (customerId: string) => {
 
 const forceRefreshAllIntegrations = async (customerId: string) => {
   try {
-    console.log(`Force refreshing all integrations for customer ${customerId}`);
+    console.info(`[SYNC] Force refreshing all integrations for customer ${customerId}`);
 
     // Clear any cached data
     await clearIntegrationCache(customerId);
@@ -142,7 +136,7 @@ const forceRefreshAllIntegrations = async (customerId: string) => {
       }
     }
 
-    console.log(`Force refresh completed for customer ${customerId}`);
+    console.info(`[SYNC] Force refresh completed for customer ${customerId}`);
   } catch (error) {
     console.error("Force refresh error:", error);
   }
@@ -162,9 +156,7 @@ const syncIntegration = async (
   integration: any,
   options: { forceRefresh?: boolean } = {},
 ) => {
-  console.log(
-    `Syncing ${integration.platform}${options.forceRefresh ? " (force refresh)" : ""}`,
-  );
+  console.info(`[SYNC] Syncing ${integration.platform}${options.forceRefresh ? " (force refresh)" : ""}`);
 
   switch (integration.platform.toLowerCase()) {
     case "outlook":
@@ -420,26 +412,24 @@ export const scheduleAutoSync = (
     intervalMinutes * 60 * 1000,
   );
 
-  console.log(
-    `Scheduled auto-sync for customer ${customerId} every ${intervalMinutes} minutes`,
-  );
+  console.info(`[SYNC] Scheduled auto-sync for customer ${customerId} every ${intervalMinutes} minutes`);
 };
 
 export const cancelAutoSync = (customerId: string) => {
   if (scheduledSyncs[customerId]) {
     clearInterval(scheduledSyncs[customerId]);
     delete scheduledSyncs[customerId];
-    console.log(`Cancelled auto-sync for customer ${customerId}`);
+    console.info(`[SYNC] Cancelled auto-sync for customer ${customerId}`);
   }
 };
 
 // Real-time notification handlers
 export const enableRealTimeNotifications = async (customerId: string) => {
-  console.log(`Setting up real-time notifications for customer ${customerId}`);
+  console.info(`[SYNC] Setting up real-time notifications for customer ${customerId}`);
   // In production: Set up WebSocket connections, push notifications, etc.
 };
 
 export const disableRealTimeNotifications = async (customerId: string) => {
-  console.log(`Disabling real-time notifications for customer ${customerId}`);
+  console.info(`[SYNC] Disabling real-time notifications for customer ${customerId}`);
   // In production: Clean up WebSocket connections, unregister push notifications, etc.
 };

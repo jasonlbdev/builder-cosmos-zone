@@ -47,6 +47,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 import RuleCreationDialog from "@/components/RuleCreationDialog";
 
 
@@ -130,6 +131,149 @@ export default function Settings() {
       confidence: 0.8,
     },
   });
+
+  // Toast for notifications
+  const { toast } = useToast();
+
+  const handleSaveAllSettings = async () => {
+    try {
+      const response = await fetch("/api/settings/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          categories,
+          aiRules,
+          userSettings,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Settings Saved",
+          description: "All settings have been saved successfully.",
+          variant: "default",
+        });
+      } else {
+        throw new Error("Failed to save settings");
+      }
+    } catch (error) {
+      console.error("Failed to save settings:", error);
+      toast({
+        title: "Save Failed",
+        description: "Could not save settings. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleTestAllConnections = async () => {
+    try {
+      const response = await fetch("/api/integrations/test", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        const results = await response.json();
+        toast({
+          title: "Connection Test Complete",
+          description: `${results.successful}/${results.total} connections successful.`,
+          variant: results.successful === results.total ? "default" : "destructive",
+        });
+      } else {
+        throw new Error("Failed to test connections");
+      }
+    } catch (error) {
+      console.error("Failed to test connections:", error);
+      toast({
+        title: "Test Failed",
+        description: "Could not test connections. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRefreshTokens = async () => {
+    try {
+      const response = await fetch("/api/integrations/refresh-tokens", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Tokens Refreshed",
+          description: "All authentication tokens have been refreshed.",
+          variant: "default",
+        });
+      } else {
+        throw new Error("Failed to refresh tokens");
+      }
+    } catch (error) {
+      console.error("Failed to refresh tokens:", error);
+      toast({
+        title: "Refresh Failed",
+        description: "Could not refresh tokens. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCheckPermissions = async () => {
+    try {
+      const response = await fetch("/api/integrations/check-permissions", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        const permissions = await response.json();
+        toast({
+          title: "Permissions Checked",
+          description: `Checked permissions for ${permissions.count} integrations.`,
+          variant: "default",
+        });
+      } else {
+        throw new Error("Failed to check permissions");
+      }
+    } catch (error) {
+      console.error("Failed to check permissions:", error);
+      toast({
+        title: "Check Failed",
+        description: "Could not check permissions. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResetConfiguration = async () => {
+    try {
+      const response = await fetch("/api/settings/reset", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Configuration Reset",
+          description: "All settings have been reset to defaults.",
+          variant: "default",
+        });
+        // Reload the page to show reset settings
+        window.location.reload();
+      } else {
+        throw new Error("Failed to reset configuration");
+      }
+    } catch (error) {
+      console.error("Failed to reset configuration:", error);
+      toast({
+        title: "Reset Failed",
+        description: "Could not reset configuration. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCreateFilter = () => {
+    // Open a new filter dialog instead of console.log
+    setNewRuleDialog(true);
+  };
 
   const handleCategoryUpdate = async (
     categoryId: string,
@@ -232,7 +376,7 @@ export default function Settings() {
               Manage your email categories, AI rules, and preferences
             </p>
           </div>
-          <Button onClick={() => console.log('Saving all settings...')}>
+          <Button onClick={handleSaveAllSettings}>
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -875,7 +1019,7 @@ export default function Settings() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => console.log('Testing all connections...')}
+                      onClick={handleTestAllConnections}
                     >
                       <Zap className="w-4 h-4 mr-2" />
                       Test All Connections
@@ -883,7 +1027,7 @@ export default function Settings() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => console.log('Refreshing tokens...')}
+                      onClick={handleRefreshTokens}
                     >
                       <Shield className="w-4 h-4 mr-2" />
                       Refresh Tokens
@@ -891,7 +1035,7 @@ export default function Settings() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => console.log('Checking permissions...')}
+                      onClick={handleCheckPermissions}
                     >
                       <Bell className="w-4 h-4 mr-2" />
                       Check Permissions
@@ -899,7 +1043,7 @@ export default function Settings() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => console.log('Resetting configuration...')}
+                      onClick={handleResetConfiguration}
                     >
                       <Palette className="w-4 h-4 mr-2" />
                       Reset Configuration
@@ -1077,7 +1221,7 @@ export default function Settings() {
                     Create custom rules to automatically process emails
                   </p>
                 </div>
-                <Button onClick={() => console.log('Creating new filter...')}>
+                <Button onClick={handleCreateFilter}>
                   <Plus className="w-4 h-4 mr-2" />
                   Create Filter
                 </Button>
@@ -1094,7 +1238,7 @@ export default function Settings() {
                       Create filters to automatically organize, forward, or
                       delete emails based on specific criteria
                     </p>
-                    <Button onClick={() => console.log('Creating first filter...')}>Create Your First Filter</Button>
+                    <Button onClick={handleCreateFilter}>Create Your First Filter</Button>
                   </div>
                 </CardContent>
               </Card>

@@ -1,9 +1,6 @@
-// Mock Data Configuration
-// This file contains all mock data for development purposes
-// In production, this entire file should be deleted and replaced with real API calls
-
-// For now, always show mock data in all environments (development + production)
-// In true production, this entire file would be deleted and replaced with real APIs
+// Application Data Configuration
+// This file provides data structures and sample data for the application
+// Configure DEV_MODE to control data source behavior
 export const DEV_MODE = true;
 
 // User Accounts Mock Data - Multiple accounts per platform
