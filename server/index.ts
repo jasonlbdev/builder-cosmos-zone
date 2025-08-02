@@ -90,6 +90,11 @@ export function createServer() {
   app.get("/api/integrations/facebook/auth", initiateFacebookOAuth);
   app.post("/api/integrations/facebook/callback", handleFacebookCallback);
 
+  // WhatsApp integration routes
+  app.get("/api/integrations/whatsapp/auth", (req, res) => {
+    res.status(501).json({ error: 'WhatsApp Business API requires manual setup' });
+  });
+
   // Generic integration management
   app.delete("/api/integrations/:platform/:id", disconnectIntegration);
   app.post("/api/integrations/:platform/:id/sync", syncIntegration);
