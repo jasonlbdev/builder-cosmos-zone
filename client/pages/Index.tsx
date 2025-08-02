@@ -389,7 +389,7 @@ export default function Index() {
                   <div className="flex items-center space-x-3">
                     <h2 className="text-lg font-semibold">{selectedSidebarItem}</h2>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-muted-foreground">��</span>
+                      <span className="text-sm text-muted-foreground">•</span>
                       <select
                         value={selectedIntegration}
                         onChange={(e) => setSelectedIntegration(e.target.value)}
@@ -456,12 +456,21 @@ export default function Index() {
                           </div>
                           
                           <div className="flex items-center space-x-2 mb-1">
-                            <Badge 
-                              variant="secondary" 
+                            <Badge
+                              variant="secondary"
                               className={cn("text-xs text-white", email.categoryColor)}
                             >
                               {email.category}
                             </Badge>
+                            {(email as any).platform && (
+                              <Badge
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                <span className="mr-1">{(email as any).platformLogo}</span>
+                                {(email as any).platform}
+                              </Badge>
+                            )}
                           </div>
                           
                           <h3 className={cn(
