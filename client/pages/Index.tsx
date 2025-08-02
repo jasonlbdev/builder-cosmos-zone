@@ -273,9 +273,9 @@ export default function Index() {
             Compose
           </Button>
           <Button variant="ghost" size="icon" asChild>
-            <a href="/settings">
+            <Link to="/settings">
               <Settings className="w-4 h-4" />
-            </a>
+            </Link>
           </Button>
         </div>
       </header>
