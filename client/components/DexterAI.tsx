@@ -140,10 +140,10 @@ export function DexterAI({ open, onClose }: DexterAIProps) {
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
               <div>
-                <h2 className="text-xl font-bold flex items-center">
+                <DialogTitle className="text-xl font-bold flex items-center">
                   Dexter AI
                   <Sparkles className="w-4 h-4 ml-2 text-yellow-500" />
-                </h2>
+                </DialogTitle>
                 <p className="text-sm text-muted-foreground">Your Intelligent Email Assistant</p>
               </div>
             </div>
