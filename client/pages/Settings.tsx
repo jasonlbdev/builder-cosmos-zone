@@ -554,12 +554,10 @@ export default function Settings() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleAddRule(category.id, {
-                            type: 'keywords',
-                            condition: 'contains',
-                            value: 'new rule',
-                            enabled: true
-                          })}
+                          onClick={() => {
+                            setSelectedCategoryForRule(category.id);
+                            setNewRuleDialog(true);
+                          }}
                         >
                           <Plus className="w-3 h-3 mr-1" />
                           Add Rule
