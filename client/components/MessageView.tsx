@@ -162,6 +162,45 @@ const EmailMessageView = ({ message }: { message: Message }) => {
 
 const MessagingConversationView = ({ message }: { message: Message }) => {
   const [replyText, setReplyText] = useState('');
+  const [conversationMessages, setConversationMessages] = useState<ConversationMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadConversation = async () => {
+      setLoading(true);
+      try {
+        const messages = await fetchConversationMessages(message.id.toString(), message.platform);
+        if (messages.length > 0) {
+          setConversationMessages(messages);
+        } else {
+          // Fallback: create a single message from the current message data
+          setConversationMessages([{
+            id: message.id.toString(),
+            sender: message.sender,
+            content: message.preview,
+            time: message.time,
+            isMe: false,
+            avatar: message.avatar
+          }]);
+        }
+      } catch (error) {
+        console.error('Failed to load conversation:', error);
+        // Fallback: create a single message from the current message data
+        setConversationMessages([{
+          id: message.id.toString(),
+          sender: message.sender,
+          content: message.preview,
+          time: message.time,
+          isMe: false,
+          avatar: message.avatar
+        }]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadConversation();
+  }, [message.id, message.platform]);
 
   const handleSendMessage = () => {
     if (replyText.trim()) {
