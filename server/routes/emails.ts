@@ -118,33 +118,78 @@ export const archiveEmail: RequestHandler = (req, res) => {
   res.json({ success: true });
 };
 
-export const getAISuggestion: RequestHandler = (req, res) => {
+export const getAISuggestion: RequestHandler = async (req, res) => {
   const { emailId, type } = req.body;
 
-  // Mock AI responses - in production this would call your AI service
-  const suggestions: Record<string, AIResponse> = {
-    reply: {
-      suggestion:
-        "Thank you for reaching out. I'll review the budget proposal and get back to you by Thursday with my feedback.",
-      type: "reply",
-      confidence: 0.95,
-    },
-    summary: {
-      suggestion:
-        "Sarah is requesting a Q4 budget review meeting for next week to discuss revenue projections, spending allocations, new project funding, and cost optimization.",
-      type: "summary",
-      confidence: 0.92,
-    },
-    action: {
-      suggestion:
-        "Schedule a meeting with the team for Tuesday, Wednesday, or Thursday afternoon to review Q4 budget planning.",
-      type: "action",
-      confidence: 0.88,
-    },
-  };
+  if (!emailId || !type) {
+    return res.status(400).json({
+      error: "Missing required fields: emailId, type"
+    });
+  }
 
-  const response = suggestions[type as string] || suggestions.reply;
-  res.json(response);
+  try {
+    // Get the actual email content
+    const email = getEmails().find(e => e.id === emailId);
+    if (!email) {
+      return res.status(404).json({ error: "Email not found" });
+    }
+
+    // Use real AI API for suggestions
+    let aiEndpoint = '';
+    let requestBody = {};
+
+    switch (type) {
+      case 'reply':
+        aiEndpoint = '/api/ai/reply';
+        requestBody = {
+          sender: email.sender,
+          subject: email.subject,
+          originalContent: email.content
+        };
+        break;
+      case 'summary':
+        aiEndpoint = '/api/ai/summarize';
+        requestBody = {
+          sender: email.sender,
+          subject: email.subject,
+          content: email.content
+        };
+        break;
+      default:
+        return res.status(400).json({ error: "Invalid suggestion type" });
+    }
+
+    // Call real AI API
+    const aiResponse = await fetch(`http://localhost:3000${aiEndpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (aiResponse.ok) {
+      const aiData = await aiResponse.json();
+      res.json({
+        suggestion: type === 'reply' ? aiData.reply : aiData.summary,
+        type: type,
+        confidence: 0.85,
+      });
+    } else {
+      // Fallback response
+      res.json({
+        suggestion: "AI suggestion requires API key configuration. Please set up AI in Settings → AI Setup first.",
+        type: type,
+        confidence: 0.1,
+      });
+    }
+  } catch (error) {
+    console.error("AI suggestion failed:", error);
+    res.status(500).json({
+      error: "Failed to generate AI suggestion",
+      suggestion: "Please ensure your email accounts and AI settings are configured properly.",
+      type: type,
+      confidence: 0.1,
+    });
+  }
 };
 
 // Integration endpoints for chat platforms

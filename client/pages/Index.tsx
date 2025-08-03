@@ -368,11 +368,32 @@ export default function Index() {
     }
   };
 
-  const handleArchive = () => {
+  const handleArchive = async () => {
     if (selectedEmail) {
-      console.log('Archiving email:', selectedEmail.id);
-      // In production, would call API to archive email
-      // For now, just remove from current view
+      try {
+        const response = await fetch(`/api/emails/${selectedEmail.id}/archive`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          toast({
+            title: "Email Archived",
+            description: "Email has been moved to archive."
+          });
+          // Remove from current view
+          setEmails(prev => prev.filter(email => email.id !== selectedEmail.id));
+          setSelectedEmail(null);
+        } else {
+          throw new Error('Failed to archive email');
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to archive email. Please try again.",
+          variant: "destructive"
+        });
+      }
       setEmails(prev => prev.filter(email => email.id !== selectedEmail.id));
       // Select next email
       const currentIndex = filteredEmails.findIndex(email => email.id === selectedEmail.id);
@@ -383,10 +404,32 @@ export default function Index() {
     }
   };
 
-  const handleStar = () => {
+  const handleStar = async () => {
     if (selectedEmail) {
-      console.log('Toggling star for email:', selectedEmail.id);
-      // Toggle the star/important status
+      try {
+        const response = await fetch(`/api/emails/${selectedEmail.id}/star`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ starred: !selectedEmail.important })
+        });
+        
+        if (response.ok) {
+          toast({
+            title: selectedEmail.important ? "Star Removed" : "Email Starred",
+            description: selectedEmail.important ? "Email unmarked as important." : "Email marked as important."
+          });
+        } else {
+          throw new Error('Failed to toggle star');
+        }
+      } catch (error) {
+        toast({
+          title: "Error", 
+          description: "Failed to update email. Please try again.",
+          variant: "destructive"
+        });
+      }
+      
+      // Update local state (always do this regardless of API result)
       setEmails(prev => prev.map(email => 
         email.id === selectedEmail.id 
           ? { ...email, important: !email.important }
@@ -395,10 +438,31 @@ export default function Index() {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedEmail) {
-      console.log('Deleting email:', selectedEmail.id);
-      // In production, would call API to delete email
+      try {
+        const response = await fetch(`/api/emails/${selectedEmail.id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          toast({
+            title: "Email Deleted",
+            description: "Email has been permanently deleted."
+          });
+        } else {
+          throw new Error('Failed to delete email');
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete email. Please try again.",
+          variant: "destructive"
+        });
+      }
+      
+      // Remove from current view (always do this)
       setEmails(prev => prev.filter(email => email.id !== selectedEmail.id));
       // Select next email
       const currentIndex = filteredEmails.findIndex(email => email.id === selectedEmail.id);
@@ -409,9 +473,32 @@ export default function Index() {
     }
   };
 
-  const handleMarkAsRead = () => {
+  const handleMarkAsRead = async () => {
     if (selectedEmail) {
-      console.log('Toggling read status for email:', selectedEmail.id);
+      try {
+        const response = await fetch(`/api/emails/${selectedEmail.id}/read`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ read: !selectedEmail.read })
+        });
+        
+        if (response.ok) {
+          toast({
+            title: selectedEmail.read ? "Marked as Unread" : "Marked as Read",
+            description: `Email ${selectedEmail.read ? 'unmarked' : 'marked'} as read.`
+          });
+        } else {
+          throw new Error('Failed to update read status');
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update email. Please try again.",
+          variant: "destructive"
+        });
+      }
+      
+      // Update local state (always do this)
       setEmails(prev => prev.map(email => 
         email.id === selectedEmail.id 
           ? { ...email, unread: !email.unread }
@@ -422,15 +509,19 @@ export default function Index() {
 
   const handleAddLabel = () => {
     if (selectedEmail) {
-      console.log('Adding label to email:', selectedEmail.id);
-      // In production, would open label selection dialog
+      toast({
+        title: "Labels Feature",
+        description: "Label management will be available once you connect your email accounts in Settings → Email Accounts."
+      });
     }
   };
 
   const handleSnooze = () => {
     if (selectedEmail) {
-      console.log('Snoozing email:', selectedEmail.id);
-      // In production, would open snooze options dialog
+      toast({
+        title: "Snooze Feature",
+        description: "Email snoozing will be available once you connect your email accounts in Settings → Email Accounts."
+      });
     }
   };
 
