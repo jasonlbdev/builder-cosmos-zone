@@ -1,31 +1,21 @@
 import { useState, useEffect } from "react";
-import {
-  X,
-  Send,
-  Sparkles,
-  MessageCircle,
-  Database,
-  Search,
-  Brain,
-  Zap,
-} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Send, Bot, User, Zap, MessageCircle, Database } from "lucide-react";
 
 interface DexterAIProps {
   open: boolean;
   onClose: () => void;
-  initialContext?: any;
+  initialContext?: {
+    action?: 'generateReply' | 'summarize' | 'smartReply' | 'summarizeChat';
+    sender?: string;
+    subject?: string;
+    content?: string;
+    platform?: string;
+  };
 }
 
 interface Message {
@@ -37,12 +27,12 @@ interface Message {
 }
 
 const dexterSuggestions = [
-  "📊 Show me a summary of today's emails",
-  "🔍 Find all emails about budget meetings",
-  "📈 What are my email trends this week?",
-  "⚡ Which emails need urgent attention?",
-  "🤖 Auto-categorize my unread emails",
-  "📅 Schedule follow-ups for pending emails",
+  "📧 Help me draft a reply to this email",
+  "📝 Summarize this email thread",
+  "🔍 What can you tell me about my emails?",
+  "⚙️ How do I connect my email accounts?",
+  "🤖 What AI features are available?",
+  "📊 What can you analyze once I connect accounts?",
 ];
 
 export function DexterAI({ open, onClose, initialContext }: DexterAIProps) {
@@ -50,18 +40,18 @@ export function DexterAI({ open, onClose, initialContext }: DexterAIProps) {
     if (initialContext) {
       switch (initialContext.action) {
         case 'generateReply':
-          return `I'll help you generate a reply to "${initialContext.subject}" from ${initialContext.sender}.\n\nBased on the email content, here's a suggested response:\n\n"Thank you for your email. I'll review the details and get back to you shortly with my thoughts."\n\nWould you like me to customize this reply or generate alternative responses?`;
+          return `I'll help you generate a reply to "${initialContext.subject}" from ${initialContext.sender}.\n\nTo create a personalized response, I'll need you to connect your email accounts first in Settings → Email Accounts. Once connected, I can draft contextual replies based on your conversation history.`;
         case 'summarize':
-          return `Here's a summary of the email "${initialContext.subject}" from ${initialContext.sender}:\n\n📝 **Key Points:**\n• Main topic discussed\n• Action items mentioned\n• Important dates or deadlines\n\nWould you like me to provide a more detailed analysis or extract specific information?`;
+          return `I can summarize the email "${initialContext.subject}" from ${initialContext.sender}.\n\nFor accurate summaries, please connect your email accounts in Settings → Email Accounts first. This allows me to provide detailed analysis of your actual email content.`;
         case 'smartReply':
-          return `I'll help you craft a smart reply to ${initialContext.sender} on ${initialContext.platform}.\n\nBased on your conversation context, here are some suggested responses:\n\n💬 "Thanks for the update!"\n📅 "Let's schedule a time to discuss this"\n✅ "Sounds good, I'll get back to you soon"\n\nWould you like me to generate a custom response?`;
+          return `I'll help you craft a smart reply to ${initialContext.sender} on ${initialContext.platform}.\n\nTo provide relevant suggestions, I need access to your connected accounts. Please set up your integrations in Settings → Email Accounts first.`;
         case 'summarizeChat':
-          return `Here's a summary of your conversation with ${initialContext.sender} on ${initialContext.platform}:\n\n📊 **Conversation Overview:**\n• Recent activity and key topics\n• Important decisions made\n• Pending items requiring follow-up\n\nWould you like me to identify action items or extract specific information from this conversation?`;
+          return `I can analyze your conversation with ${initialContext.sender} on ${initialContext.platform}.\n\nConnect your accounts in Settings → Email Accounts to enable conversation analysis and insights.`;
         default:
-          return "Hey there! I'm Dexter AI, your intelligent email assistant! 🤖\n\nI can help you analyze your entire email database, find patterns, categorize messages, and answer questions about your communications across all platforms. What would you like to know?";
+          return "Hey there! I'm Dexter AI, your intelligent email assistant! 🤖\n\nI can help you draft replies, summarize emails, and provide insights about your communications. To get started, connect your email accounts in Settings → Email Accounts.";
       }
     }
-    return "Hey there! I'm Dexter AI, your intelligent email assistant! 🤖\n\nI can help you analyze your entire email database, find patterns, categorize messages, and answer questions about your communications across all platforms. What would you like to know?";
+    return "Hey there! I'm Dexter AI, your intelligent email assistant! 🤖\n\nI can help you draft replies, summarize emails, and provide insights about your communications. To get started, connect your email accounts in Settings → Email Accounts.";
   };
 
   const [messages, setMessages] = useState<Message[]>([
@@ -76,20 +66,18 @@ export function DexterAI({ open, onClose, initialContext }: DexterAIProps) {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  // Reset messages when initialContext changes
+  // Reset messages when context changes
   useEffect(() => {
-    if (open) {
-      setMessages([
-        {
-          id: "1",
-          type: "assistant",
-          content: getInitialMessage(),
-          timestamp: new Date().toLocaleTimeString(),
-          suggestions: dexterSuggestions,
-        },
-      ]);
-    }
-  }, [initialContext, open]);
+    setMessages([
+      {
+        id: "1",
+        type: "assistant", 
+        content: getInitialMessage(),
+        timestamp: new Date().toLocaleTimeString(),
+        suggestions: dexterSuggestions,
+      },
+    ]);
+  }, [initialContext]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -105,13 +93,11 @@ export function DexterAI({ open, onClose, initialContext }: DexterAIProps) {
     setInput("");
     setIsTyping(true);
 
-    // Real AI processing
+    // Try real AI processing first
     try {
       const response = await fetch("/api/ai/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: input,
           context: initialContext,
@@ -167,199 +153,139 @@ export function DexterAI({ open, onClose, initialContext }: DexterAIProps) {
   ): { content: string; suggestions?: string[] } => {
     const lowerQuery = query.toLowerCase();
 
-    if (lowerQuery.includes("summary") || lowerQuery.includes("today")) {
+    if (lowerQuery.includes("summary") || lowerQuery.includes("today") || lowerQuery.includes("emails")) {
       return {
-        content:
-          "📊 **Today's Email Summary:**\n\n• **23 new emails** received across all platforms\n• **3 urgent** items requiring immediate attention\n• **7 marketing** emails auto-categorized\n• **2 important** financial notifications\n• **85% categorization** accuracy achieved\n\n**Top senders:** Sarah Johnson (3), LinkedIn (2), GitHub (2)\n**Most active platform:** Gmail (12 emails), Slack (8 messages)",
+        content: "I'd love to analyze your emails and provide a real summary! To do this, I need you to:\n\n1. **Connect your email accounts** in Settings → Email Accounts\n2. **Set up IMAP/POP3** for real email access\n3. **Configure AI settings** in Settings → AI Setup\n\nOnce connected, I can provide detailed insights about your actual email data.",
         suggestions: [
-          "🔍 Show me the urgent emails",
-          "📧 Open Gmail emails only",
-          "⚡ What needs my immediate attention?",
+          "🔧 How do I connect email accounts?",
+          "📊 What insights can you provide?",
+          "⚙️ Show me the setup process",
         ],
       };
     }
 
-    if (lowerQuery.includes("budget") || lowerQuery.includes("meeting")) {
+    if (lowerQuery.includes("reply") || lowerQuery.includes("draft") || lowerQuery.includes("response")) {
       return {
-        content:
-          '🔍 **Found 4 emails about budget meetings:**\n\n1. **Sarah Johnson** - "Q4 Budget Review Meeting" (2m ago)\n   *Category: To Respond* | *Platform: Gmail*\n\n2. **David Kim** - "Budget Planning Session" (1h ago)\n   *Category: Important* | *Platform: Outlook*\n\n3. **Finance Team** - "Annual Budget Discussion" (3h ago)\n   *Category: FYI* | *Platform: Slack*\n\n4. **Alex Rivera** - "Re: Budget Allocation" (1d ago)\n   *Category: Awaiting Reply* | *Platform: Gmail*',
+        content: "I can help you draft professional email replies! Here's what I need:\n\n1. **Email accounts connected** for context\n2. **AI API keys configured** for smart generation\n3. **The specific email** you want to reply to\n\nOnce set up, I can analyze the original email and draft contextual, professional responses in your style.",
         suggestions: [
-          "📅 Schedule a budget meeting",
-          "💰 Show financial emails only",
-          "📊 Analyze spending patterns",
+          "📧 How do I set up email accounts?",
+          "🤖 Configure AI for reply generation",
+          "📝 What makes a good email reply?",
         ],
       };
     }
 
-    if (lowerQuery.includes("trends") || lowerQuery.includes("week")) {
+    if (lowerQuery.includes("help") || lowerQuery.includes("setup") || lowerQuery.includes("start")) {
       return {
-        content:
-          "📈 **This Week's Email Trends:**\n\n**Volume Analysis:**\n• Monday: 32 emails (highest)\n• Tuesday: 28 emails\n• Wednesday: 24 emails\n�� Thursday: 19 emails (today)\n• Average: 25.8 emails/day\n\n**Category Breakdown:**\n• Marketing: 35% (↑5% from last week)\n• Work: 40% (↓2% from last week)\n• Important: 15% (↑3% from last week)\n• Social: 10% (stable)\n\n**Response Time:** Average 2.5 hours (improving!)",
+        content: "I'm here to help! Here's how to get started:\n\n**🔧 Email Setup:**\n• Settings → Email Accounts\n• Add IMAP/POP3 accounts\n• Test connection\n\n**🤖 AI Setup:**\n• Settings → AI Setup\n• Add OpenAI or Anthropic API key\n• Test AI capabilities\n\n**✨ What I can do:**\n• Draft email replies\n• Summarize email threads\n• Answer questions about your emails\n• Provide writing assistance",
         suggestions: [
-          "📊 Show monthly trends",
-          "⏰ Optimize response times",
-          "🎯 Set email goals",
+          "📧 Set up email accounts",
+          "🤖 Configure AI settings",
+          "📊 What can you analyze?",
         ],
       };
     }
 
-    if (lowerQuery.includes("urgent") || lowerQuery.includes("attention")) {
+    if (lowerQuery.includes("what") || lowerQuery.includes("can you") || lowerQuery.includes("capabilities")) {
       return {
-        content:
-          '⚡ **Emails Requiring Urgent Attention:**\n\n**🔴 High Priority (3 emails):**\n\n1. **David Kim** - "Urgent: Contract review needed"\n   *Deadline: Tomorrow* | *Platform: Gmail*\n\n2. **Sarah Johnson** - "Q4 Budget Review Meeting"\n   *Response needed: Today* | *Platform: Gmail*\n\n3. **Legal Team** - "Action Required: NDA Signature"\n   *Deadline: End of day* | *Platform: Outlook*\n\n**Recommended Actions:**\n• Reply to David Kim first (most urgent)\n• Schedule budget meeting with Sarah\n• Review and sign NDA',
+        content: "Here's what I can do for you:\n\n**📧 Email Management:**\n• Draft professional replies\n• Summarize long email threads\n• Analyze conversation context\n\n**🔍 Data Analysis:**\n• Search through your emails\n• Find specific conversations\n• Identify important messages\n\n**⚙️ Setup Required:**\n• Connect email accounts (Settings → Email Accounts)\n• Configure AI settings (Settings → AI Setup)\n• Add IMAP/POP3 for real email access",
         suggestions: [
-          "✉️ Draft reply to David Kim",
-          "📅 Schedule with Sarah",
-          "📋 Open legal documents",
-        ],
-      };
-    }
-
-    if (lowerQuery.includes("categorize") || lowerQuery.includes("unread")) {
-      return {
-        content:
-          "🤖 **AI Categorization Complete!**\n\n**Processed 15 unread emails:**\n\n✅ **Auto-categorized:**\n• 3 → To Respond (95% confidence)\n• 4 → Marketing (88% confidence)\n• 2 → Important (92% confidence)\n• 3 → FYI (85% confidence)\n• 2 → Updates (90% confidence)\n• 1 → Promotions (87% confidence)\n\n**🎯 Average confidence: 89.5%**\n\n**Actions taken:**\n• Starred 2 high-importance emails\n��� Set 3 follow-up reminders\n• Archived 4 outdated promotions",
-        suggestions: [
-          "📊 Review categorization",
-          "⚙️ Adjust AI confidence",
-          "🔄 Re-categorize specific emails",
+          "🔧 Start setup process",
+          "📝 Draft a sample reply",
+          "📊 Analyze my emails",
         ],
       };
     }
 
     // Default response
     return {
-      content: `🤖 I understand you're asking about: "${query}"\n\nI can help you with:\n• **Email analysis** across all platforms\n• **Smart categorization** and filtering\n• **Trend insights** and patterns\n• **Response suggestions** and drafting\n• **Calendar integration** and scheduling\n• **Contact management** and insights\n\nCould you be more specific about what you'd like me to analyze or help you with?`,
+      content: `I understand you're asking about: "${query}"\n\nI'm designed to be your intelligent email assistant! I can:\n• **Draft email replies** with context and professionalism\n• **Summarize email threads** for quick understanding\n• **Answer questions** about your email communications\n\nTo provide accurate assistance, I need access to your actual email data. Please connect your accounts in Settings → Email Accounts.`,
       suggestions: [
-        "📊 Analyze my email patterns",
-        "🔍 Search for specific topics",
-        "📧 Help with email management",
-        "📅 Schedule management",
+        "⚙️ Connect email accounts",
+        "🤖 Configure AI settings", 
+        "📧 Learn about email setup",
+        "🔧 Get help with setup",
       ],
     };
   };
 
   const handleSuggestionClick = (suggestion: string) => {
-    setInput(suggestion.replace(/[📊🔍📈⚡🤖📅📧⏰🎯✉️📋🔄⚙️]/g, "").trim());
+    setInput(suggestion.replace(/[📊🔍📈⚡🤖📅📧⏰🎯✉️📋🔄⚙️🔧📝]/g, "").trim());
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] p-0">
+      <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col p-0">
         <DialogHeader className="p-6 pb-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                  🤖
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-              </div>
-              <div>
-                <DialogTitle className="text-xl font-bold flex items-center">
-                  Dexter AI
-                  <Sparkles className="w-4 h-4 ml-2 text-yellow-500" />
-                </DialogTitle>
-                <p className="text-sm text-muted-foreground">
-                  Your Intelligent Email Assistant
-                </p>
-              </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Bot className="w-5 h-5 text-white" />
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge
-                variant="secondary"
-                className="bg-green-100 text-green-800"
-              >
-                <Brain className="w-3 h-3 mr-1" />
-                Online
-              </Badge>
-              <Button variant="ghost" size="icon" onClick={onClose}>
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+            <DialogTitle className="text-xl">Dexter AI Assistant</DialogTitle>
+            <Badge variant="secondary" className="ml-auto">AI-Powered</Badge>
           </div>
         </DialogHeader>
 
-        <div className="flex flex-col h-[500px]">
-          <ScrollArea className="flex-1 px-6">
-            <div className="space-y-4 pb-4">
+        <div className="flex-1 flex flex-col min-h-0 p-6 pt-0">
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-4">
               {messages.map((message) => (
-                <div key={message.id} className="flex space-x-3">
-                  {message.type === "assistant" ? (
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs">
-                        🤖
-                      </AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-muted text-xs">
-                        You
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-medium">
-                        {message.type === "assistant" ? "Dexter AI" : "You"}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {message.timestamp}
-                      </span>
-                    </div>
-                    <div
-                      className={cn(
-                        "rounded-lg p-3 whitespace-pre-line text-sm",
-                        message.type === "assistant"
-                          ? "bg-muted"
-                          : "bg-primary text-primary-foreground",
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.type === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-lg p-3 ${
+                      message.type === "user"
+                        ? "bg-blue-500 text-white"
+                        : "bg-muted"
+                    }`}
+                  >
+                    <div className="flex items-start space-x-2">
+                      {message.type === "assistant" && (
+                        <Bot className="w-4 h-4 mt-0.5 flex-shrink-0" />
                       )}
-                    >
-                      {message.content}
+                      {message.type === "user" && (
+                        <User className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      )}
+                      <div className="flex-1">
+                        <div className="whitespace-pre-wrap text-sm">
+                          {message.content}
+                        </div>
+                        <div className="text-xs opacity-70 mt-1">
+                          {message.timestamp}
+                        </div>
+                      </div>
                     </div>
                     {message.suggestions && (
-                      <div className="mt-3 space-y-2">
-                        <p className="text-xs text-muted-foreground">
-                          Suggestions:
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {message.suggestions.map((suggestion, index) => (
-                            <Button
-                              key={index}
-                              variant="outline"
-                              size="sm"
-                              className="text-xs h-8"
-                              onClick={() => handleSuggestionClick(suggestion)}
-                            >
-                              {suggestion}
-                            </Button>
-                          ))}
-                        </div>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {message.suggestions.map((suggestion, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs h-7"
+                            onClick={() => handleSuggestionClick(suggestion)}
+                          >
+                            {suggestion}
+                          </Button>
+                        ))}
                       </div>
                     )}
                   </div>
                 </div>
               ))}
-
               {isTyping && (
-                <div className="flex space-x-3">
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs">
-                      🤖
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="bg-muted rounded-lg p-3">
+                <div className="flex justify-start">
+                  <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                    <div className="flex items-center space-x-2">
+                      <Bot className="w-4 h-4" />
                       <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                        <div
-                          className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                          style={{ animationDelay: "0.1s" }}
-                        ></div>
-                        <div
-                          className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                          style={{ animationDelay: "0.2s" }}
-                        ></div>
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-75"></div>
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-150"></div>
                       </div>
                     </div>
                   </div>
@@ -368,12 +294,12 @@ export function DexterAI({ open, onClose, initialContext }: DexterAIProps) {
             </div>
           </ScrollArea>
 
-          <div className="border-t p-4">
+          <div className="mt-4 space-y-3">
             <div className="flex space-x-2">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask Dexter anything about your emails..."
+                placeholder="Ask me anything about your emails..."
                 onKeyPress={(e) => e.key === "Enter" && handleSend()}
                 className="flex-1"
               />
@@ -385,11 +311,11 @@ export function DexterAI({ open, onClose, initialContext }: DexterAIProps) {
               <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                 <div className="flex items-center space-x-1">
                   <Database className="w-3 h-3" />
-                  <span>23,456 emails indexed</span>
+                  <span>Ready for analysis</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <MessageCircle className="w-3 h-3" />
-                  <span>7 platforms connected</span>
+                  <span>Multi-platform support</span>
                 </div>
               </div>
               <div className="flex items-center space-x-1 text-xs text-muted-foreground">

@@ -1,16 +1,20 @@
 import { RequestHandler } from "express";
-import OpenAI from "openai";
-import Anthropic from "@anthropic-ai/sdk";
 
-// Lazy initialize AI clients to avoid startup errors without API keys
-let openai: OpenAI | null = null;
-let anthropic: Anthropic | null = null;
+// Dynamic import AI clients to avoid startup errors without API keys
+let openai: any = null;
+let anthropic: any = null;
 
-const getOpenAIClient = (): OpenAI => {
+const getOpenAIClient = async (): Promise<any> => {
   if (!openai && process.env.OPENAI_API_KEY) {
-    openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    try {
+      const OpenAI = (await import("openai")).default;
+      openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    } catch (error) {
+      console.error("Failed to load OpenAI:", error);
+      throw new Error("OpenAI package not available");
+    }
   }
   if (!openai) {
     throw new Error("OpenAI client not available - API key missing");
@@ -18,11 +22,17 @@ const getOpenAIClient = (): OpenAI => {
   return openai;
 };
 
-const getAnthropicClient = (): Anthropic => {
+const getAnthropicClient = async (): Promise<any> => {
   if (!anthropic && process.env.ANTHROPIC_API_KEY) {
-    anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
+    try {
+      const Anthropic = (await import("@anthropic-ai/sdk")).default;
+      anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+    } catch (error) {
+      console.error("Failed to load Anthropic:", error);
+      throw new Error("Anthropic package not available");
+    }
   }
   if (!anthropic) {
     throw new Error("Anthropic client not available - API key missing");
@@ -145,7 +155,7 @@ const getAIProvider = () => {
 
 async function callOpenAI(prompt: string, systemPrompt?: string): Promise<string> {
   try {
-    const client = getOpenAIClient();
+    const client = await getOpenAIClient();
     const response = await client.chat.completions.create({
       model: "gpt-4-turbo-preview",
       messages: [
@@ -165,7 +175,7 @@ async function callOpenAI(prompt: string, systemPrompt?: string): Promise<string
 
 async function callAnthropic(prompt: string, systemPrompt?: string): Promise<string> {
   try {
-    const client = getAnthropicClient();
+    const client = await getAnthropicClient();
     const response = await client.messages.create({
       model: "claude-3-sonnet-20240229",
       max_tokens: 1000,
@@ -199,113 +209,9 @@ async function callAI(prompt: string, systemPrompt?: string): Promise<string> {
 
 // API Endpoints
 
-export const categorizeEmailAI: RequestHandler = async (req, res) => {
-  try {
-    const { sender, subject, content, metadata }: EmailAnalysisRequest = req.body;
-
-    if (!sender || !subject || !content) {
-      return res.status(400).json({
-        error: "Missing required fields: sender, subject, content"
-      });
-    }
-
-    const prompt = EMAIL_CATEGORIZATION_PROMPT
-      .replace('{sender}', sender)
-      .replace('{subject}', subject)
-      .replace('{content}', content.substring(0, 2000)); // Limit content length
-
-    const aiResponse = await callAI(prompt);
-    
-    try {
-      const result = JSON.parse(aiResponse);
-      
-      res.json({
-        success: true,
-        categorization: result,
-        metadata: {
-          provider: getAIProvider(),
-          processingTime: Date.now(),
-          inputLength: content.length,
-        }
-      });
-    } catch (parseError) {
-      // Fallback if JSON parsing fails
-      res.json({
-        success: true,
-        categorization: {
-          category: "FYI",
-          confidence: 0.5,
-          reasoning: "AI response could not be parsed, using fallback",
-          urgency: "low",
-          suggestedActions: ["Review manually"],
-          keywords: []
-        },
-        rawResponse: aiResponse,
-        metadata: {
-          provider: getAIProvider(),
-          error: "JSON parse failed",
-        }
-      });
-    }
-  } catch (error) {
-    console.error("[AI] Email categorization failed:", error);
-    
-    // Fallback to rule-based categorization if AI is unavailable
-    if (error.message.includes("API key missing") || error.message.includes("No AI API keys")) {
-      const fallbackResult = {
-        category: "FYI",
-        confidence: 0.6,
-        reasoning: "Rule-based categorization (AI unavailable)",
-        urgency: "medium",
-        suggestedActions: ["Review when convenient"],
-        keywords: [],
-        fallback: true
-      };
-      
-      // Basic rule-based logic
-      const text = `${sender} ${subject} ${content}`.toLowerCase();
-      if (text.includes("urgent") || text.includes("asap") || text.includes("deadline")) {
-        fallbackResult.category = "To Respond";
-        fallbackResult.urgency = "high";
-        fallbackResult.confidence = 0.8;
-        fallbackResult.reasoning = "Detected urgent keywords";
-      } else if (text.includes("invoice") || text.includes("payment") || text.includes("billing")) {
-        fallbackResult.category = "Important";
-        fallbackResult.urgency = "high";
-        fallbackResult.confidence = 0.9;
-        fallbackResult.reasoning = "Financial/billing related";
-      } else if (text.includes("newsletter") || text.includes("unsubscribe") || text.includes("promotion")) {
-        fallbackResult.category = "Marketing";
-        fallbackResult.urgency = "low";
-        fallbackResult.confidence = 0.7;
-        fallbackResult.reasoning = "Marketing/promotional content";
-      }
-
-      return res.json({
-        success: true,
-        categorization: fallbackResult,
-        metadata: {
-          provider: "rule_based_fallback",
-          processingTime: Date.now(),
-          inputLength: content.length,
-        }
-      });
-    }
-
-    res.status(500).json({
-      success: false,
-      error: "AI categorization failed",
-      message: error.message,
-      fallback: {
-        category: "FYI",
-        confidence: 0.3,
-        reasoning: "AI service unavailable, manual review required",
-        urgency: "low",
-        suggestedActions: ["Review manually"]
-      }
-    });
-  }
-};
+// AI EMAIL CATEGORIZATION REMOVED
+// AI should only be used for: reply generation, summarization, and chat interface
+// Email categorization is manual or rule-based only, not AI-powered
 
 export const generateEmailReply: RequestHandler = async (req, res) => {
   try {
@@ -492,7 +398,7 @@ export const getAIStatus: RequestHandler = (req, res) => {
       available: !!(hasOpenAI || hasAnthropic),
       provider: provider,
       capabilities: {
-        emailCategorization: true,
+        emailCategorization: false,  // AI does NOT categorize emails
         replyGeneration: true,
         summarization: true,
         chat: true,

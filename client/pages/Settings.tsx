@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getEmailCategories, type EmailCategory, type CategoryRule } from "../../shared/data/mockData";
 import {
@@ -16,6 +16,11 @@ import {
   Bot,
   Filter,
   Tag,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +45,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -132,8 +138,87 @@ export default function Settings() {
     },
   });
 
+  // AI API Key Management
+  const [aiStatus, setAIStatus] = useState<any>(null);
+  const [openaiKey, setOpenaiKey] = useState("");
+  const [anthropicKey, setAnthropicKey] = useState("");
+  const [showOpenaiKey, setShowOpenaiKey] = useState(false);
+  const [showAnthropicKey, setShowAnthropicKey] = useState(false);
+  const [testingKeys, setTestingKeys] = useState(false);
+
   // Toast for notifications
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Load AI status and existing keys
+    fetchAIStatus();
+    loadSavedKeys();
+  }, []);
+
+  const fetchAIStatus = async () => {
+    try {
+      const response = await fetch("/api/ai/status");
+      if (response.ok) {
+        const data = await response.json();
+        setAIStatus(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch AI status:", error);
+    }
+  };
+
+  const loadSavedKeys = () => {
+    // Load from localStorage (in production, these would be server-side encrypted)
+    const savedOpenaiKey = localStorage.getItem("openai_api_key") || "";
+    const savedAnthropicKey = localStorage.getItem("anthropic_api_key") || "";
+    
+    if (savedOpenaiKey) setOpenaiKey(savedOpenaiKey);
+    if (savedAnthropicKey) setAnthropicKey(savedAnthropicKey);
+  };
+
+  const handleSaveAPIKey = async (provider: 'openai' | 'anthropic') => {
+    const key = provider === 'openai' ? openaiKey : anthropicKey;
+    
+    if (!key.trim()) {
+      toast({
+        title: "Error",
+        description: `Please enter a valid ${provider.toUpperCase()} API key`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Save to localStorage (in production, send to secure backend)
+      localStorage.setItem(`${provider}_api_key`, key);
+      
+      toast({
+        title: "Success",
+        description: `${provider.toUpperCase()} API key saved successfully!`
+      });
+      
+      fetchAIStatus(); // Refresh status
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Failed to save ${provider.toUpperCase()} API key`,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRemoveAPIKey = async (provider: 'openai' | 'anthropic') => {
+    localStorage.removeItem(`${provider}_api_key`);
+    if (provider === 'openai') setOpenaiKey("");
+    if (provider === 'anthropic') setAnthropicKey("");
+    
+    toast({
+      title: "Success",
+      description: `${provider.toUpperCase()} API key removed`
+    });
+    
+    fetchAIStatus(); // Refresh status
+  };
 
   const handleSaveAllSettings = async () => {
     try {
@@ -386,7 +471,7 @@ export default function Settings() {
       <div className="flex-1 p-6">
         <div className="max-w-6xl mx-auto">
           <Tabs defaultValue="categories" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-8">
               <TabsTrigger value="categories">
                 <Tag className="w-4 h-4 mr-2" />
                 Categories
@@ -394,6 +479,14 @@ export default function Settings() {
               <TabsTrigger value="ai-rules">
                 <Bot className="w-4 h-4 mr-2" />
                 AI Rules
+              </TabsTrigger>
+              <TabsTrigger value="ai-setup">
+                <Shield className="w-4 h-4 mr-2" />
+                AI Setup
+              </TabsTrigger>
+              <TabsTrigger value="email-accounts">
+                <Mail className="w-4 h-4 mr-2" />
+                Email Accounts
               </TabsTrigger>
               <TabsTrigger value="integrations">
                 <Zap className="w-4 h-4 mr-2" />
@@ -784,6 +877,382 @@ export default function Settings() {
                   </Card>
                 ))}
               </div>
+            </TabsContent>
+
+            {/* AI Setup Tab */}
+            <TabsContent value="ai-setup" className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold">AI Configuration</h3>
+                <p className="text-muted-foreground">
+                  Configure your AI provider API keys to enable intelligent email processing
+                </p>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>AI Service Status</CardTitle>
+                  <CardDescription>
+                    Current status of AI integrations and capabilities
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-3 h-3 rounded-full ${aiStatus?.status?.available ? 'bg-green-500' : 'bg-orange-400'}`}></div>
+                      <div>
+                        <p className="font-medium">
+                          {aiStatus?.status?.available ? 'AI Services Active' : 'Setup Required'}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {aiStatus?.status?.available 
+                            ? `Using ${aiStatus.status.provider?.toUpperCase()} for AI processing`
+                            : "Configure at least one API key to enable AI features"
+                          }
+                        </p>
+                      </div>
+                    </div>
+                    {aiStatus?.status?.available && (
+                      <Badge variant="default" className="bg-green-600">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Active
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* AI Capabilities */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                        <span className="font-medium text-sm">Email Categorization</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Manual categorization only - AI does not auto-categorize
+                      </p>
+                    </div>
+                    
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className={`w-2 h-2 rounded-full ${aiStatus?.status?.capabilities?.replyGeneration ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        <span className="font-medium text-sm">Reply Generation</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Generate contextual email replies and responses
+                      </p>
+                    </div>
+
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className={`w-2 h-2 rounded-full ${aiStatus?.status?.capabilities?.summarization ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        <span className="font-medium text-sm">Email Summarization</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Create concise summaries of long email threads
+                      </p>
+                    </div>
+
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className={`w-2 h-2 rounded-full ${aiStatus?.status?.capabilities?.chat ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        <span className="font-medium text-sm">AI Assistant</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Interactive AI assistant for email management
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* OpenAI Configuration */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                      AI
+                    </div>
+                    <span>OpenAI (GPT-4)</span>
+                    {aiStatus?.setup?.openai === "configured" ? (
+                      <Badge variant="default" className="bg-green-600">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Active
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="border-gray-400">
+                        <XCircle className="w-3 h-3 mr-1" />
+                        Setup Required
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription>
+                    Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline font-medium">platform.openai.com</a>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex space-x-2">
+                    <div className="relative flex-1">
+                      <Input
+                        type={showOpenaiKey ? "text" : "password"}
+                        placeholder="sk-..."
+                        value={openaiKey}
+                        onChange={(e) => setOpenaiKey(e.target.value)}
+                        className="pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3"
+                        onClick={() => setShowOpenaiKey(!showOpenaiKey)}
+                      >
+                        {showOpenaiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    <Button 
+                      onClick={() => handleSaveAPIKey('openai')}
+                      disabled={testingKeys || !openaiKey.trim()}
+                    >
+                      {testingKeys ? "Saving..." : "Save"}
+                    </Button>
+                    {openaiKey && (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handleRemoveAPIKey('openai')}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Anthropic Configuration */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                      C
+                    </div>
+                    <span>Anthropic (Claude)</span>
+                    {aiStatus?.setup?.anthropic === "configured" ? (
+                      <Badge variant="default" className="bg-green-600">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Active
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="border-gray-400">
+                        <XCircle className="w-3 h-3 mr-1" />
+                        Setup Required
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription>
+                    Get your API key from <a href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium">console.anthropic.com</a>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex space-x-2">
+                    <div className="relative flex-1">
+                      <Input
+                        type={showAnthropicKey ? "text" : "password"}
+                        placeholder="sk-ant-..."
+                        value={anthropicKey}
+                        onChange={(e) => setAnthropicKey(e.target.value)}
+                        className="pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3"
+                        onClick={() => setShowAnthropicKey(!showAnthropicKey)}
+                      >
+                        {showAnthropicKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    <Button 
+                      onClick={() => handleSaveAPIKey('anthropic')}
+                      disabled={testingKeys || !anthropicKey.trim()}
+                    >
+                      {testingKeys ? "Saving..." : "Save"}
+                    </Button>
+                    {anthropicKey && (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handleRemoveAPIKey('anthropic')}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Security Note:</strong> For this demo, API keys are stored locally in your browser. 
+                  In production, keys would be securely encrypted and stored server-side with proper access controls.
+                </AlertDescription>
+              </Alert>
+            </TabsContent>
+
+            {/* Email Accounts Tab */}
+            <TabsContent value="email-accounts" className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold">Email Account Setup</h3>
+                <p className="text-muted-foreground">
+                  Connect your email accounts using IMAP/POP3 for real email access
+                </p>
+              </div>
+
+              {/* Quick Setup Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <Mail className="w-4 h-4 text-white" />
+                      </div>
+                      <CardTitle className="text-base">Gmail</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Connect via IMAP with app password
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Set up Gmail
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <Mail className="w-4 h-4 text-white" />
+                      </div>
+                      <CardTitle className="text-base">Outlook</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Connect via IMAP/POP3
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Set up Outlook
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center">
+                        <Mail className="w-4 h-4 text-white" />
+                      </div>
+                      <CardTitle className="text-base">Custom IMAP</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Any IMAP/POP3 provider
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Custom Setup
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Manual IMAP Setup */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Manual IMAP/POP3 Setup</CardTitle>
+                  <CardDescription>
+                    Configure any email provider using IMAP or POP3 settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email Address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="your@email.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Password/App Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="imap-server">IMAP Server</Label>
+                      <Input
+                        id="imap-server"
+                        placeholder="imap.gmail.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="imap-port">IMAP Port</Label>
+                      <Input
+                        id="imap-port"
+                        placeholder="993"
+                        type="number"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Switch id="imap-ssl" defaultChecked />
+                    <Label htmlFor="imap-ssl">Use SSL/TLS</Label>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <Button>Test Connection</Button>
+                    <Button variant="outline">Save Account</Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Connected Accounts */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Connected Email Accounts</CardTitle>
+                  <CardDescription>
+                    Manage your connected email accounts and sync settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8">
+                    <Mail className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">
+                      No email accounts connected
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      Connect your first email account to start managing your messages with AI
+                    </p>
+                    <Button>Connect Email Account</Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Security:</strong> Your email credentials are encrypted and stored securely. 
+                  We recommend using app-specific passwords when available (Gmail, Outlook, etc.).
+                </AlertDescription>
+              </Alert>
             </TabsContent>
 
             {/* Integrations Tab */}

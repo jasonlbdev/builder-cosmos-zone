@@ -148,14 +148,14 @@ export function createServer() {
   app.delete("/api/integrations/:platform/:id", disconnectIntegration);
   app.post("/api/integrations/:platform/:id/sync", syncIntegration);
 
-  // AI categorization routes (rule-based, legacy)
-  app.post("/api/ai/categorize/legacy", categorizeEmail);
-  app.post("/api/ai/categorize/bulk", bulkCategorizeEmails);
-  app.post("/api/ai/process-batch", processEmailBatch);
-  app.get("/api/ai/rules", getCategoryRules);
-  app.post("/api/ai/rules", createCategoryRule);
-  app.patch("/api/ai/rules/:ruleId", updateCategoryRule);
-  app.delete("/api/ai/rules/:ruleId", deleteCategoryRule);
+  // Legacy categorization routes (rule-based only, no AI)
+  app.post("/api/categorize", categorizeEmail);
+  app.post("/api/categorize/bulk", bulkCategorizeEmails);
+  app.post("/api/process-batch", processEmailBatch);
+  app.get("/api/rules", getCategoryRules);
+  app.post("/api/rules", createCategoryRule);
+  app.patch("/api/rules/:ruleId", updateCategoryRule);
+  app.delete("/api/rules/:ruleId", deleteCategoryRule);
 
   // Email provider routes (Outlook, Gmail, WhatsApp)
   app.get("/api/email-providers", getEmailProviderStatus);
@@ -181,9 +181,8 @@ export function createServer() {
   app.post("/api/imap/setup", setupIMAPIntegration);
   app.post("/api/imap/sync", syncIMAPEmails);
 
-  // Real AI API routes
+  // Real AI API routes (NO categorization - only replies, summaries, chat)
   app.get("/api/ai/status", getAIStatus);
-  app.post("/api/ai/categorize", categorizeEmailAI);
   app.post("/api/ai/reply", generateEmailReply);
   app.post("/api/ai/summarize", summarizeEmail);
   app.post("/api/ai/chat", chatWithAI);
