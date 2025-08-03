@@ -50,28 +50,27 @@ import {
   sendMessage as sendConversationMessage,
   markAsRead as markMessageAsRead,
 } from "./routes/messages";
+// import {
+//   testIMAPConnection,
+//   setupIMAPIntegration,
+//   syncIMAPEmails,
+//   getIMAPProviders,
+// } from "./routes/imap-integration";
 import {
-  testIMAPConnection,
-  setupIMAPIntegration,
-  syncIMAPEmails,
-  getIMAPProviders,
-} from "./routes/imap-integration";
-import {
-  categorizeEmailAI,
   generateEmailReply,
   summarizeEmail,
   chatWithAI,
   getAIStatus,
 } from "./routes/ai-api";
-import {
-  initiateWhatsAppBrowser,
-  initiateTelegramBrowser,
-  getBrowserQRCode,
-  checkBrowserStatus,
-  getBrowserMessages,
-  closeBrowserSession,
-  getBrowserSessions,
-} from "./routes/headless-automation";
+// import {
+//   initiateWhatsAppBrowser,
+//   initiateTelegramBrowser,
+//   getBrowserQRCode,
+//   checkBrowserStatus,
+//   getBrowserMessages,
+//   closeBrowserSession,
+//   getBrowserSessions,
+// } from "./routes/headless-automation";
 
 export function createServer() {
   const app = express();
@@ -175,11 +174,11 @@ export function createServer() {
   app.post("/api/messages/:messageId/send", sendConversationMessage);
   app.post("/api/messages/:messageId/read", markMessageAsRead);
 
-  // IMAP/POP Integration routes
-  app.get("/api/imap/providers", getIMAPProviders);
-  app.post("/api/imap/test", testIMAPConnection);
-  app.post("/api/imap/setup", setupIMAPIntegration);
-  app.post("/api/imap/sync", syncIMAPEmails);
+  // IMAP/POP Integration routes (temporarily disabled for Netlify build)
+  // app.get("/api/imap/providers", getIMAPProviders);
+  // app.post("/api/imap/test", testIMAPConnection);
+  // app.post("/api/imap/setup", setupIMAPIntegration);
+  // app.post("/api/imap/sync", syncIMAPEmails);
 
   // Real AI API routes (NO categorization - only replies, summaries, chat)
   app.get("/api/ai/status", getAIStatus);
@@ -187,14 +186,14 @@ export function createServer() {
   app.post("/api/ai/summarize", summarizeEmail);
   app.post("/api/ai/chat", chatWithAI);
 
-  // Headless Browser Automation routes
-  app.get("/api/browser/sessions", getBrowserSessions);
-  app.post("/api/browser/whatsapp/start", initiateWhatsAppBrowser);
-  app.post("/api/browser/telegram/start", initiateTelegramBrowser);
-  app.get("/api/browser/:sessionId/qr", getBrowserQRCode);
-  app.get("/api/browser/:sessionId/status", checkBrowserStatus);
-  app.get("/api/browser/:sessionId/messages", getBrowserMessages);
-  app.delete("/api/browser/:sessionId", closeBrowserSession);
+  // Headless Browser Automation routes (temporarily disabled for Netlify build)
+  // app.get("/api/browser/sessions", getBrowserSessions);
+  // app.post("/api/browser/whatsapp/start", initiateWhatsAppBrowser);
+  // app.post("/api/browser/telegram/start", initiateTelegramBrowser);
+  // app.get("/api/browser/:sessionId/qr", getBrowserQRCode);
+  // app.get("/api/browser/:sessionId/status", checkBrowserStatus);
+  // app.get("/api/browser/:sessionId/messages", getBrowserMessages);
+  // app.delete("/api/browser/:sessionId", closeBrowserSession);
 
   return app;
 }

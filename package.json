@@ -22,18 +22,18 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.57.0",
-    "@types/imap": "^0.8.42",
+
     "@types/nodemailer": "^6.4.17",
-    "@types/puppeteer": "^5.4.7",
+
     "@types/qrcode": "^1.5.5",
     "dotenv": "^17.2.0",
     "express": "^4.18.2",
-    "imap": "^0.8.19",
-    "mailparser": "^3.7.4",
-    "node-imap": "^0.9.6",
+
+
+
     "nodemailer": "^7.0.5",
     "openai": "^5.11.0",
-    "puppeteer": "^24.15.0",
+
     "qrcode": "^1.5.4",
     "zod": "^3.23.8"
   },
