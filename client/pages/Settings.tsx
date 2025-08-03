@@ -1121,7 +1121,36 @@ export default function Settings() {
                     <p className="text-sm text-muted-foreground mb-3">
                       Connect via IMAP with app password
                     </p>
-                    <Button variant="outline" size="sm" className="w-full">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/email-providers/gmail/auth');
+                          const data = await response.json();
+                          
+                          if (data.error) {
+                            toast({
+                              title: "Setup Required",
+                              description: "Gmail integration requires Google OAuth setup. Please configure GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET environment variables first.",
+                              variant: "destructive"
+                            });
+                            return;
+                          }
+                          
+                          if (data.authUrl) {
+                            window.open(data.authUrl, '_blank', 'width=500,height=600');
+                          }
+                        } catch (error) {
+                          toast({
+                            title: "Connection Failed", 
+                            description: "Unable to connect to Gmail. Please try again.",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                    >
                       Set up Gmail
                     </Button>
                   </CardContent>
@@ -1140,7 +1169,36 @@ export default function Settings() {
                     <p className="text-sm text-muted-foreground mb-3">
                       Connect via IMAP/POP3
                     </p>
-                    <Button variant="outline" size="sm" className="w-full">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/email-providers/outlook/auth');
+                          const data = await response.json();
+                          
+                          if (data.error) {
+                            toast({
+                              title: "Setup Required",
+                              description: "Outlook integration requires Microsoft OAuth setup. Please configure OUTLOOK_CLIENT_ID and OUTLOOK_CLIENT_SECRET environment variables first.",
+                              variant: "destructive"
+                            });
+                            return;
+                          }
+                          
+                          if (data.authUrl) {
+                            window.open(data.authUrl, '_blank', 'width=500,height=600');
+                          }
+                        } catch (error) {
+                          toast({
+                            title: "Connection Failed",
+                            description: "Unable to connect to Outlook. Please try again.",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                    >
                       Set up Outlook
                     </Button>
                   </CardContent>

@@ -428,6 +428,22 @@ export const initiateGmailOAuth: RequestHandler = (req, res) => {
     "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send";
   const state = Math.random().toString(36).substring(7);
 
+  if (!clientId || clientId === 'undefined') {
+    return res.status(400).json({
+      error: "Gmail OAuth not configured",
+      message: "Missing GMAIL_CLIENT_ID environment variable",
+      setup: {
+        required: ["GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET"],
+        instructions: [
+          "1. Go to Google Cloud Console",
+          "2. Create OAuth 2.0 credentials", 
+          "3. Add environment variables to your deployment",
+          "4. Set redirect URI: " + redirectUri
+        ]
+      }
+    });
+  }
+
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&state=${state}&access_type=offline&prompt=consent`;
 
   res.json({ authUrl, state });
