@@ -175,10 +175,15 @@ export function createServer() {
   app.post("/api/messages/:messageId/read", markMessageAsRead);
 
   // Real IMAP Integration routes - actually connects to email servers
-  // Use regular import since we're not in an async function and need routes available immediately
-  const { testImapConnection, fetchImapEmails } = require("./routes/real-imap");
-  app.post("/api/imap/test", testImapConnection);
-  app.post("/api/imap/fetch", fetchImapEmails);
+  // Note: These will be loaded via top-level imports
+  app.post("/api/imap/test", async (req, res) => {
+    const { testImapConnection } = await import("./routes/real-imap.js");
+    return testImapConnection(req, res);
+  });
+  app.post("/api/imap/fetch", async (req, res) => {
+    const { fetchImapEmails } = await import("./routes/real-imap.js");
+    return fetchImapEmails(req, res);
+  });
 
   // Real AI API routes (NO categorization - only replies, summaries, chat)
   app.get("/api/ai/status", getAIStatus);
