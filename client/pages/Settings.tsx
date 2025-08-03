@@ -1197,13 +1197,40 @@ export default function Settings() {
                       size="sm" 
                       className="w-full"
                       onClick={() => {
-                        toast({
-                          title: "Custom Email Setup",
-                          description: "Enter your email provider details below to connect any IMAP/POP3 account.",
-                        });
+                        const emailInput = document.getElementById('email') as HTMLInputElement;
+                        const passwordInput = document.getElementById('password') as HTMLInputElement;
+                        
+                        if (!emailInput?.value || !passwordInput?.value) {
+                          toast({
+                            title: "Missing Information",
+                            description: "Please enter your email and password below first.",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        
+                        // Auto-detect Gmail settings
+                        const serverInput = document.getElementById('imap-server') as HTMLInputElement;
+                        const portInput = document.getElementById('imap-port') as HTMLInputElement;
+                        
+                        if (emailInput.value.includes('@gmail.com')) {
+                          serverInput.value = 'imap.gmail.com';
+                          portInput.value = '993';
+                          toast({
+                            title: "Gmail Detected",
+                            description: "Auto-filled Gmail IMAP settings. Use an App Password instead of your regular password.",
+                          });
+                        } else if (emailInput.value.includes('@outlook.com') || emailInput.value.includes('@hotmail.com')) {
+                          serverInput.value = 'imap-mail.outlook.com';
+                          portInput.value = '993';
+                          toast({
+                            title: "Outlook Detected", 
+                            description: "Auto-filled Outlook IMAP settings.",
+                          });
+                        }
                       }}
                     >
-                      Custom Setup
+                      Auto-Setup
                     </Button>
                   </CardContent>
                 </Card>
@@ -1261,25 +1288,124 @@ export default function Settings() {
                   </div>
 
                   <div className="flex space-x-2">
-                    <Button onClick={() => {
+                    <Button onClick={async () => {
+                      const emailInput = document.getElementById('email') as HTMLInputElement;
+                      const passwordInput = document.getElementById('password') as HTMLInputElement;
+                      const serverInput = document.getElementById('imap-server') as HTMLInputElement;
+                      const portInput = document.getElementById('imap-port') as HTMLInputElement;
+                      
+                      if (!emailInput?.value || !passwordInput?.value || !serverInput?.value) {
+                        toast({
+                          title: "Missing Information",
+                          description: "Please fill in all required fields first.",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                      
                       toast({
                         title: "Testing Connection...",
-                        description: "Checking IMAP settings...",
+                        description: "Connecting to " + serverInput.value,
                       });
-                      setTimeout(() => {
-                        toast({
-                          title: "✅ Connection Successful",
-                          description: "IMAP connection verified! Ready to save account.",
+                      
+                      try {
+                        const response = await fetch('/api/imap/test', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            host: serverInput.value,
+                            port: parseInt(portInput.value) || 993,
+                            username: emailInput.value,
+                            password: passwordInput.value,
+                            secure: true
+                          })
                         });
-                      }, 2000);
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                          toast({
+                            title: "✅ Connection Successful",
+                            description: `Found ${data.mailboxInfo.messageCount} emails. Ready to save account!`,
+                          });
+                        } else {
+                          toast({
+                            title: "Connection Failed",
+                            description: data.error || "Could not connect to email server.",
+                            variant: "destructive"
+                          });
+                        }
+                      } catch (error) {
+                        toast({
+                          title: "Connection Error",
+                          description: "Unable to test connection. Please check your settings.",
+                          variant: "destructive"
+                        });
+                      }
                     }}>Test Connection</Button>
                     <Button 
                       variant="outline"
-                      onClick={() => {
+                      onClick={async () => {
+                        const emailInput = document.getElementById('email') as HTMLInputElement;
+                        const passwordInput = document.getElementById('password') as HTMLInputElement;
+                        const serverInput = document.getElementById('imap-server') as HTMLInputElement;
+                        const portInput = document.getElementById('imap-port') as HTMLInputElement;
+                        
+                        if (!emailInput?.value || !passwordInput?.value || !serverInput?.value) {
+                          toast({
+                            title: "Missing Information",
+                            description: "Please test connection first to verify settings.",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        
                         toast({
-                          title: "✅ Account Saved",
-                          description: "Email account configured successfully! Emails will sync automatically.",
+                          title: "Saving Account...",
+                          description: "Connecting and fetching your emails...",
                         });
+                        
+                        try {
+                          const response = await fetch('/api/imap/fetch', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              host: serverInput.value,
+                              port: parseInt(portInput.value) || 993,
+                              username: emailInput.value,
+                              password: passwordInput.value,
+                              secure: true
+                            })
+                          });
+                          
+                          const data = await response.json();
+                          
+                          if (data.success) {
+                            toast({
+                              title: "✅ Account Saved!",
+                              description: `Successfully fetched ${data.emails.length} emails from ${emailInput.value}. Check your inbox!`,
+                            });
+                            
+                            // Clear the form
+                            emailInput.value = '';
+                            passwordInput.value = '';
+                            serverInput.value = '';
+                            portInput.value = '';
+                            
+                          } else {
+                            toast({
+                              title: "Save Failed",
+                              description: data.error || "Could not save email account.",
+                              variant: "destructive"
+                            });
+                          }
+                        } catch (error) {
+                          toast({
+                            title: "Save Error",
+                            description: "Unable to save account. Please try again.",
+                            variant: "destructive"
+                          });
+                        }
                       }}
                     >Save Account</Button>
                   </div>

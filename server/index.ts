@@ -174,11 +174,11 @@ export function createServer() {
   app.post("/api/messages/:messageId/send", sendConversationMessage);
   app.post("/api/messages/:messageId/read", markMessageAsRead);
 
-  // IMAP/POP Integration routes (temporarily disabled for Netlify build)
-  // app.get("/api/imap/providers", getIMAPProviders);
-  // app.post("/api/imap/test", testIMAPConnection);
-  // app.post("/api/imap/setup", setupIMAPIntegration);
-  // app.post("/api/imap/sync", syncIMAPEmails);
+  // Real IMAP Integration routes - actually connects to email servers
+  import("./routes/real-imap").then(({ testImapConnection, fetchImapEmails }) => {
+    app.post("/api/imap/test", testImapConnection);
+    app.post("/api/imap/fetch", fetchImapEmails);
+  });
 
   // Real AI API routes (NO categorization - only replies, summaries, chat)
   app.get("/api/ai/status", getAIStatus);
