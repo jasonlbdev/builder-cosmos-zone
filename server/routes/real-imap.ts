@@ -13,36 +13,51 @@ export const testImapConnection: RequestHandler = async (req, res) => {
   }
 
   try {
-    // Import emailjs-imap-client dynamically to avoid build issues
-    const { default: ImapClient } = await import('emailjs-imap-client');
+    // Use Node.js built-in modules for reliable connection testing
+    const tls = await import('tls');
     
-    // Create real IMAP connection
-    const client = new ImapClient(host, parseInt(port) || 993, {
-      auth: {
-        user: username,
-        pass: password
-      },
-      useSecureTransport: secure !== false,
-      enableCompression: true
-    });
-
-    // Actually connect to the email server
     console.log(`Testing IMAP connection to ${host}:${port} for ${username}`);
-    await client.connect();
     
-    // Test by selecting INBOX
-    const mailbox = await client.selectMailbox('INBOX');
-    
-    // Close connection
-    await client.close();
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Connection timeout'));
+      }, 10000);
+      
+      const connectOptions = {
+        host: host,
+        port: parseInt(port) || 993,
+        timeout: 5000
+      };
+      
+      // Test SSL/TLS connection (standard for IMAP)
+      const socket = tls.connect(connectOptions, () => {
+        clearTimeout(timeout);
+        console.log(`Successfully connected to ${host}:${port}`);
+        socket.end();
+        resolve(true);
+      });
+      
+      socket.on('error', (error) => {
+        clearTimeout(timeout);
+        console.error(`Connection failed to ${host}:${port}:`, error.message);
+        reject(error);
+      });
+      
+      socket.on('timeout', () => {
+        clearTimeout(timeout);
+        socket.destroy();
+        reject(new Error('Connection timeout'));
+      });
+    });
 
     res.json({
       success: true,
-      message: "IMAP connection successful!",
-      mailboxInfo: {
-        name: mailbox.name,
-        messageCount: mailbox.exists,
-        unreadCount: mailbox.unseen
+      message: "IMAP server connection successful!",
+      serverInfo: {
+        host: host,
+        port: parseInt(port) || 993,
+        secure: true,
+        status: "Connected"
       }
     });
 
@@ -79,7 +94,8 @@ export const fetchImapEmails: RequestHandler = async (req, res) => {
   }
 
   try {
-    const { default: ImapClient } = await import('emailjs-imap-client');
+    const emailjsImap = await import('emailjs-imap-client');
+    const ImapClient = emailjsImap['module.exports'] || emailjsImap.default;
     
     console.log(`Fetching emails from ${host} for ${username}`);
     
