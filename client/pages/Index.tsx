@@ -308,6 +308,73 @@ export default function Index() {
       );
     }
 
+    // Filter by selected folder
+    if (selectedFolder !== "Inbox") {
+      switch (selectedFolder) {
+        case "Sent":
+          // Show sent emails (we'll need to load these separately)
+          const userEmails = [
+            "john.doe@gmail.com",
+            "j.doe.work@gmail.com",
+            "john.doe@company.com",
+            "user@gmail.com",
+            "user@company.com"
+          ];
+          categoryEmails = emails.filter(email =>
+            userEmails.includes(email.email.toLowerCase())
+          );
+          break;
+        case "Starred":
+          categoryEmails = categoryEmails.filter(email => email.important);
+          break;
+        case "Important":
+          categoryEmails = categoryEmails.filter(email => email.important);
+          break;
+        case "Archive":
+          categoryEmails = getArchivedEmails();
+          break;
+        case "Trash":
+          categoryEmails = getDeletedEmails();
+          break;
+        case "To Respond":
+          categoryEmails = categoryEmails.filter(email => email.unread);
+          break;
+        case "Awaiting Reply":
+          categoryEmails = categoryEmails.filter(email =>
+            email.labels?.includes("awaiting-reply") ||
+            email.subject.toLowerCase().includes("re:")
+          );
+          break;
+        case "FYI":
+          categoryEmails = categoryEmails.filter(email =>
+            email.category === "FYI" ||
+            email.labels?.includes("fyi")
+          );
+          break;
+        case "Marketing":
+          categoryEmails = categoryEmails.filter(email =>
+            email.category === "Marketing" ||
+            email.category === "Promotions"
+          );
+          break;
+        case "Promotions":
+          categoryEmails = categoryEmails.filter(email =>
+            email.category === "Promotions" ||
+            email.labels?.includes("promotions")
+          );
+          break;
+        case "Updates":
+          categoryEmails = categoryEmails.filter(email =>
+            email.category === "Updates" ||
+            email.labels?.includes("updates")
+          );
+          break;
+        default:
+          // Inbox - already filtered
+          break;
+      }
+    }
+
     if (selectedIntegration !== "All") {
       categoryEmails = categoryEmails.filter(email => email.platform === selectedIntegration);
     }
