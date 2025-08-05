@@ -379,11 +379,26 @@ export default function Index() {
 
   const getFilteredEmails = () => {
     let categoryEmails = emails;
-    
-    if (selectedIntegration !== "All") {
-      categoryEmails = emails.filter(email => email.platform === selectedIntegration);
+
+    // Filter out sent emails unless in chain view
+    if (!showEmailChain) {
+      // Get user accounts to identify sent messages
+      const userEmails = [
+        "john.doe@gmail.com",
+        "j.doe.work@gmail.com",
+        "john.doe@company.com",
+        "user@gmail.com",
+        "user@company.com"
+      ];
+      categoryEmails = categoryEmails.filter(email =>
+        !userEmails.includes(email.email.toLowerCase())
+      );
     }
-    
+
+    if (selectedIntegration !== "All") {
+      categoryEmails = categoryEmails.filter(email => email.platform === selectedIntegration);
+    }
+
     if (searchQuery.trim()) {
       return categoryEmails.filter((email) =>
         email.sender.toLowerCase().includes(searchQuery) ||
@@ -394,7 +409,7 @@ export default function Index() {
         email.labels?.some(label => label.toLowerCase().includes(searchQuery))
       );
     }
-    
+
     return categoryEmails;
   };
 
