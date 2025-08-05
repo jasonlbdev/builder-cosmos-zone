@@ -277,11 +277,19 @@ const EmailView = ({ message }: { message: Message }) => {
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-2 flex-wrap gap-2">
-          <Button size="sm" onClick={() => console.log('Reply clicked')}>
+          <Button
+            size="sm"
+            onClick={handleReplyClick}
+            variant={showReplyBox && !isForwarding ? "default" : "outline"}
+          >
             <Reply className="w-4 h-4 mr-2" />
             Reply
           </Button>
-          <Button size="sm" variant="outline" onClick={() => console.log('Forward clicked')}>
+          <Button
+            size="sm"
+            variant={showReplyBox && isForwarding ? "default" : "outline"}
+            onClick={handleForwardClick}
+          >
             <Forward className="w-4 h-4 mr-2" />
             Forward
           </Button>
