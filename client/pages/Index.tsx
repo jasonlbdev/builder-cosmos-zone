@@ -536,15 +536,14 @@ export default function Index() {
                 onKeyPress={handleKeyPress}
                 className="w-64"
               />
-              <AdvancedSearchModal 
-                onSearch={handleAdvancedSearch}
-                trigger={
-                  <Button variant="outline" size="sm">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Advanced
-                  </Button>
-                }
-              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdvancedSearch(true)}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Advanced
+              </Button>
             </div>
           </div>
 
