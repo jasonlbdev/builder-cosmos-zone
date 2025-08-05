@@ -25,6 +25,8 @@ import {
   ChevronRight,
   Calendar,
   CheckSquare,
+  Filter,
+  GitBranch,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +42,9 @@ import {
 import ComposeModal from "@/components/ComposeModal";
 import DexterAI from "@/components/DexterAI";
 import MessageView from "@/components/MessageView";
+import EmailChainView from "@/components/EmailChainView";
+import AdvancedSearchModal from "@/components/AdvancedSearchModal";
+import SearchResultsView from "@/components/SearchResultsView";
 import { cn } from "@/lib/utils";
 import { getEmails, getSentEmails, getArchivedEmails, getDeletedEmails, type Email } from "../../shared/data/mockData";
 import {
@@ -190,6 +195,11 @@ export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showIntegrationModal, setShowIntegrationModal] = useState(false);
   const [selectedIntegrationData, setSelectedIntegrationData] = useState<any>(null);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchFilters, setSearchFilters] = useState<any[]>([]);
+  const [showEmailChains, setShowEmailChains] = useState(false);
 
   // Load emails from centralized API on component mount
   useEffect(() => {
@@ -571,18 +581,43 @@ export default function Index() {
             <h1 className="text-xl font-bold">Dexter</h1>
           </div>
 
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Search emails, contacts, or commands..."
-              className="pl-10 w-96"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="relative flex items-center space-x-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search emails, contacts, or commands..."
+                className="pl-10 w-96"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && searchQuery.trim()) {
+                    handleBasicSearch();
+                  }
+                }}
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAdvancedSearch(true)}
+              className="flex items-center space-x-1"
+            >
+              <Filter className="w-4 h-4" />
+              <span>Advanced</span>
+            </Button>
           </div>
         </div>
 
         <div className="flex items-center space-x-3">
+          <Button
+            variant={showEmailChains ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowEmailChains(!showEmailChains)}
+            className="flex items-center space-x-1"
+          >
+            <GitBranch className="w-4 h-4" />
+            <span>Chains</span>
+          </Button>
           <Button
             onClick={() => setShowCompose(true)}
             className="bg-primary hover:bg-primary/90"
