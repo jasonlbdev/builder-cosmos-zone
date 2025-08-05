@@ -88,24 +88,107 @@ const isEmailPlatform = (platform: string) => {
   return ["Outlook", "Gmail"].includes(platform);
 };
 
-// Fetch conversation messages for messaging platforms
+// Fetch conversation messages for messaging platforms (using mock data)
 const fetchConversationMessages = async (
   messageId: string,
   platform: string,
 ): Promise<ConversationMessage[]> => {
-  try {
-    const response = await fetch(
-      `/api/messages/${messageId}/conversation?platform=${platform}`,
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch conversation");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching conversation:", error);
-    // Fallback to current message only
-    return [];
-  }
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  // Mock conversation data
+  const mockConversations: Record<string, ConversationMessage[]> = {
+    "6": [
+      {
+        id: "1",
+        sender: "Amazon Support",
+        content: "Hello! Your package #AMZ123456 has been shipped and is on its way.",
+        time: "2h ago",
+        isMe: false,
+        avatar: "AS",
+        status: "delivered",
+      },
+      {
+        id: "2",
+        sender: "You",
+        content: "Great! When can I expect delivery?",
+        time: "1h ago",
+        isMe: true,
+        avatar: "ME",
+        status: "read",
+      },
+      {
+        id: "3",
+        sender: "Amazon Support",
+        content: "Your package will arrive tomorrow between 2-6 PM. You'll receive tracking updates via SMS.",
+        time: "45m ago",
+        isMe: false,
+        avatar: "AS",
+        status: "delivered",
+      },
+    ],
+    "7": [
+      {
+        id: "1",
+        sender: "DevOps Team",
+        content: "🚨 Server Alert: High CPU usage detected on production server",
+        time: "30m ago",
+        isMe: false,
+        avatar: "DT",
+        status: "delivered",
+      },
+      {
+        id: "2",
+        sender: "You",
+        content: "On it! Checking the logs now.",
+        time: "28m ago",
+        isMe: true,
+        avatar: "ME",
+        status: "read",
+      },
+      {
+        id: "3",
+        sender: "DevOps Team",
+        content: "Thanks! The issue seems to be with the background job queue. CPU is back to normal now.",
+        time: "15m ago",
+        isMe: false,
+        avatar: "DT",
+        status: "delivered",
+      },
+      {
+        id: "4",
+        sender: "You",
+        content: "Perfect! I've optimized the queue processing. Should prevent future spikes.",
+        time: "10m ago",
+        isMe: true,
+        avatar: "ME",
+        status: "read",
+      },
+    ],
+    "1": [
+      {
+        id: "1",
+        sender: "Sarah Johnson",
+        content: "Can we reschedule the Q4 budget meeting? Something urgent came up.",
+        time: "5m ago",
+        isMe: false,
+        avatar: "SJ",
+        status: "delivered",
+      },
+      {
+        id: "2",
+        sender: "You",
+        content: "Of course! What works better for you?",
+        time: "3m ago",
+        isMe: true,
+        avatar: "ME",
+        status: "read",
+      },
+    ],
+  };
+
+  // Return mock conversation or empty array
+  return mockConversations[messageId] || [];
 };
 
 const EmailMessageView = ({ 
