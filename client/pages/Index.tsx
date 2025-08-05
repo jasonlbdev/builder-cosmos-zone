@@ -158,6 +158,40 @@ const integrations = {
       },
     ],
   },
+  cloudStorage: {
+    name: "Cloud Storage",
+    isOpen: false,
+    items: [
+      {
+        name: "Google Drive",
+        status: "healthy",
+        lastSync: "5 mins ago",
+        workspaces: ["Personal", "Work"],
+        unreadCount: 0,
+      },
+      {
+        name: "Dropbox",
+        status: "healthy",
+        lastSync: "10 mins ago",
+        workspaces: ["Business"],
+        unreadCount: 0,
+      },
+      {
+        name: "OneDrive",
+        status: "disconnected",
+        lastSync: "Never",
+        workspaces: [],
+        unreadCount: 0,
+      },
+      {
+        name: "iCloud",
+        status: "warning",
+        lastSync: "1 hour ago",
+        workspaces: ["Personal"],
+        unreadCount: 0,
+      },
+    ],
+  },
 };
 
 // Helper function to check if email looks suspicious
