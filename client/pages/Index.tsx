@@ -837,22 +837,33 @@ export default function Index() {
                                   
                                   {/* Security Status Badge */}
                                   {securityStatus.status !== "safe" && (
-                                    <Badge 
-                                      variant="outline" 
-                                      className={cn(
-                                        "text-xs",
-                                        securityStatus.level === "high" ? "text-red-700 bg-red-50 border-red-200" :
-                                        securityStatus.level === "medium" ? "text-orange-700 bg-orange-50 border-orange-200" :
-                                        "text-yellow-700 bg-yellow-50 border-yellow-200"
+                                    <div className="relative group">
+                                      <Badge
+                                        variant="outline"
+                                        className={cn(
+                                          "text-xs cursor-help",
+                                          securityStatus.level === "high" ? "text-red-700 bg-red-50 border-red-200" :
+                                          securityStatus.level === "medium" ? "text-orange-700 bg-orange-50 border-orange-200" :
+                                          "text-yellow-700 bg-yellow-50 border-yellow-200"
+                                        )}
+                                      >
+                                        {securityStatus.status === "threat" ? (
+                                          <ShieldAlert className="w-3 h-3 mr-1" />
+                                        ) : (
+                                          <Shield className="w-3 h-3 mr-1" />
+                                        )}
+                                        {securityStatus.status}
+                                      </Badge>
+                                      {/* Tooltip */}
+                                      {securityStatus.reason && (
+                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-normal max-w-xs">
+                                          <div className="text-center">
+                                            {securityStatus.reason}
+                                          </div>
+                                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                                        </div>
                                       )}
-                                    >
-                                      {securityStatus.status === "threat" ? (
-                                        <ShieldAlert className="w-3 h-3 mr-1" />
-                                      ) : (
-                                        <Shield className="w-3 h-3 mr-1" />
-                                      )}
-                                      {securityStatus.status}
-                                    </Badge>
+                                    </div>
                                   )}
                                   
                                   {email.important && <Star className="w-3 h-3 text-yellow-500" />}
