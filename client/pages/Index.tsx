@@ -603,6 +603,7 @@ export default function Index() {
                           variant={item.active ? "default" : "ghost"}
                           className="w-full justify-start mb-1"
                           size="sm"
+                          onClick={() => handleSidebarItemClick(item.label)}
                         >
                           <item.icon className="w-4 h-4 mr-3" />
                           <span className="flex-1 text-left">{item.label}</span>
