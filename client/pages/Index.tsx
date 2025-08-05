@@ -212,6 +212,15 @@ export default function Index() {
     }));
   };
 
+  const handleSidebarItemClick = (folderName: string) => {
+    setSelectedFolder(folderName);
+    // Update sidebar items to reflect active state
+    setSidebarItems(prev => prev.map(item => ({
+      ...item,
+      active: item.label === folderName
+    })));
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "healthy":
