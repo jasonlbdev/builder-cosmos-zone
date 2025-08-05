@@ -265,7 +265,7 @@ export default function EmailToTaskExtraction({
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <Sparkles className="w-5 h-5 text-purple-500" />
-            <span>AI Task Extraction</span>
+            <span>Create Task</span>
             {emailContext && (
               <Badge variant="outline" className="ml-2">
                 {emailContext.subject}
