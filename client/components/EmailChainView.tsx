@@ -350,9 +350,9 @@ export default function EmailChainView({
     return acc;
   }, {} as Record<string, Email[]>);
   
-  // Sort emails within each thread by position
+  // Sort emails within each thread by position (most recent first)
   Object.keys(emailsByThread).forEach(threadId => {
-    emailsByThread[threadId].sort((a, b) => (a.threadPosition || 0) - (b.threadPosition || 0));
+    emailsByThread[threadId].sort((a, b) => (b.threadPosition || 0) - (a.threadPosition || 0));
   });
   
   const toggleThread = (threadId: string) => {
