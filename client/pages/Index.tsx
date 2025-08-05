@@ -757,127 +757,167 @@ export default function Index() {
 
       <div className="flex-1 flex">
         <ResizablePanelGroup direction="horizontal">
-          {/* Sidebar */}
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={25}>
-            <div className="h-full border-r border-border">
-              <div className="p-4">
-                <div className="space-y-1">
-                  {sidebarItems.map((item) => (
+          {/* Collapsible Left Sidebar */}
+          {!leftPanelCollapsed && (
+            <>
+              <ResizablePanel defaultSize={20} minSize={15} maxSize={25}>
+                <div className="h-full border-r border-border">
+                  <div className="flex items-center justify-between p-2 border-b border-border">
+                    <h2 className="text-sm font-semibold">Navigation</h2>
                     <Button
-                      key={item.label}
-                      variant={
-                        selectedSidebarItem === item.label
-                          ? "secondary"
-                          : "ghost"
-                      }
-                      className="w-full justify-start"
-                      onClick={() => setSelectedSidebarItem(item.label)}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setLeftPanelCollapsed(true)}
                     >
-                      <item.icon className="w-4 h-4 mr-3" />
-                      <span className="flex-1 text-left">{item.label}</span>
-                      {item.count > 0 && (
-                        <Badge variant="secondary" className="ml-auto">
-                          {item.count}
-                        </Badge>
-                      )}
+                      <PanelLeftClose className="w-4 h-4" />
                     </Button>
-                  ))}
-                </div>
+                  </div>
+                  <div className="p-3">
+                    <div className="space-y-1">
+                      {sidebarItems.map((item) => (
+                        <Button
+                          key={item.label}
+                          variant={
+                            selectedSidebarItem === item.label
+                              ? "secondary"
+                              : "ghost"
+                          }
+                          className="w-full justify-start"
+                          onClick={() => setSelectedSidebarItem(item.label)}
+                        >
+                          <item.icon className="w-4 h-4 mr-3" />
+                          <span className="flex-1 text-left">{item.label}</span>
+                          {item.count > 0 && (
+                            <Badge variant="secondary" className="ml-auto">
+                              {item.count}
+                            </Badge>
+                          )}
+                        </Button>
+                      ))}
+                    </div>
 
-                <Separator className="my-4" />
+                    <Separator className="my-4" />
 
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-muted-foreground px-2">
-                    Productivity
-                  </h3>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    asChild
-                  >
-                    <Link to="/calendar">
-                      <Calendar className="w-4 h-4 mr-3" />
-                      Calendar
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    asChild
-                  >
-                    <Link to="/tasks">
-                      <CheckSquare className="w-4 h-4 mr-3" />
-                      Tasks
-                    </Link>
-                  </Button>
-                </div>
-
-                <Separator className="my-4" />
-
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-muted-foreground px-2">
-                    Integrations
-                  </h3>
-                  {Object.entries(integrationCategories).map(([key, category]) => (
-                    <div key={key} className="space-y-1">
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground px-2">
+                        Productivity
+                      </h3>
                       <Button
                         variant="ghost"
-                        className="w-full justify-start text-xs p-2"
-                        onClick={() => toggleIntegrationCategory(key as keyof typeof integrations)}
+                        className="w-full justify-start"
+                        asChild
                       >
-                        {category.isOpen ? (
-                          <ChevronDown className="w-3 h-3 mr-2" />
-                        ) : (
-                          <ChevronRight className="w-3 h-3 mr-2" />
-                        )}
-                        {category.name}
+                        <Link to="/calendar">
+                          <Calendar className="w-4 h-4 mr-3" />
+                          Calendar
+                        </Link>
                       </Button>
-                      {category.isOpen && (
-                        <div className="ml-4 space-y-1">
-                          {category.items.map((item) => (
-                            <Button
-                              key={item.name}
-                              variant="ghost"
-                              className="w-full justify-start text-xs p-1"
-                              onClick={() => {
-                                // If not connected, redirect to integration setup
-                                if (item.status === 'disconnected' || item.status === 'error') {
-                                  window.location.href = `/integrations?setup=${item.name.toLowerCase()}`;
-                                  return;
-                                }
-                                // Otherwise show integration details modal
-                                setSelectedIntegration(item.name);
-                                setSelectedIntegrationData(item);
-                                setShowIntegrationModal(true);
-                              }}
-                            >
-                              <div
-                                className={`w-2 h-2 rounded-full mr-2 ${getStatusColor(
-                                  item.status,
-                                )}`}
-                              />
-                              <span className="flex-1 text-left">{item.name}</span>
-                              {item.unreadCount > 0 && (
-                                <Badge variant="secondary" className="ml-auto text-xs">
-                                  {item.unreadCount}
-                                </Badge>
-                              )}
-                            </Button>
-                          ))}
-                        </div>
-                      )}
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        asChild
+                      >
+                        <Link to="/tasks">
+                          <CheckSquare className="w-4 h-4 mr-3" />
+                          Tasks
+                        </Link>
+                      </Button>
                     </div>
-                  ))}
+
+                    <Separator className="my-4" />
+
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-muted-foreground px-2">
+                        Integrations
+                      </h3>
+                      {Object.entries(integrationCategories).map(([key, category]) => (
+                        <div key={key} className="space-y-1">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-xs p-2"
+                            onClick={() => toggleIntegrationCategory(key as keyof typeof integrations)}
+                          >
+                            {category.isOpen ? (
+                              <ChevronDown className="w-3 h-3 mr-2" />
+                            ) : (
+                              <ChevronRight className="w-3 h-3 mr-2" />
+                            )}
+                            {category.name}
+                          </Button>
+                          {category.isOpen && (
+                            <div className="ml-4 space-y-1">
+                              {category.items.map((item) => (
+                                <Button
+                                  key={item.name}
+                                  variant="ghost"
+                                  className="w-full justify-start text-xs p-1"
+                                  onClick={() => {
+                                    // If not connected, redirect to integration setup
+                                    if (item.status === 'disconnected' || item.status === 'error') {
+                                      window.location.href = `/integrations?setup=${item.name.toLowerCase()}`;
+                                      return;
+                                    }
+                                    // Otherwise show integration details modal
+                                    setSelectedIntegration(item.name);
+                                    setSelectedIntegrationData(item);
+                                    setShowIntegrationModal(true);
+                                  }}
+                                >
+                                  <div
+                                    className={`w-2 h-2 rounded-full mr-2 ${getStatusColor(
+                                      item.status,
+                                    )}`}
+                                  />
+                                  <span className="flex-1 text-left">{item.name}</span>
+                                  {item.unreadCount > 0 && (
+                                    <Badge variant="secondary" className="ml-auto text-xs">
+                                      {item.unreadCount}
+                                    </Badge>
+                                  )}
+                                </Button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+              </ResizablePanel>
+              <ResizableHandle />
+            </>
+          )}
+
+          {/* Collapsed Left Panel Trigger */}
+          {leftPanelCollapsed && (
+            <div className="w-12 border-r border-border flex flex-col items-center py-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLeftPanelCollapsed(false)}
+                className="mb-2"
+              >
+                <PanelLeft className="w-4 h-4" />
+              </Button>
+              <div className="flex flex-col space-y-1">
+                {sidebarItems.slice(0, 5).map((item) => (
+                  <Button
+                    key={item.label}
+                    variant={selectedSidebarItem === item.label ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setSelectedSidebarItem(item.label)}
+                    className="w-8 h-8 p-0"
+                  >
+                    <item.icon className="w-4 h-4" />
+                  </Button>
+                ))}
               </div>
             </div>
-          </ResizablePanel>
-
-          <ResizableHandle />
+          )}
 
           {/* Email List / Search Results / Email Chains */}
-          <ResizablePanel defaultSize={35}>
-            <div className="h-full border-r border-border">
+          <ResizablePanel defaultSize={leftPanelCollapsed ? (rightPanelCollapsed ? 100 : 60) : (rightPanelCollapsed ? 80 : 35)}>
+            <div className={cn("h-full", !rightPanelCollapsed && "border-r border-border")}>
               {showSearchResults ? (
                 <SearchResultsView
                   results={searchResults}
@@ -886,19 +926,18 @@ export default function Index() {
                   onResultSelect={handleSearchResultSelect}
                   onClearFilter={handleClearFilter}
                   onClearAllFilters={handleClearAllFilters}
-                  className="p-4"
+                  className="p-2"
                 />
               ) : showEmailChains ? (
-                <div className="p-4">
-                  <EmailChainView
-                    emails={filteredEmails}
-                    selectedEmailId={selectedEmailId}
-                    onEmailSelect={setSelectedEmailId}
-                  />
-                </div>
+                <EmailChainView
+                  emails={filteredEmails}
+                  selectedEmailId={selectedEmailId}
+                  onEmailSelect={setSelectedEmailId}
+                  className="p-2"
+                />
               ) : (
                 <>
-                  <div className="p-4 border-b border-border">
+                  <div className="p-3 border-b border-border">
                     <div className="flex items-center justify-between mb-3">
                       <h2 className="text-lg font-semibold">{selectedSidebarItem}</h2>
                       <div className="flex items-center space-x-2">
@@ -1058,22 +1097,50 @@ export default function Index() {
             </div>
           </ResizablePanel>
 
-          <ResizableHandle />
+          {/* Collapsible Right Panel */}
+          {!rightPanelCollapsed && (
+            <>
+              <ResizableHandle />
+              <ResizablePanel defaultSize={45}>
+                <div className="h-full">
+                  <div className="flex items-center justify-between p-2 border-b border-border">
+                    <h2 className="text-sm font-semibold">Message Details</h2>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRightPanelCollapsed(true)}
+                    >
+                      <PanelRightClose className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <MessageView
+                    message={selectedEmail}
+                    onReply={handleReply}
+                    onForward={handleForward}
+                    onArchive={handleArchive}
+                    onStar={handleStar}
+                    onDelete={handleDelete}
+                    onMarkAsRead={handleMarkAsRead}
+                    onAddLabel={handleAddLabel}
+                    onSnooze={handleSnooze}
+                  />
+                </div>
+              </ResizablePanel>
+            </>
+          )}
 
-          {/* Message Content */}
-          <ResizablePanel defaultSize={45}>
-            <MessageView 
-              message={selectedEmail} 
-              onReply={handleReply}
-              onForward={handleForward}
-              onArchive={handleArchive}
-              onStar={handleStar}
-              onDelete={handleDelete}
-              onMarkAsRead={handleMarkAsRead}
-              onAddLabel={handleAddLabel}
-              onSnooze={handleSnooze}
-            />
-          </ResizablePanel>
+          {/* Collapsed Right Panel Trigger */}
+          {rightPanelCollapsed && (
+            <div className="w-12 border-l border-border flex flex-col items-center py-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setRightPanelCollapsed(false)}
+              >
+                <PanelRight className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
         </ResizablePanelGroup>
       </div>
 
