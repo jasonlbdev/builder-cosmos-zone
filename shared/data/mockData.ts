@@ -224,6 +224,21 @@ export interface Email {
   platform?: string;
   platformLogo?: string;
   platformColor?: string;
+  // Thread/Chain support
+  threadId?: string;
+  parentId?: string;
+  conversationType?: "external" | "internal" | "mixed";
+  participants?: Array<{
+    email: string;
+    name: string;
+    avatar: string;
+    type: "external" | "internal";
+    domain?: string;
+  }>;
+  threadPosition?: number;
+  hasReplies?: boolean;
+  isThreadHead?: boolean;
+  forkPoint?: boolean;
 }
 
 export const mockEmails: Email[] = [
