@@ -43,6 +43,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
 import { getUserAccounts, getContacts, getFrequentContacts, type UserAccount, type Contact } from "../../shared/data/mockData";
+import SmartTemplates from "./SmartTemplates";
+import FollowUpOrchestration from "./FollowUpOrchestration";
 
 interface ComposeModalProps {
   open: boolean;
@@ -97,6 +99,9 @@ export function ComposeModal({
   
   // Toast for notifications
   const { toast } = useToast();
+  
+  // Template integration
+  const [emailContext, setEmailContext] = useState<any>(null);
 
   // Load user accounts and contacts when platform changes
   useEffect(() => {
@@ -110,7 +115,17 @@ export function ComposeModal({
     // Load contacts for this platform
     const contacts = getContacts(selectedPlatform);
     setAvailableContacts(contacts);
-  }, [selectedPlatform]);
+    
+    // Set email context for templates
+    if (replyTo || subject) {
+      setEmailContext({
+        recipient: replyTo,
+        subject: subject,
+        sender: selectedFromAccount?.address,
+        content: "", // Empty for new composition
+      });
+    }
+  }, [selectedPlatform, replyTo, subject, selectedFromAccount]);
 
   const currentPlatform = availablePlatforms.find(p => p.id === selectedPlatform);
   const isEmailPlatform = currentPlatform?.type === "email";
@@ -209,6 +224,10 @@ export function ComposeModal({
     } catch (error) {
       console.error("Failed to generate AI content:", error);
     }
+  };
+
+  const handleTemplateSelected = (template: string) => {
+    setContent(template);
   };
 
   const saveDraft = async () => {
@@ -605,36 +624,46 @@ export function ComposeModal({
             <Separator />
 
             {/* Formatting Toolbar */}
-            <div className="flex items-center space-x-2 py-2">
-              <Button variant="ghost" size="sm">
-                <Bold className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm">
-                <Italic className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm">
-                <Underline className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm">
-                <Link className="w-4 h-4" />
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <Button variant="ghost" size="sm">
-                <Paperclip className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm">
-                <Smile className="w-4 h-4" />
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={generateAIContent}
-                className="text-primary"
-              >
-                <Zap className="w-4 h-4 mr-1" />
-                AI Draft
-              </Button>
+            <div className="flex items-center justify-between py-2">
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="sm">
+                  <Bold className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Italic className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Underline className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Link className="w-4 h-4" />
+                </Button>
+                <Separator orientation="vertical" className="h-6" />
+                <Button variant="ghost" size="sm">
+                  <Paperclip className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Smile className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <SmartTemplates
+                  emailContext={emailContext}
+                  onTemplateSelected={handleTemplateSelected}
+                  trigger="manual"
+                />
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={generateAIContent}
+                  className="text-primary"
+                >
+                  <Zap className="w-4 h-4 mr-1" />
+                  AI Draft
+                </Button>
+              </div>
             </div>
 
             <Separator />
@@ -690,6 +719,19 @@ export function ComposeModal({
                 >
                   Schedule Send
                 </Button>
+                
+                {replyTo && (
+                  <FollowUpOrchestration
+                    emailId="compose_draft"
+                    emailSubject={emailSubject}
+                    emailSender={replyTo}
+                    trigger="manual"
+                  >
+                    <Button variant="outline" size="sm">
+                      Follow-up
+                    </Button>
+                  </FollowUpOrchestration>
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 <Button variant="outline" onClick={onClose}>
