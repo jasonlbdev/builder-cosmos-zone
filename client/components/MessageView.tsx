@@ -431,6 +431,40 @@ const EmailView = ({ message }: { message: Message }) => {
           </Button>
         </div>
       </div>
+
+      {/* Reply Box */}
+      <div className="border-t border-border p-4">
+        <div className="flex items-start space-x-3">
+          <div className="flex-1">
+            <Textarea
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder={`Reply to ${message.sender}...`}
+              className="min-h-[80px] resize-none"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.metaKey) {
+                  e.preventDefault();
+                  handleSendReply();
+                }
+              }}
+            />
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center space-x-2">
+                <Button size="sm" variant="ghost">
+                  <Paperclip className="w-4 h-4" />
+                </Button>
+                <Button size="sm" variant="ghost">
+                  <Smile className="w-4 h-4" />
+                </Button>
+              </div>
+              <Button size="sm" onClick={handleSendReply} disabled={!replyText.trim()}>
+                <Send className="w-4 h-4 mr-2" />
+                Send
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
