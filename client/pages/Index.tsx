@@ -997,7 +997,7 @@ export default function Index() {
               />
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedIntegrationData && (
             <div className="space-y-6">
               {/* Status Section */}
@@ -1069,6 +1069,14 @@ export default function Index() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Advanced Search Modal */}
+      <AdvancedSearchModal
+        open={showAdvancedSearch}
+        onClose={() => setShowAdvancedSearch(false)}
+        onSearch={handleAdvancedSearch}
+        initialQuery={searchQuery}
+      />
     </div>
   );
 }
