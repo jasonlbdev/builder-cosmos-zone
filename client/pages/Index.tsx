@@ -574,7 +574,7 @@ export default function Index() {
                             <Button
                               variant="ghost"
                               className="w-full justify-start text-xs p-2"
-                              onClick={() => toggleIntegrationCategory(key as keyof typeof integrations)}
+                              onClick={() => toggleIntegrationCategory(key as keyof typeof defaultIntegrationCategories)}
                             >
                               {category.isOpen ? (
                                 <ChevronDown className="w-3 h-3 mr-2" />
