@@ -47,6 +47,7 @@ import AdvancedSearchModal from "@/components/AdvancedSearchModal";
 import SearchResultsView from "@/components/SearchResultsView";
 import { cn } from "@/lib/utils";
 import { getEmails, getSentEmails, getArchivedEmails, getDeletedEmails, type Email } from "../../shared/data/mockData";
+import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
