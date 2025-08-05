@@ -22,6 +22,7 @@ import {
   ArrowRight,
   Eye,
   EyeOff,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -93,35 +94,123 @@ const getConversationTypeColor = (type?: string) => {
   }
 };
 
+const getThreadLineColor = (type?: string) => {
+  switch (type) {
+    case "internal":
+      return "border-orange-400";
+    case "external":
+      return "border-blue-400";
+    case "mixed":
+      return "border-purple-400";
+    default:
+      return "border-gray-400";
+  }
+};
+
+const getThreadBgColor = (type?: string) => {
+  switch (type) {
+    case "internal":
+      return "bg-orange-50 border-orange-200";
+    case "external":
+      return "bg-blue-50 border-blue-200";
+    case "mixed":
+      return "bg-purple-50 border-purple-200";
+    default:
+      return "bg-gray-50 border-gray-200";
+  }
+};
+
 const EmailThreadItem = ({ 
   email, 
   isSelected, 
   onSelect, 
   isLast,
-  level = 0 
+  level = 0,
+  threadEmails = [],
+  index = 0
 }: { 
   email: Email; 
   isSelected: boolean; 
   onSelect: (id: string) => void;
   isLast: boolean;
   level?: number;
+  threadEmails?: Email[];
+  index?: number;
 }) => {
   const [showFullContent, setShowFullContent] = useState(false);
   
+  // Calculate indentation based on conversation type changes
+  const getIndentLevel = () => {
+    if (level === 0 || email.isThreadHead) return 0;
+    
+    // Check if this is a fork from the main thread
+    if (email.forkPoint) return 1;
+    
+    // If this continues an internal conversation, maintain the same level
+    if (email.conversationType === "internal" && email.parentId) {
+      const parentEmail = threadEmails.find(e => e.id === email.parentId);
+      if (parentEmail?.conversationType === "internal") return 1;
+    }
+    
+    // If this rejoins the main thread, return to base level
+    if (email.conversationType === "mixed") return 0;
+    
+    return level;
+  };
+
+  const indentLevel = getIndentLevel();
+  const indentPixels = indentLevel * 32; // 32px per level
+  
+  const isMainThread = indentLevel === 0;
+  const isForkedThread = indentLevel > 0;
+  
   return (
-    <div className={cn("relative", level > 0 && "ml-6")}>
-      {/* Connection Line */}
-      {level > 0 && (
-        <div className="absolute -left-6 top-0 bottom-0 w-6 flex items-start">
-          <div className="w-full h-8 border-l-2 border-b-2 border-muted-foreground/20 rounded-bl-lg mt-2" />
+    <div className={cn("relative", !isMainThread && "ml-8")} style={{ paddingLeft: `${indentPixels}px` }}>
+      {/* Thread Connection Lines */}
+      {!email.isThreadHead && (
+        <div className="absolute top-0 bottom-0" style={{ left: `${Math.max(0, indentPixels - 16)}px` }}>
+          {/* Vertical line for thread continuity */}
+          {!isLast && (
+            <div 
+              className={cn(
+                "absolute top-0 bottom-0 w-0.5 -translate-x-0.5",
+                isForkedThread ? getThreadLineColor(email.conversationType) : getThreadLineColor("external")
+              )}
+              style={{ left: isForkedThread ? "16px" : "0px" }}
+            />
+          )}
+          
+          {/* Horizontal connector line */}
+          <div 
+            className={cn(
+              "absolute top-4 w-4 h-0.5 -translate-y-0.5",
+              isForkedThread ? getThreadLineColor(email.conversationType) : getThreadLineColor("external")
+            )}
+            style={{ left: isForkedThread ? "0px" : "0px" }}
+          />
+          
+          {/* Corner connector for forks */}
+          {email.forkPoint && (
+            <div 
+              className={cn(
+                "absolute top-0 w-0.5 h-4",
+                getThreadLineColor(email.conversationType)
+              )}
+              style={{ left: "0px" }}
+            />
+          )}
         </div>
       )}
       
       {/* Fork Indicator */}
       {email.forkPoint && (
         <div className="flex items-center space-x-2 mb-2 text-xs text-muted-foreground">
-          <GitBranch className="w-3 h-3" />
-          <span>Conversation forked to internal discussion</span>
+          <GitBranch className={cn("w-3 h-3", email.conversationType === "internal" ? "text-orange-600" : "text-blue-600")} />
+          <span>
+            {email.conversationType === "internal" 
+              ? "Conversation forked to internal discussion" 
+              : "Conversation forked to external thread"}
+          </span>
         </div>
       )}
       
@@ -131,7 +220,8 @@ const EmailThreadItem = ({
           isSelected
             ? "bg-accent border-accent-foreground/20 shadow-sm"
             : "border-border hover:bg-accent/50 hover:border-accent-foreground/10",
-          email.unread && "border-l-4 border-l-primary"
+          email.unread && "border-l-4 border-l-primary",
+          isForkedThread && getThreadBgColor(email.conversationType)
         )}
         onClick={() => onSelect(email.id)}
       >
@@ -173,6 +263,11 @@ const EmailThreadItem = ({
                   className={cn("text-xs", email.categoryColor, "text-white")}
                 >
                   {email.category}
+                </Badge>
+                
+                {/* Thread Position Indicator */}
+                <Badge variant="outline" className="text-xs">
+                  #{email.threadPosition || 1}
                 </Badge>
               </div>
             </div>
@@ -253,9 +348,9 @@ const EmailThreadItem = ({
       </div>
       
       {/* Merge Back Indicator */}
-      {email.conversationType === "mixed" && email.parentId && (
+      {email.conversationType === "mixed" && email.parentId && !isMainThread && (
         <div className="flex items-center space-x-2 mt-2 text-xs text-muted-foreground">
-          <GitMerge className="w-3 h-3" />
+          <GitMerge className="w-3 h-3 text-purple-600" />
           <span>Conversation rejoined main thread</span>
         </div>
       )}
@@ -307,24 +402,43 @@ export default function EmailChainView({
   return (
     <div className={cn("space-y-4", className)}>
       {/* Controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <h3 className="text-sm font-medium">Email Chains</h3>
-          <Badge variant="secondary" className="text-xs">
-            {Object.keys(emailsByThread).length} thread{Object.keys(emailsByThread).length !== 1 ? 's' : ''}
-          </Badge>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Mail className="w-5 h-5" />
+            <h3 className="font-medium">Email Threads</h3>
+            <Badge variant="secondary">
+              {Object.keys(emailsByThread).length} thread{Object.keys(emailsByThread).length !== 1 ? 's' : ''}
+            </Badge>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button
+              variant={showInternalOnly ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowInternalOnly(!showInternalOnly)}
+              className="text-xs"
+            >
+              <Lock className="w-3 h-3 mr-1" />
+              Internal Only
+            </Button>
+          </div>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <Button
-            variant={showInternalOnly ? "default" : "outline"}
-            size="sm"
-            onClick={() => setShowInternalOnly(!showInternalOnly)}
-            className="text-xs"
-          >
-            <Lock className="w-3 h-3 mr-1" />
-            Internal Only
-          </Button>
+        {/* Legend */}
+        <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+          <div className="flex items-center space-x-1">
+            <div className="w-3 h-0.5 bg-blue-400"></div>
+            <span>External</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div className="w-3 h-0.5 bg-orange-400"></div>
+            <span>Internal</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div className="w-3 h-0.5 bg-purple-400"></div>
+            <span>Mixed</span>
+          </div>
         </div>
       </div>
       
@@ -332,12 +446,13 @@ export default function EmailChainView({
       
       {/* Thread List */}
       <ScrollArea className="h-[calc(100vh-200px)]">
-        <div className="space-y-4">
+        <div className="space-y-6">
           {Object.entries(emailsByThread).map(([threadId, threadEmails]) => {
             const threadHead = threadEmails.find(email => email.isThreadHead) || threadEmails[0];
             const isExpanded = expandedThreads.has(threadId);
             const visibleEmails = filteredEmails(threadEmails);
             const hasInternalFork = threadEmails.some(email => email.forkPoint);
+            const hasMixedConversation = threadEmails.some(email => email.conversationType === "mixed");
             
             if (visibleEmails.length === 0) return null;
             
@@ -345,7 +460,7 @@ export default function EmailChainView({
               <div key={threadId} className="space-y-2">
                 <Collapsible open={isExpanded} onOpenChange={() => toggleThread(threadId)}>
                   <CollapsibleTrigger asChild>
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 cursor-pointer">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 cursor-pointer">
                       <div className="flex items-center space-x-2">
                         {isExpanded ? (
                           <ChevronDown className="w-4 h-4" />
@@ -355,16 +470,33 @@ export default function EmailChainView({
                         <div className="flex items-center space-x-2">
                           <MessageSquare className="w-4 h-4" />
                           <span className="text-sm font-medium truncate max-w-[200px]">
-                            {threadHead.subject}
+                            {threadHead.subject.replace(/^(Re:|Fwd:|RE:|FWD:)\s*/i, '')}
                           </span>
                         </div>
                         
-                        {hasInternalFork && (
-                          <Badge variant="outline" className="text-xs">
-                            <GitBranch className="w-3 h-3 mr-1" />
-                            Fork
-                          </Badge>
-                        )}
+                        {/* Thread Indicators */}
+                        <div className="flex items-center space-x-1">
+                          {hasInternalFork && (
+                            <Badge variant="outline" className="text-xs">
+                              <GitBranch className="w-3 h-3 mr-1" />
+                              Fork
+                            </Badge>
+                          )}
+                          
+                          {hasMixedConversation && (
+                            <Badge variant="outline" className="text-xs">
+                              <GitMerge className="w-3 h-3 mr-1" />
+                              Merge
+                            </Badge>
+                          )}
+                          
+                          {threadHead.platform && (
+                            <Badge variant="outline" className="text-xs">
+                              <span className="mr-1">{threadHead.platformLogo}</span>
+                              {threadHead.platform}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="flex items-center space-x-2">
@@ -378,17 +510,24 @@ export default function EmailChainView({
                     </div>
                   </CollapsibleTrigger>
                   
-                  <CollapsibleContent className="space-y-2 mt-2">
-                    {visibleEmails.map((email, index) => (
-                      <EmailThreadItem
-                        key={email.id}
-                        email={email}
-                        isSelected={selectedEmailId === email.id}
-                        onSelect={onEmailSelect}
-                        isLast={index === visibleEmails.length - 1}
-                        level={email.parentId ? 1 : 0}
-                      />
-                    ))}
+                  <CollapsibleContent className="space-y-1 mt-2">
+                    <div className="relative">
+                      {/* Main thread line */}
+                      <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-blue-400/30"></div>
+                      
+                      {visibleEmails.map((email, index) => (
+                        <EmailThreadItem
+                          key={email.id}
+                          email={email}
+                          isSelected={selectedEmailId === email.id}
+                          onSelect={onEmailSelect}
+                          isLast={index === visibleEmails.length - 1}
+                          level={email.parentId ? 1 : 0}
+                          threadEmails={threadEmails}
+                          index={index}
+                        />
+                      ))}
+                    </div>
                   </CollapsibleContent>
                 </Collapsible>
               </div>
