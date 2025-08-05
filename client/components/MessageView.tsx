@@ -196,6 +196,21 @@ const fetchConversationMessages = async (
 };
 
 const EmailView = ({ message }: { message: Message }) => {
+  const [replyText, setReplyText] = useState("");
+
+  const handleSendReply = () => {
+    if (replyText.trim()) {
+      console.log('Sending reply:', {
+        to: message.email || message.sender,
+        subject: `Re: ${message.subject}`,
+        content: replyText
+      });
+      // Here you would integrate with email sending API
+      setReplyText("");
+      // Show success toast
+    }
+  };
+
   return (
     <>
       {/* Email Header */}
