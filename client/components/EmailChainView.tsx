@@ -150,46 +150,58 @@ const EmailThreadItem = ({
   const isForkedThread = indentLevel > 0;
   
   return (
-    <div className="mb-3">
+    <div className="mb-5">
       {/* Fork Indicator */}
       {email.forkPoint && (
-        <div className="flex items-center space-x-2 mb-3 ml-8 text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+        <div className="flex items-center space-x-2 mb-4 ml-8 text-xs text-muted-foreground bg-muted/30 p-2 rounded">
           <GitBranch className={cn("w-3 h-3", email.conversationType === "internal" ? "text-orange-600" : "text-blue-600")} />
           <span>
-            {email.conversationType === "internal" 
-              ? "🔒 Internal discussion started" 
+            {email.conversationType === "internal"
+              ? "🔒 Internal discussion started"
               : "🌐 External fork"}
           </span>
         </div>
       )}
-      
+
       <div className={cn("relative", isForkedThread && "ml-8")}>
         {/* Folder-style indentation line */}
         {isForkedThread && (
           <div className="absolute -left-4 top-0 bottom-0 flex flex-col">
-            {/* Vertical line */}
-            <div 
+            {/* Vertical line - extends full height for continuation or shorter for end */}
+            <div
               className={cn(
                 "w-px",
                 email.conversationType === "internal" ? "bg-orange-300" : "bg-blue-300"
               )}
-              style={{ height: isLast ? "24px" : "100%" }}
+              style={{
+                height: isLast ? "28px" : "calc(100% + 20px)"
+              }}
             />
             {/* Horizontal connector */}
-            <div 
+            <div
               className={cn(
-                "absolute top-6 left-0 w-6 h-px",
+                "absolute top-7 left-0 w-6 h-px",
                 email.conversationType === "internal" ? "bg-orange-300" : "bg-blue-300"
               )}
             />
-            {/* Folder-style corner */}
-            {isLast && (
-              <div 
-                className={cn(
-                  "absolute top-6 left-0 w-6 h-px border-b",
-                  email.conversationType === "internal" ? "border-orange-300" : "border-blue-300"
-                )}
-              />
+            {/* End cap for last item in fork that doesn't rejoin */}
+            {isLast && !email.conversationType?.includes("mixed") && (
+              <>
+                {/* L-shaped corner */}
+                <div
+                  className={cn(
+                    "absolute top-7 left-0 w-6 h-px",
+                    email.conversationType === "internal" ? "bg-orange-300" : "bg-blue-300"
+                  )}
+                />
+                {/* End indicator dot */}
+                <div
+                  className={cn(
+                    "absolute top-6 left-6 w-2 h-2 rounded-full border-2 bg-background",
+                    email.conversationType === "internal" ? "border-orange-400" : "border-blue-400"
+                  )}
+                />
+              </>
             )}
           </div>
         )}
