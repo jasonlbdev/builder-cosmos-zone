@@ -726,11 +726,26 @@ export default function Index() {
           {/* Email List Panel */}
           <ResizablePanel defaultSize={rightPanelCollapsed ? 75 : 40}>
             <div className="h-full">
-              {showEmailChain && selectedEmail ? (
-                <EmailChainView 
-                  email={selectedEmail} 
-                  onClose={() => setShowEmailChain(false)}
-                />
+              {showEmailChain ? (
+                <div className="h-full flex flex-col">
+                  <div className="p-2 border-b border-border flex items-center justify-between">
+                    <h2 className="text-sm font-semibold">Email Chain View</h2>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowEmailChain(false)}
+                    >
+                      <ArrowRight className="w-4 h-4 mr-2" />
+                      Back to List
+                    </Button>
+                  </div>
+                  <EmailChainView
+                    emails={filteredEmails}
+                    selectedEmailId={selectedEmailId}
+                    onEmailSelect={setSelectedEmailId}
+                    className="flex-1"
+                  />
+                </div>
               ) : (
                 <>
                   <div className="p-2 border-b border-border">
