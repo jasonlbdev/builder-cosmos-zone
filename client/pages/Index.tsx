@@ -37,6 +37,8 @@ import {
   Brain,
   Building2,
   Target,
+  Table,
+  List,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
