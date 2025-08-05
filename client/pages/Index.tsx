@@ -532,7 +532,16 @@ export default function Index() {
           </div>
 
           <div className="flex items-center space-x-2">
-            
+            <Button
+              onClick={() => setEmailViewLayout(emailViewLayout === "card" ? "table" : "card")}
+              variant="outline"
+              size="sm"
+              title={`Switch to ${emailViewLayout === "card" ? "table" : "card"} view`}
+            >
+              {emailViewLayout === "card" ? <Table className="w-4 h-4 mr-2" /> : <List className="w-4 h-4 mr-2" />}
+              {emailViewLayout === "card" ? "Table" : "Cards"}
+            </Button>
+
             <Button
               onClick={() => setShowEmailChain(!showEmailChain)}
               variant={showEmailChain ? "default" : "outline"}
