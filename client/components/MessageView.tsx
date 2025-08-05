@@ -209,8 +209,33 @@ const EmailView = ({ message }: { message: Message }) => {
       });
       // Here you would integrate with email sending API
       setReplyText("");
+      setShowReplyBox(false);
       // Show success toast
     }
+  };
+
+  const handleReplyClick = () => {
+    setShowReplyBox(true);
+    setIsForwarding(false);
+    // Auto-focus on reply box after state update
+    setTimeout(() => {
+      const textarea = document.querySelector('textarea[placeholder*="Reply"]') as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.focus();
+      }
+    }, 100);
+  };
+
+  const handleForwardClick = () => {
+    setIsForwarding(true);
+    setShowReplyBox(true);
+    setReplyText(`\n\n---------- Forwarded message ----------\nFrom: ${message.sender} <${message.email}>\nDate: ${message.time}\nSubject: ${message.subject}\n\n${message.content || message.preview}`);
+  };
+
+  const handleCancelReply = () => {
+    setShowReplyBox(false);
+    setIsForwarding(false);
+    setReplyText("");
   };
 
   return (
