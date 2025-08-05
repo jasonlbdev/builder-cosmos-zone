@@ -936,9 +936,10 @@ export default function Index() {
                         <div className="border-b border-border bg-muted/30 sticky top-0 z-10">
                           <div className="grid grid-cols-12 gap-2 p-3 text-xs font-medium text-muted-foreground">
                             <div className="col-span-1"></div>
-                            <div className="col-span-3">From</div>
+                            <div className="col-span-2">From</div>
                             <div className="col-span-4">Subject</div>
                             <div className="col-span-2">Category</div>
+                            <div className="col-span-1">Thread</div>
                             <div className="col-span-1">Platform</div>
                             <div className="col-span-1">Time</div>
                           </div>
