@@ -1038,6 +1038,23 @@ export default function Index() {
                                 </Badge>
                               </div>
 
+                              {/* Thread */}
+                              <div className="col-span-1 flex items-center">
+                                {email.threadId && email.threadId !== email.id ? (
+                                  <Badge variant="outline" className="text-xs px-1 py-0.5">
+                                    <MessageSquare className="w-3 h-3 mr-1" />
+                                    {email.threadPosition || 1}
+                                  </Badge>
+                                ) : email.hasReplies ? (
+                                  <Badge variant="outline" className="text-xs px-1 py-0.5">
+                                    <GitBranch className="w-3 h-3 mr-1" />
+                                    Head
+                                  </Badge>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground">—</span>
+                                )}
+                              </div>
+
                               {/* Platform */}
                               <div className="col-span-1 flex items-center">
                                 {email.platform && (
