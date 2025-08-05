@@ -509,7 +509,7 @@ export default function Index() {
           });
           // Remove from current view
           setEmails(prev => prev.filter(email => email.id !== selectedEmail.id));
-          setSelectedEmail(null);
+          setSelectedEmailId(null);
         } else {
           throw new Error('Failed to archive email');
         }
