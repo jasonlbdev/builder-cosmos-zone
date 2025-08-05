@@ -199,6 +199,71 @@ export default function Index() {
     setEmails(getEmails());
   }, []);
 
+  // Update sidebar items with dynamic counts when emails change
+  useEffect(() => {
+    const updatedItems = sidebarItemsTemplate.map(item => {
+      let count = 0;
+
+      switch (item.label) {
+        case "Inbox":
+          count = emails.filter(email => email.unread).length;
+          break;
+        case "Sent":
+          count = 0; // Sent emails would come from a different source
+          break;
+        case "To Respond":
+          count = emails.filter(email => email.unread).length;
+          break;
+        case "Awaiting Reply":
+          count = emails.filter(email =>
+            email.labels?.includes("awaiting-reply") ||
+            email.subject.toLowerCase().includes("re:")
+          ).length;
+          break;
+        case "Important":
+          count = emails.filter(email => email.important).length;
+          break;
+        case "Starred":
+          count = emails.filter(email => email.important).length;
+          break;
+        case "FYI":
+          count = emails.filter(email =>
+            email.category === "FYI" ||
+            email.labels?.includes("fyi")
+          ).length;
+          break;
+        case "Marketing":
+          count = emails.filter(email =>
+            email.category === "Marketing" ||
+            email.category === "Promotions"
+          ).length;
+          break;
+        case "Promotions":
+          count = emails.filter(email =>
+            email.category === "Promotions" ||
+            email.labels?.includes("promotions")
+          ).length;
+          break;
+        case "Updates":
+          count = emails.filter(email =>
+            email.category === "Updates" ||
+            email.labels?.includes("updates")
+          ).length;
+          break;
+        default:
+          count = 0;
+      }
+
+      return {
+        ...item,
+        count,
+        active: item.label === selectedFolder
+      };
+    });
+
+    setSidebarItems(updatedItems);
+  }, [emails, selectedFolder]);
+
   const highlightText = (text: string, query: string) => {
     if (!query.trim()) return [{ text, highlighted: false }];
     
