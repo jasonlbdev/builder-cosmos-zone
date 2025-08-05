@@ -3,6 +3,35 @@
 // Configure DEV_MODE to control data source behavior
 export const DEV_MODE = true;
 
+// Import organized data from separate files
+import { allEmails, inboxEmails, sentEmails, archivedEmails, suspiciousEmails } from "./emails";
+import { mockTasks } from "./tasks";
+import { mockUserAccounts, mockIntegrations, integrationCategories } from "./integrations";
+import type {
+  Email,
+  Task,
+  UserAccount,
+  Integration,
+  CalendarEvent,
+  EmailCategory,
+  CategoryRule,
+  ConversationMessage,
+  CRMContact
+} from "./types";
+
+// Re-export types for backward compatibility
+export type {
+  Email,
+  Task,
+  UserAccount,
+  Integration,
+  CalendarEvent,
+  EmailCategory,
+  CategoryRule,
+  ConversationMessage,
+  CRMContact
+};
+
 // User Accounts Mock Data - Multiple accounts per platform
 export interface UserAccount {
   id: string;
