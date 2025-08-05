@@ -27,6 +27,10 @@ import {
   CheckSquare,
   Filter,
   GitBranch,
+  PanelLeftClose,
+  PanelRightClose,
+  PanelLeft,
+  PanelRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
