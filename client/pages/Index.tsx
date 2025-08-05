@@ -466,55 +466,7 @@ export default function Index() {
     emails.find((email) => email.id === selectedEmailId) || emails[0] : 
     emails[0];
 
-  // Calculate dynamic counts for sidebar items
-  const getSidebarItemsWithCounts = () => {
-    return sidebarItemsTemplate.map(item => {
-      let count = 0;
-      
-      switch (item.label) {
-        case "Inbox":
-          count = emails.length;
-          break;
-        case "Sent":
-          count = getSentEmails().length;
-          break;
-        case "To Respond":
-          count = emails.filter(email => email.category === "To Respond").length;
-          break;
-        case "Awaiting Reply":
-          count = emails.filter(email => email.category === "Awaiting Reply").length;
-          break;
-        case "Important":
-          count = emails.filter(email => email.category === "Important" || email.important).length;
-          break;
-        case "Starred":
-          count = emails.filter(email => email.important).length;
-          break;
-        case "FYI":
-          count = emails.filter(email => email.category === "FYI").length;
-          break;
-        case "Marketing":
-          count = emails.filter(email => email.category === "Marketing").length;
-          break;
-        case "Promotions":
-          count = emails.filter(email => email.category === "Promotions").length;
-          break;
-        case "Updates":
-          count = emails.filter(email => email.category === "Updates").length;
-          break;
-        case "Archive":
-          count = getArchivedEmails().length;
-          break;
-        case "Trash":
-          count = getDeletedEmails().length;
-          break;
-        default:
-          count = 0;
-      }
-      
-      return { ...item, count };
-    });
-  };
+  // Dynamic sidebar counts now handled in useEffect above
 
   // Sidebar items now managed through state with dynamic counts
 
