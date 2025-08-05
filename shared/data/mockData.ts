@@ -1241,8 +1241,11 @@ export const mockIntegrations: Integration[] = [
   },
 ];
 
-// Helper functions for data access
-export const getEmails = (): Email[] => DEV_MODE ? mockEmails : [];
+// Helper functions for data access - now using imported organized data
+export const getEmails = (): Email[] => DEV_MODE ? allEmails : [];
+export const getSentEmails = (): Email[] => DEV_MODE ? sentEmails : [];
+export const getArchivedEmails = (): Email[] => DEV_MODE ? archivedEmails : [];
+export const getDeletedEmails = (): Email[] => DEV_MODE ? archivedEmails : []; // Using archived as placeholder
 export const getTasks = (): Task[] => DEV_MODE ? mockTasks : [];
 export const getEvents = (): CalendarEvent[] => DEV_MODE ? mockEvents : [];
 export const getEmailCategories = (): EmailCategory[] => DEV_MODE ? mockEmailCategories : [];
