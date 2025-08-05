@@ -448,7 +448,7 @@ export default function Index() {
     });
   };
 
-  const sidebarItems = getSidebarItemsWithCounts();
+  // Sidebar items now managed through state with dynamic counts
 
   // Search handlers
   const handleBasicSearch = () => {
