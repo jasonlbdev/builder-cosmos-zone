@@ -605,7 +605,7 @@ export default function Index() {
         const response = await fetch(`/api/emails/${selectedEmail.id}/read`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ read: !selectedEmail.read })
+          body: JSON.stringify({ read: !selectedEmail.unread })
         });
         
         if (response.ok) {
