@@ -38,7 +38,7 @@ import {
 import { cn } from "@/lib/utils";
 
 interface Message {
-  id: number;
+  id: string;
   sender: string;
   email?: string;
   subject?: string;
