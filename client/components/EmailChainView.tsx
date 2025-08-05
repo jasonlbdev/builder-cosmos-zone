@@ -226,75 +226,67 @@ const EmailThreadItem = ({
         onClick={() => onSelect(email.id)}
       >
         {/* Email Header */}
-        <div className="flex items-start justify-between mb-2">
+        <div className="flex items-start justify-between mb-1">
           <div className="flex items-center space-x-2 flex-1 min-w-0">
-            <Avatar className="w-6 h-6">
+            <Avatar className="w-5 h-5">
               <AvatarFallback className="text-xs">{email.avatar}</AvatarFallback>
             </Avatar>
-            
+
             <div className="flex-1 min-w-0">
-              <div className="flex items-center space-x-2">
-                <span className={cn("text-sm truncate", email.unread ? "font-medium" : "font-normal")}>
+              <div className="flex items-center space-x-1">
+                <span className={cn("text-xs truncate", email.unread ? "font-medium" : "font-normal")}>
                   {email.sender}
                 </span>
-                
+
                 {/* Platform Badge */}
                 {email.platform && (
-                  <Badge variant="outline" className="text-xs px-1 py-0">
+                  <Badge variant="outline" className="text-xs px-1 py-0 h-4">
                     <span className="mr-1">{email.platformLogo}</span>
                     {email.platform}
                   </Badge>
                 )}
               </div>
-              
-              <div className="flex items-center space-x-2 mt-1">
+
+              <div className="flex items-center space-x-1 mt-0.5">
                 {/* Conversation Type */}
-                <Badge 
-                  variant="outline" 
-                  className={cn("text-xs px-2 py-0", getConversationTypeColor(email.conversationType))}
+                <Badge
+                  variant="outline"
+                  className={cn("text-xs px-1 py-0 h-4", getConversationTypeColor(email.conversationType))}
                 >
                   {getConversationTypeIcon(email.conversationType)}
                   <span className="ml-1 capitalize">{email.conversationType || "external"}</span>
                 </Badge>
-                
-                {/* Category Badge */}
-                <Badge
-                  variant="secondary"
-                  className={cn("text-xs", email.categoryColor, "text-white")}
-                >
-                  {email.category}
-                </Badge>
-                
+
                 {/* Thread Position Indicator */}
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs px-1 py-0 h-4">
                   #{email.threadPosition || 1}
                 </Badge>
               </div>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-2">
+
+          <div className="flex items-center space-x-1">
             <span className="text-xs text-muted-foreground">{email.time}</span>
             {email.unread && <div className="w-2 h-2 bg-primary rounded-full" />}
           </div>
         </div>
-        
+
         {/* Subject */}
-        <h4 className={cn("text-sm mb-2 truncate", email.unread ? "font-medium" : "font-normal")}>
+        <h4 className={cn("text-xs mb-1 truncate", email.unread ? "font-medium" : "font-normal")}>
           {email.subject}
         </h4>
-        
+
         {/* Preview/Content */}
         <div className="text-xs text-muted-foreground">
-          <div className={cn("transition-all duration-200", showFullContent ? "" : "line-clamp-2")}>
+          <div className={cn("transition-all duration-200", showFullContent ? "" : "line-clamp-1")}>
             {showFullContent ? email.content : email.preview}
           </div>
-          
+
           {email.content && email.content.length > email.preview.length && (
             <Button
               variant="ghost"
               size="sm"
-              className="h-auto p-0 text-xs text-primary hover:text-primary/80 mt-1"
+              className="h-auto p-0 text-xs text-primary hover:text-primary/80 mt-0.5"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowFullContent(!showFullContent);
@@ -303,12 +295,12 @@ const EmailThreadItem = ({
               {showFullContent ? (
                 <>
                   <EyeOff className="w-3 h-3 mr-1" />
-                  Show less
+                  Less
                 </>
               ) : (
                 <>
                   <Eye className="w-3 h-3 mr-1" />
-                  Show more
+                  More
                 </>
               )}
             </Button>
