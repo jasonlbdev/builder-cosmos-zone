@@ -1544,17 +1544,19 @@ export default function Settings() {
                   </div>
 
                   <div className="flex justify-between pt-4">
-                    <Button variant="outline" asChild>
-                      <Link to="/integrations">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Integration
-                      </Link>
+                    <Button
+                      variant="outline"
+                      onClick={() => window.location.href = '/integrations'}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Integration
                     </Button>
-                    <Button variant="outline" asChild>
-                      <Link to="/integrations/management">
-                        <Settings className="w-4 h-4 mr-2" />
-                        Manage All
-                      </Link>
+                    <Button
+                      variant="outline"
+                      onClick={() => window.location.href = '/integrations/management'}
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Manage All
                     </Button>
                   </div>
                 </CardContent>
