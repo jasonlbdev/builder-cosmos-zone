@@ -203,7 +203,7 @@ export default function Index() {
     }));
   };
 
-  const toggleIntegrationCategory = (key: keyof typeof integrations) => {
+  const toggleIntegrationCategory = (key: keyof typeof defaultIntegrationCategories) => {
     setIntegrationCategories(prev => ({
       ...prev,
       [key]: {
