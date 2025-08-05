@@ -400,33 +400,31 @@ export default function EmailChainView({
   };
   
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn("h-full flex flex-col", className)}>
       {/* Controls */}
-      <div className="space-y-3">
+      <div className="space-y-3 p-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Mail className="w-5 h-5" />
-            <h3 className="font-medium">Email Threads</h3>
-            <Badge variant="secondary">
+            <Mail className="w-4 h-4" />
+            <h3 className="text-sm font-medium">Email Threads</h3>
+            <Badge variant="secondary" className="text-xs">
               {Object.keys(emailsByThread).length} thread{Object.keys(emailsByThread).length !== 1 ? 's' : ''}
             </Badge>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button
-              variant={showInternalOnly ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowInternalOnly(!showInternalOnly)}
-              className="text-xs"
-            >
-              <Lock className="w-3 h-3 mr-1" />
-              Internal Only
-            </Button>
-          </div>
+
+          <Button
+            variant={showInternalOnly ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowInternalOnly(!showInternalOnly)}
+            className="text-xs h-7"
+          >
+            <Lock className="w-3 h-3 mr-1" />
+            Internal Only
+          </Button>
         </div>
-        
+
         {/* Legend */}
-        <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+        <div className="flex items-center space-x-3 text-xs text-muted-foreground">
           <div className="flex items-center space-x-1">
             <div className="w-3 h-0.5 bg-blue-400"></div>
             <span>External</span>
@@ -441,12 +439,10 @@ export default function EmailChainView({
           </div>
         </div>
       </div>
-      
-      <Separator />
-      
+
       {/* Thread List */}
-      <ScrollArea className="h-[calc(100vh-200px)]">
-        <div className="space-y-6">
+      <ScrollArea className="flex-1">
+        <div className="space-y-4 p-3">
           {Object.entries(emailsByThread).map(([threadId, threadEmails]) => {
             const threadHead = threadEmails.find(email => email.isThreadHead) || threadEmails[0];
             const isExpanded = expandedThreads.has(threadId);
