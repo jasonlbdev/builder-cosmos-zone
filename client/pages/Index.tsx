@@ -285,6 +285,7 @@ export default function Index() {
   const [showCRM, setShowCRM] = useState(false);
   const [showTaskExtraction, setShowTaskExtraction] = useState(false);
   const [showSecurity, setShowSecurity] = useState(false);
+  const [emailViewLayout, setEmailViewLayout] = useState<"card" | "table">("card");
 
   useEffect(() => {
     setEmails(getEmails());
