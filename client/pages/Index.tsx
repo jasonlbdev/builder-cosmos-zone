@@ -187,6 +187,7 @@ export default function Index() {
   const [showSecurity, setShowSecurity] = useState(false);
   const [emailViewLayout, setEmailViewLayout] = useState<"card" | "table">("card");
   const [selectedFolder, setSelectedFolder] = useState<string>("Inbox");
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [sidebarItems, setSidebarItems] = useState(() =>
     sidebarItemsTemplate.map(item => ({
       ...item,
