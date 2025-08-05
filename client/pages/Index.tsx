@@ -65,6 +65,7 @@ import EmailToTaskExtraction from "@/components/EmailToTaskExtraction";
 import SecurityThreatDetection from "@/components/SecurityThreatDetection";
 import { cn } from "@/lib/utils";
 import { getEmails, getSentEmails, getArchivedEmails, getDeletedEmails, type Email } from "../../shared/data/mockData";
+import { integrationCategories as defaultIntegrationCategories } from "../../shared/data/integrations";
 import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
