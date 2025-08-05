@@ -186,6 +186,7 @@ export default function Index() {
   const [showTaskExtraction, setShowTaskExtraction] = useState(false);
   const [showSecurity, setShowSecurity] = useState(false);
   const [emailViewLayout, setEmailViewLayout] = useState<"card" | "table">("card");
+  const [selectedFolder, setSelectedFolder] = useState<string>("Inbox");
 
   useEffect(() => {
     setEmails(getEmails());
