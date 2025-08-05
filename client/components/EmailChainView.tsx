@@ -142,24 +142,24 @@ const EmailThreadItem = ({
   // Calculate indentation based on conversation type changes
   const getIndentLevel = () => {
     if (level === 0 || email.isThreadHead) return 0;
-    
+
     // Check if this is a fork from the main thread
     if (email.forkPoint) return 1;
-    
+
     // If this continues an internal conversation, maintain the same level
     if (email.conversationType === "internal" && email.parentId) {
       const parentEmail = threadEmails.find(e => e.id === email.parentId);
       if (parentEmail?.conversationType === "internal") return 1;
     }
-    
+
     // If this rejoins the main thread, return to base level
     if (email.conversationType === "mixed") return 0;
-    
+
     return level;
   };
 
   const indentLevel = getIndentLevel();
-  const indentPixels = indentLevel * 32; // 32px per level
+  const indentPixels = indentLevel * 20; // 20px per level (reduced from 32px)
   
   const isMainThread = indentLevel === 0;
   const isForkedThread = indentLevel > 0;
