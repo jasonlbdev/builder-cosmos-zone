@@ -94,29 +94,16 @@ const getConversationTypeColor = (type?: string) => {
   }
 };
 
-const getThreadLineColor = (type?: string) => {
-  switch (type) {
-    case "internal":
-      return "border-orange-400";
-    case "external":
-      return "border-blue-400";
-    case "mixed":
-      return "border-purple-400";
-    default:
-      return "border-gray-400";
-  }
-};
-
 const getThreadBgColor = (type?: string) => {
   switch (type) {
     case "internal":
-      return "bg-orange-50 border-orange-200";
+      return "bg-orange-50/50 border-orange-200/50";
     case "external":
-      return "bg-blue-50 border-blue-200";
+      return "bg-blue-50/50 border-blue-200/50";
     case "mixed":
-      return "bg-purple-50 border-purple-200";
+      return "bg-purple-50/50 border-purple-200/50";
     default:
-      return "bg-gray-50 border-gray-200";
+      return "bg-gray-50/50 border-gray-200/50";
   }
 };
 
@@ -141,211 +128,205 @@ const EmailThreadItem = ({
   
   // Calculate indentation based on conversation type changes
   const getIndentLevel = () => {
-    if (level === 0 || email.isThreadHead) return 0;
-
+    if (email.isThreadHead) return 0;
+    
     // Check if this is a fork from the main thread
     if (email.forkPoint) return 1;
-
+    
     // If this continues an internal conversation, maintain the same level
     if (email.conversationType === "internal" && email.parentId) {
       const parentEmail = threadEmails.find(e => e.id === email.parentId);
       if (parentEmail?.conversationType === "internal") return 1;
     }
-
+    
     // If this rejoins the main thread, return to base level
     if (email.conversationType === "mixed") return 0;
-
-    return level;
+    
+    return level > 0 ? level : 0;
   };
 
   const indentLevel = getIndentLevel();
-  const indentPixels = indentLevel * 20; // 20px per level (reduced from 32px)
-  
   const isMainThread = indentLevel === 0;
   const isForkedThread = indentLevel > 0;
   
   return (
-    <div className={cn("relative", !isMainThread && "ml-4")} style={{ paddingLeft: `${indentPixels}px` }}>
-      {/* Thread Connection Lines */}
-      {!email.isThreadHead && (
-        <div className="absolute top-0 bottom-0" style={{ left: `${Math.max(0, indentPixels - 12)}px` }}>
-          {/* Vertical line for thread continuity */}
-          {!isLast && (
-            <div
-              className={cn(
-                "absolute top-0 bottom-0 w-0.5 -translate-x-0.5",
-                isForkedThread ? getThreadLineColor(email.conversationType) : getThreadLineColor("external")
-              )}
-              style={{ left: isForkedThread ? "12px" : "0px" }}
-            />
-          )}
-
-          {/* Horizontal connector line */}
-          <div
-            className={cn(
-              "absolute top-3 w-3 h-0.5 -translate-y-0.5",
-              isForkedThread ? getThreadLineColor(email.conversationType) : getThreadLineColor("external")
-            )}
-            style={{ left: isForkedThread ? "0px" : "0px" }}
-          />
-
-          {/* Corner connector for forks */}
-          {email.forkPoint && (
-            <div
-              className={cn(
-                "absolute top-0 w-0.5 h-3",
-                getThreadLineColor(email.conversationType)
-              )}
-              style={{ left: "0px" }}
-            />
-          )}
-        </div>
-      )}
-
+    <div className="mb-3">
       {/* Fork Indicator */}
       {email.forkPoint && (
-        <div className="flex items-center space-x-2 mb-1 text-xs text-muted-foreground">
+        <div className="flex items-center space-x-2 mb-3 ml-8 text-xs text-muted-foreground bg-muted/30 p-2 rounded">
           <GitBranch className={cn("w-3 h-3", email.conversationType === "internal" ? "text-orange-600" : "text-blue-600")} />
           <span>
-            {email.conversationType === "internal"
-              ? "Internal discussion"
-              : "External fork"}
+            {email.conversationType === "internal" 
+              ? "🔒 Internal discussion started" 
+              : "🌐 External fork"}
           </span>
         </div>
       )}
-
-      <div
-        className={cn(
-          "p-2 rounded border cursor-pointer transition-all duration-200",
-          isSelected
-            ? "bg-accent border-accent-foreground/20 shadow-sm"
-            : "border-border hover:bg-accent/50 hover:border-accent-foreground/10",
-          email.unread && "border-l-4 border-l-primary",
-          isForkedThread && getThreadBgColor(email.conversationType)
-        )}
-        onClick={() => onSelect(email.id)}
-      >
-        {/* Email Header */}
-        <div className="flex items-start justify-between mb-1">
-          <div className="flex items-center space-x-2 flex-1 min-w-0">
-            <Avatar className="w-5 h-5">
-              <AvatarFallback className="text-xs">{email.avatar}</AvatarFallback>
-            </Avatar>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center space-x-1">
-                <span className={cn("text-xs truncate", email.unread ? "font-medium" : "font-normal")}>
-                  {email.sender}
-                </span>
-
-                {/* Platform Badge */}
-                {email.platform && (
-                  <Badge variant="outline" className="text-xs px-1 py-0 h-4">
-                    <span className="mr-1">{email.platformLogo}</span>
-                    {email.platform}
-                  </Badge>
+      
+      <div className={cn("relative", isForkedThread && "ml-8")}>
+        {/* Folder-style indentation line */}
+        {isForkedThread && (
+          <div className="absolute -left-4 top-0 bottom-0 flex flex-col">
+            {/* Vertical line */}
+            <div 
+              className={cn(
+                "w-px",
+                email.conversationType === "internal" ? "bg-orange-300" : "bg-blue-300"
+              )}
+              style={{ height: isLast ? "24px" : "100%" }}
+            />
+            {/* Horizontal connector */}
+            <div 
+              className={cn(
+                "absolute top-6 left-0 w-6 h-px",
+                email.conversationType === "internal" ? "bg-orange-300" : "bg-blue-300"
+              )}
+            />
+            {/* Folder-style corner */}
+            {isLast && (
+              <div 
+                className={cn(
+                  "absolute top-6 left-0 w-6 h-px border-b",
+                  email.conversationType === "internal" ? "border-orange-300" : "border-blue-300"
                 )}
-              </div>
-
-              <div className="flex items-center space-x-1 mt-0.5">
-                {/* Conversation Type */}
-                <Badge
-                  variant="outline"
-                  className={cn("text-xs px-1 py-0 h-4", getConversationTypeColor(email.conversationType))}
-                >
-                  {getConversationTypeIcon(email.conversationType)}
-                  <span className="ml-1 capitalize">{email.conversationType || "external"}</span>
-                </Badge>
-
-                {/* Thread Position Indicator */}
-                <Badge variant="outline" className="text-xs px-1 py-0 h-4">
-                  #{email.threadPosition || 1}
-                </Badge>
+              />
+            )}
+          </div>
+        )}
+        
+        <div
+          className={cn(
+            "p-3 rounded-lg border cursor-pointer transition-all duration-200",
+            isSelected
+              ? "bg-accent border-accent-foreground/20 shadow-sm"
+              : "border-border hover:bg-accent/50 hover:border-accent-foreground/10",
+            email.unread && "border-l-4 border-l-primary",
+            isForkedThread && getThreadBgColor(email.conversationType)
+          )}
+          onClick={() => onSelect(email.id)}
+        >
+          {/* Email Header */}
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex items-center space-x-2 flex-1 min-w-0">
+              <Avatar className="w-6 h-6">
+                <AvatarFallback className="text-xs">{email.avatar}</AvatarFallback>
+              </Avatar>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center space-x-2">
+                  <span className={cn("text-sm truncate", email.unread ? "font-medium" : "font-normal")}>
+                    {email.sender}
+                  </span>
+                  
+                  {/* Platform Badge */}
+                  {email.platform && (
+                    <Badge variant="outline" className="text-xs px-1 py-0 h-5">
+                      <span className="mr-1">{email.platformLogo}</span>
+                      {email.platform}
+                    </Badge>
+                  )}
+                </div>
+                
+                <div className="flex items-center space-x-2 mt-1">
+                  {/* Conversation Type */}
+                  <Badge 
+                    variant="outline" 
+                    className={cn("text-xs px-2 py-0 h-5", getConversationTypeColor(email.conversationType))}
+                  >
+                    {getConversationTypeIcon(email.conversationType)}
+                    <span className="ml-1 capitalize">{email.conversationType || "external"}</span>
+                  </Badge>
+                  
+                  {/* Thread Position Indicator */}
+                  <Badge variant="outline" className="text-xs px-2 py-0 h-5">
+                    #{email.threadPosition || 1}
+                  </Badge>
+                </div>
               </div>
             </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-muted-foreground">{email.time}</span>
+              {email.unread && <div className="w-2 h-2 bg-primary rounded-full" />}
+            </div>
           </div>
-
-          <div className="flex items-center space-x-1">
-            <span className="text-xs text-muted-foreground">{email.time}</span>
-            {email.unread && <div className="w-2 h-2 bg-primary rounded-full" />}
+          
+          {/* Subject */}
+          <h4 className={cn("text-sm mb-2 truncate", email.unread ? "font-medium" : "font-normal")}>
+            {email.subject}
+          </h4>
+          
+          {/* Preview/Content */}
+          <div className="text-xs text-muted-foreground">
+            <div className={cn("transition-all duration-200", showFullContent ? "" : "line-clamp-2")}>
+              {showFullContent ? email.content : email.preview}
+            </div>
+            
+            {email.content && email.content.length > email.preview.length && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto p-0 text-xs text-primary hover:text-primary/80 mt-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowFullContent(!showFullContent);
+                }}
+              >
+                {showFullContent ? (
+                  <>
+                    <EyeOff className="w-3 h-3 mr-1" />
+                    Show less
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-3 h-3 mr-1" />
+                    Show more
+                  </>
+                )}
+              </Button>
+            )}
           </div>
-        </div>
-
-        {/* Subject */}
-        <h4 className={cn("text-xs mb-1 truncate", email.unread ? "font-medium" : "font-normal")}>
-          {email.subject}
-        </h4>
-
-        {/* Preview/Content */}
-        <div className="text-xs text-muted-foreground">
-          <div className={cn("transition-all duration-200", showFullContent ? "" : "line-clamp-1")}>
-            {showFullContent ? email.content : email.preview}
-          </div>
-
-          {email.content && email.content.length > email.preview.length && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto p-0 text-xs text-primary hover:text-primary/80 mt-0.5"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowFullContent(!showFullContent);
-              }}
-            >
-              {showFullContent ? (
-                <>
-                  <EyeOff className="w-3 h-3 mr-1" />
-                  Less
-                </>
-              ) : (
-                <>
-                  <Eye className="w-3 h-3 mr-1" />
-                  More
-                </>
-              )}
-            </Button>
+          
+          {/* Participants */}
+          {email.participants && email.participants.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-border/50">
+              <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                <Users className="w-3 h-3" />
+                <span>Participants:</span>
+                <div className="flex items-center space-x-1">
+                  {email.participants.slice(0, 3).map((participant, index) => (
+                    <div key={participant.email} className="flex items-center">
+                      <Avatar className="w-4 h-4">
+                        <AvatarFallback className="text-xs">{participant.avatar}</AvatarFallback>
+                      </Avatar>
+                      <span className={cn(
+                        "ml-1",
+                        participant.type === "internal" ? "text-orange-600" : "text-blue-600"
+                      )}>
+                        {participant.name}
+                      </span>
+                      {index < Math.min(email.participants.length, 3) - 1 && (
+                        <span className="mx-1">,</span>
+                      )}
+                    </div>
+                  ))}
+                  {email.participants.length > 3 && (
+                    <span className="text-muted-foreground">+{email.participants.length - 3} more</span>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
         </div>
         
-        {/* Participants */}
-        {email.participants && email.participants.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-border/50">
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-              <Users className="w-3 h-3" />
-              <span>Participants:</span>
-              <div className="flex items-center space-x-1">
-                {email.participants.slice(0, 3).map((participant, index) => (
-                  <div key={participant.email} className="flex items-center">
-                    <Avatar className="w-4 h-4">
-                      <AvatarFallback className="text-xs">{participant.avatar}</AvatarFallback>
-                    </Avatar>
-                    <span className={cn(
-                      "ml-1",
-                      participant.type === "internal" ? "text-orange-600" : "text-blue-600"
-                    )}>
-                      {participant.name}
-                    </span>
-                    {index < Math.min(email.participants.length, 3) - 1 && (
-                      <span className="mx-1">,</span>
-                    )}
-                  </div>
-                ))}
-                {email.participants.length > 3 && (
-                  <span className="text-muted-foreground">+{email.participants.length - 3} more</span>
-                )}
-              </div>
-            </div>
+        {/* Merge Back Indicator */}
+        {email.conversationType === "mixed" && email.parentId && !isMainThread && (
+          <div className="flex items-center space-x-2 mt-2 ml-2 text-xs text-muted-foreground bg-purple-50 p-2 rounded">
+            <GitMerge className="w-3 h-3 text-purple-600" />
+            <span>🔄 Conversation rejoined main thread</span>
           </div>
         )}
       </div>
-      
-      {/* Merge Back Indicator */}
-      {email.conversationType === "mixed" && email.parentId && !isMainThread && (
-        <div className="flex items-center space-x-2 mt-2 text-xs text-muted-foreground">
-          <GitMerge className="w-3 h-3 text-purple-600" />
-          <span>Conversation rejoined main thread</span>
-        </div>
-      )}
     </div>
   );
 };
@@ -403,7 +384,7 @@ export default function EmailChainView({
               {Object.keys(emailsByThread).length} thread{Object.keys(emailsByThread).length !== 1 ? 's' : ''}
             </Badge>
           </div>
-
+          
           <Button
             variant={showInternalOnly ? "default" : "outline"}
             size="sm"
@@ -414,7 +395,7 @@ export default function EmailChainView({
             Internal Only
           </Button>
         </div>
-
+        
         {/* Legend */}
         <div className="flex items-center space-x-3 text-xs text-muted-foreground">
           <div className="flex items-center space-x-1">
@@ -431,7 +412,7 @@ export default function EmailChainView({
           </div>
         </div>
       </div>
-
+      
       {/* Thread List */}
       <ScrollArea className="flex-1">
         <div className="space-y-4 p-3">
@@ -449,48 +430,55 @@ export default function EmailChainView({
                 <Collapsible open={isExpanded} onOpenChange={() => toggleThread(threadId)}>
                   <CollapsibleTrigger asChild>
                     <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 cursor-pointer">
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
                         {isExpanded ? (
                           <ChevronDown className="w-4 h-4" />
                         ) : (
                           <ChevronRight className="w-4 h-4" />
                         )}
+                        
                         <div className="flex items-center space-x-2">
                           <MessageSquare className="w-4 h-4" />
-                          <span className="text-sm font-medium truncate max-w-[200px]">
-                            {threadHead.subject.replace(/^(Re:|Fwd:|RE:|FWD:)\s*/i, '')}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium truncate max-w-[200px]">
+                              {threadHead.subject.replace(/^(Re:|Fwd:|RE:|FWD:)\s*/i, '')}
+                            </span>
+                            <span className="text-xs text-muted-foreground truncate">
+                              Started by {threadHead.email}
+                            </span>
+                          </div>
                         </div>
-                        
-                        {/* Thread Indicators */}
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        {/* Thread Indicators moved to the right */}
                         <div className="flex items-center space-x-1">
                           {hasInternalFork && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs h-5">
                               <GitBranch className="w-3 h-3 mr-1" />
                               Fork
                             </Badge>
                           )}
                           
                           {hasMixedConversation && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs h-5">
                               <GitMerge className="w-3 h-3 mr-1" />
                               Merge
                             </Badge>
                           )}
                           
                           {threadHead.platform && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs h-5">
                               <span className="mr-1">{threadHead.platformLogo}</span>
                               {threadHead.platform}
                             </Badge>
                           )}
                         </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="secondary" className="text-xs">
+                        
+                        <Badge variant="secondary" className="text-xs h-5">
                           {visibleEmails.length} message{visibleEmails.length !== 1 ? 's' : ''}
                         </Badge>
+                        
                         <span className="text-xs text-muted-foreground">
                           {threadHead.time}
                         </span>
@@ -498,11 +486,8 @@ export default function EmailChainView({
                     </div>
                   </CollapsibleTrigger>
                   
-                  <CollapsibleContent className="space-y-1 mt-2">
-                    <div className="relative">
-                      {/* Main thread line */}
-                      <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-blue-400/30"></div>
-                      
+                  <CollapsibleContent className="mt-2">
+                    <div className="space-y-1">
                       {visibleEmails.map((email, index) => (
                         <EmailThreadItem
                           key={email.id}
