@@ -1162,6 +1162,13 @@ export default function Index() {
         platformLogo={selectedEmail?.platformLogo}
       />
 
+      <AdvancedSearchModal
+        open={showAdvancedSearch}
+        onClose={() => setShowAdvancedSearch(false)}
+        onSearch={handleAdvancedSearch}
+        initialQuery={searchQuery}
+      />
+
       <DexterAI 
         open={showDexterAI} 
         onClose={() => {
