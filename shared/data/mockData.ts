@@ -242,6 +242,43 @@ export interface Email {
 }
 
 export const mockEmails: Email[] = [
+  // SUSPICIOUS DEMO EMAILS
+  {
+    id: "suspicious1",
+    sender: "Microsoft Security Team",
+    email: "microsoft@micros0ft-security.com",
+    subject: "URGENT: Your Account Security Alert - Immediate Action Required",
+    content: "Dear User,\n\nWe have detected suspicious activity on your Microsoft account. Your account will be suspended in 24 hours unless you verify your identity immediately.\n\nClick here to verify: https://microsoft-verify.suspicious-domain.com\n\nDo not ignore this message.\n\nMicrosoft Security Team",
+    preview: "We have detected suspicious activity on your Microsoft account. Your account will be suspended...",
+    time: "15m ago",
+    unread: true,
+    important: false,
+    category: "Security Alert",
+    categoryColor: "bg-red-500",
+    avatar: "MS",
+    labels: ["phishing", "urgent"],
+    platform: "Gmail",
+    platformLogo: "📧",
+    platformColor: "bg-red-500"
+  },
+  {
+    id: "suspicious2",
+    sender: "Microsoft Support",
+    email: "noreply@micr0soft-support.net",
+    subject: "Account Verification Required - Action Needed",
+    content: "Hello,\n\nYour Microsoft Office 365 subscription requires immediate verification. Click the link below to maintain access to your account.\n\nVerify Now: https://office365-verify.fake-domain.org\n\nThis link expires in 2 hours.\n\nBest regards,\nMicrosoft Support",
+    preview: "Your Microsoft Office 365 subscription requires immediate verification. Click the link below...",
+    time: "3h ago",
+    unread: true,
+    important: false,
+    category: "Updates",
+    categoryColor: "bg-blue-500",
+    avatar: "MS",
+    labels: ["verification", "office365"],
+    platform: "Outlook",
+    platformLogo: "📨",
+    platformColor: "bg-blue-500"
+  },
   // Thread 1: Budget Review - External to Internal Fork
   {
     id: "1",
