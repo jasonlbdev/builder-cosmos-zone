@@ -970,7 +970,7 @@ export default function Index() {
                               </div>
 
                               {/* From */}
-                              <div className="col-span-3 flex items-center space-x-2 min-w-0">
+                              <div className="col-span-2 flex items-center space-x-2 min-w-0">
                                 <span className={cn("text-sm truncate", email.unread ? "font-medium" : "font-normal")}>
                                   {email.sender}
                                 </span>
