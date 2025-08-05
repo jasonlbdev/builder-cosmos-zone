@@ -466,39 +466,84 @@ const EmailView = ({ message }: { message: Message }) => {
         </div>
       </div>
 
-      {/* Reply Box */}
-      <div className="border-t border-border p-4">
-        <div className="flex items-start space-x-3">
-          <div className="flex-1">
-            <Textarea
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              placeholder={`Reply to ${message.sender}...`}
-              className="min-h-[80px] resize-none"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && e.metaKey) {
-                  e.preventDefault();
-                  handleSendReply();
-                }
-              }}
-            />
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center space-x-2">
-                <Button size="sm" variant="ghost">
-                  <Paperclip className="w-4 h-4" />
-                </Button>
-                <Button size="sm" variant="ghost">
-                  <Smile className="w-4 h-4" />
-                </Button>
+      {/* Reply/Forward Box */}
+      {showReplyBox && (
+        <div className="border-t border-border p-4 bg-muted/20">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium">
+              {isForwarding ? "Forward Email" : "Reply to"} {message.sender}
+            </h3>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleCancelReply}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              ✕
+            </Button>
+          </div>
+
+          {isForwarding && (
+            <div className="mb-3">
+              <Input
+                placeholder="To: Enter recipient email address"
+                className="mb-2"
+              />
+              <Input
+                placeholder={`Subject: Fwd: ${message.subject}`}
+                className="mb-2"
+              />
+            </div>
+          )}
+
+          <div className="flex items-start space-x-3">
+            <div className="flex-1">
+              <Textarea
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder={isForwarding ? "Add your message..." : `Reply to ${message.sender}...`}
+                className="min-h-[120px] resize-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.metaKey) {
+                    e.preventDefault();
+                    handleSendReply();
+                  }
+                }}
+              />
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center space-x-2">
+                  <Button size="sm" variant="ghost">
+                    <Paperclip className="w-4 h-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost">
+                    <Smile className="w-4 h-4" />
+                  </Button>
+                  <span className="text-xs text-muted-foreground">
+                    {isForwarding ? "Cmd+Enter to forward" : "Cmd+Enter to reply"}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCancelReply}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleSendReply}
+                    disabled={!replyText.trim()}
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    {isForwarding ? "Forward" : "Send Reply"}
+                  </Button>
+                </div>
               </div>
-              <Button size="sm" onClick={handleSendReply} disabled={!replyText.trim()}>
-                <Send className="w-4 h-4 mr-2" />
-                Send
-              </Button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 };
