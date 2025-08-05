@@ -278,7 +278,7 @@ export default function Index() {
   const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false);
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
   const [showEmailChain, setShowEmailChain] = useState(false);
-  const [integrationCategories, setIntegrationCategories] = useState(integrations);
+  const [integrationCategories, setIntegrationCategories] = useState(defaultIntegrationCategories);
   const [showDexterAI, setShowDexterAI] = useState(false);
   const [aiContext, setAiContext] = useState<any>(null);
   const [showIntegrationModal, setShowIntegrationModal] = useState(false);
