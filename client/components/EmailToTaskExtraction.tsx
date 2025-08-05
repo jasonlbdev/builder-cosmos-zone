@@ -258,7 +258,7 @@ export default function EmailToTaskExtraction({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Brain className="w-4 h-4 mr-2" />
-          Extract Tasks
+          Create Task
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-6xl max-h-[90vh]">
