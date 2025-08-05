@@ -201,6 +201,8 @@ export default function Index() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchFilters, setSearchFilters] = useState<any[]>([]);
   const [showEmailChains, setShowEmailChains] = useState(false);
+  const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false);
+  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
 
   // Load emails from centralized API on component mount
   useEffect(() => {
