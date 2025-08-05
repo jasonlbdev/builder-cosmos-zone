@@ -187,6 +187,10 @@ export default function Index() {
   const [showSecurity, setShowSecurity] = useState(false);
   const [emailViewLayout, setEmailViewLayout] = useState<"card" | "table">("card");
   const [selectedFolder, setSelectedFolder] = useState<string>("Inbox");
+  const [sidebarItems, setSidebarItems] = useState(sidebarItemsTemplate.map(item => ({
+    ...item,
+    active: item.label === "Inbox"
+  })));
 
   useEffect(() => {
     setEmails(getEmails());
