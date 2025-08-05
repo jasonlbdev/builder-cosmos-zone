@@ -165,35 +165,35 @@ const EmailThreadItem = ({
   const isForkedThread = indentLevel > 0;
   
   return (
-    <div className={cn("relative", !isMainThread && "ml-8")} style={{ paddingLeft: `${indentPixels}px` }}>
+    <div className={cn("relative", !isMainThread && "ml-4")} style={{ paddingLeft: `${indentPixels}px` }}>
       {/* Thread Connection Lines */}
       {!email.isThreadHead && (
-        <div className="absolute top-0 bottom-0" style={{ left: `${Math.max(0, indentPixels - 16)}px` }}>
+        <div className="absolute top-0 bottom-0" style={{ left: `${Math.max(0, indentPixels - 12)}px` }}>
           {/* Vertical line for thread continuity */}
           {!isLast && (
-            <div 
+            <div
               className={cn(
                 "absolute top-0 bottom-0 w-0.5 -translate-x-0.5",
                 isForkedThread ? getThreadLineColor(email.conversationType) : getThreadLineColor("external")
               )}
-              style={{ left: isForkedThread ? "16px" : "0px" }}
+              style={{ left: isForkedThread ? "12px" : "0px" }}
             />
           )}
-          
+
           {/* Horizontal connector line */}
-          <div 
+          <div
             className={cn(
-              "absolute top-4 w-4 h-0.5 -translate-y-0.5",
+              "absolute top-3 w-3 h-0.5 -translate-y-0.5",
               isForkedThread ? getThreadLineColor(email.conversationType) : getThreadLineColor("external")
             )}
             style={{ left: isForkedThread ? "0px" : "0px" }}
           />
-          
+
           {/* Corner connector for forks */}
           {email.forkPoint && (
-            <div 
+            <div
               className={cn(
-                "absolute top-0 w-0.5 h-4",
+                "absolute top-0 w-0.5 h-3",
                 getThreadLineColor(email.conversationType)
               )}
               style={{ left: "0px" }}
@@ -201,22 +201,22 @@ const EmailThreadItem = ({
           )}
         </div>
       )}
-      
+
       {/* Fork Indicator */}
       {email.forkPoint && (
-        <div className="flex items-center space-x-2 mb-2 text-xs text-muted-foreground">
+        <div className="flex items-center space-x-2 mb-1 text-xs text-muted-foreground">
           <GitBranch className={cn("w-3 h-3", email.conversationType === "internal" ? "text-orange-600" : "text-blue-600")} />
           <span>
-            {email.conversationType === "internal" 
-              ? "Conversation forked to internal discussion" 
-              : "Conversation forked to external thread"}
+            {email.conversationType === "internal"
+              ? "Internal discussion"
+              : "External fork"}
           </span>
         </div>
       )}
-      
+
       <div
         className={cn(
-          "p-3 rounded-lg border cursor-pointer transition-all duration-200",
+          "p-2 rounded border cursor-pointer transition-all duration-200",
           isSelected
             ? "bg-accent border-accent-foreground/20 shadow-sm"
             : "border-border hover:bg-accent/50 hover:border-accent-foreground/10",
