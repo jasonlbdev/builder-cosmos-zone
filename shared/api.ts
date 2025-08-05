@@ -19,6 +19,48 @@ export interface Email {
   avatar: string;
   labels?: string[];
   attachments?: Attachment[];
+  platform?: string;
+  platformLogo?: string;
+  platformColor?: string;
+  // Thread/Chain support
+  threadId?: string;
+  parentId?: string;
+  conversationType?: "external" | "internal" | "mixed";
+  participants?: EmailParticipant[];
+  threadPosition?: number;
+  hasReplies?: boolean;
+  isThreadHead?: boolean;
+  forkPoint?: boolean;
+}
+
+export interface EmailParticipant {
+  email: string;
+  name: string;
+  avatar: string;
+  type: "external" | "internal";
+  domain?: string;
+}
+
+export interface EmailThread {
+  id: string;
+  subject: string;
+  participants: EmailParticipant[];
+  messageCount: number;
+  lastActivity: string;
+  hasInternalFork: boolean;
+  conversationPath: ConversationFork[];
+  emails: Email[];
+}
+
+export interface ConversationFork {
+  id: string;
+  type: "external" | "internal" | "rejoined";
+  participantChange: {
+    added: EmailParticipant[];
+    removed: EmailParticipant[];
+  };
+  atMessageId: string;
+  description: string;
 }
 
 export interface Attachment {
