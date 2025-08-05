@@ -495,8 +495,8 @@ export default function EmailChainView({
                     </div>
                   </CollapsibleTrigger>
                   
-                  <CollapsibleContent className="mt-2">
-                    <div className="space-y-1">
+                  <CollapsibleContent className="mt-4">
+                    <div className="space-y-2 relative">
                       {visibleEmails.map((email, index) => (
                         <EmailThreadItem
                           key={email.id}
