@@ -160,7 +160,7 @@ const integrations = {
   },
   cloudStorage: {
     name: "Cloud Storage",
-    isOpen: false,
+    isOpen: true,
     items: [
       {
         name: "Google Drive",
