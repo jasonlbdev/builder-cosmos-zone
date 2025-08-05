@@ -529,51 +529,6 @@ export default function Index() {
           </div>
 
           <div className="flex items-center space-x-2">
-            {selectedEmail && (
-              <div className="flex items-center space-x-2">
-                <CRMIntegration
-                  emailSender={selectedEmail.email}
-                  emailSubject={selectedEmail.subject}
-                  emailContent={selectedEmail.content}
-                  emailId={selectedEmail.id}
-                >
-                  <Button variant="outline" size="sm">
-                    <Database className="w-4 h-4 mr-2" />
-                    CRM
-                  </Button>
-                </CRMIntegration>
-
-                <EmailToTaskExtraction
-                  emailContext={{
-                    id: selectedEmail.id,
-                    subject: selectedEmail.subject,
-                    content: selectedEmail.content || selectedEmail.preview,
-                    sender: selectedEmail.email,
-                    recipients: [],
-                    timestamp: selectedEmail.time
-                  }}
-                >
-                  <Button variant="outline" size="sm">
-                    <CheckSquare className="w-4 h-4 mr-2" />
-                    Create Task
-                  </Button>
-                </EmailToTaskExtraction>
-
-                <SecurityThreatDetection
-                  emailId={selectedEmail.id}
-                  emailContent={selectedEmail.content}
-                  emailSender={selectedEmail.email}
-                  emailSubject={selectedEmail.subject}
-                >
-                  <Button variant="outline" size="sm">
-                    <Shield className="w-4 h-4 mr-2" />
-                    Security
-                  </Button>
-                </SecurityThreatDetection>
-              </div>
-            )}
-
-            <Separator orientation="vertical" className="h-6" />
             
             <Button
               onClick={() => setShowEmailChain(!showEmailChain)}
