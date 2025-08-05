@@ -149,46 +149,59 @@ const EmailThreadItem = ({
   const isMainThread = indentLevel === 0;
   const isForkedThread = indentLevel > 0;
   
-  return (
-    <div className="mb-8 relative">
-      {/* Main Thread Line - Straight Blue Line for All Emails */}
-      <div className="absolute left-3 top-0 bottom-0 w-px bg-blue-300" />
+  // Find the first email in this thread that started the internal discussion
+  const isFirstInternalEmail = () => {
+    if (!email.forkPoint || email.conversationType !== "internal") return false;
 
-      {/* Fork Indicator */}
-      {email.forkPoint && (
-        <div className="flex items-center space-x-2 mb-6 ml-12 text-xs font-medium text-muted-foreground bg-orange-50 border border-orange-200 p-3 rounded-lg">
+    // Check if this is the first email in the thread with internal conversation type
+    const sortedThreadEmails = [...threadEmails].sort((a, b) => (a.threadPosition || 0) - (b.threadPosition || 0));
+    const firstInternalEmail = sortedThreadEmails.find(e => e.conversationType === "internal");
+    return firstInternalEmail?.id === email.id;
+  };
+
+  return (
+    <div className="mb-10 relative">
+      {/* Fork Indicator - Only show on the FIRST internal email */}
+      {isFirstInternalEmail() && (
+        <div className="flex items-center space-x-2 mb-6 text-xs font-medium text-orange-700 bg-orange-50 border border-orange-200 p-3 rounded-lg shadow-sm">
           <GitBranch className="w-4 h-4 text-orange-600" />
           <span>🔒 Internal discussion started</span>
         </div>
       )}
 
-      <div className={cn("relative", isForkedThread && "ml-8")}>
+      <div className="relative pl-12">
+        {/* Main Thread Line - Positioned outside email content */}
+        <div className="absolute -left-8 top-0 bottom-0 w-px bg-blue-300" />
+
+        {/* Main thread connector dot */}
+        <div className="absolute -left-9 top-8 w-2 h-2 rounded-full bg-blue-400 border-2 border-background z-10" />
+
         {/* Fork Branch Line - Only for forked emails */}
         {isForkedThread && (
-          <div className="absolute -left-4 top-0 bottom-0">
+          <div className="absolute -left-8 top-0 bottom-0">
             {/* Horizontal connector from main line to fork */}
-            <div className="absolute top-8 left-0 w-4 h-px bg-orange-400" />
+            <div className="absolute top-8 left-0 w-6 h-px bg-orange-400" />
 
             {/* Vertical fork line */}
             <div
-              className="absolute left-4 top-8 w-px bg-orange-400"
+              className="absolute left-6 top-8 w-px bg-orange-400"
               style={{
-                height: isLast ? "32px" : "calc(100% + 32px)"
+                height: isLast ? "40px" : "calc(100% + 40px)"
               }}
             />
 
+            {/* Fork connector dot */}
+            <div className="absolute left-5 top-7 w-2 h-2 rounded-full bg-orange-400 border-2 border-background z-10" />
+
             {/* End indicator for last forked email */}
             {isLast && (
-              <div className="absolute left-2 top-10 flex items-center space-x-2 bg-orange-100 border border-orange-300 px-2 py-1 rounded text-xs font-medium text-orange-700">
+              <div className="absolute left-8 top-12 flex items-center space-x-2 bg-orange-100 border border-orange-300 px-3 py-2 rounded-lg text-xs font-medium text-orange-700 shadow-sm">
                 <div className="w-2 h-2 rounded-full bg-orange-500" />
-                <span>End</span>
+                <span>Internal discussion ended</span>
               </div>
             )}
           </div>
         )}
-
-        {/* Main thread connector dot */}
-        <div className="absolute left-2 top-8 w-2 h-2 rounded-full bg-blue-400 border-2 border-background" />
         
         <div
           className={cn(
