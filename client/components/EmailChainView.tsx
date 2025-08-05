@@ -333,9 +333,17 @@ const EmailThreadItem = ({
         
         {/* Merge Back Indicator */}
         {email.conversationType === "mixed" && email.parentId && !isMainThread && (
-          <div className="flex items-center space-x-2 mt-2 ml-2 text-xs text-muted-foreground bg-purple-50 p-2 rounded">
+          <div className="flex items-center space-x-2 mt-3 ml-2 text-xs text-muted-foreground bg-purple-50 p-2 rounded">
             <GitMerge className="w-3 h-3 text-purple-600" />
             <span>🔄 Conversation rejoined main thread</span>
+          </div>
+        )}
+
+        {/* End Indicator for Internal Discussions */}
+        {isLast && isForkedThread && email.conversationType === "internal" && (
+          <div className="flex items-center space-x-2 mt-3 ml-2 text-xs text-muted-foreground bg-orange-50 p-2 rounded">
+            <div className="w-2 h-2 rounded-full bg-orange-400" />
+            <span>🔚 Internal discussion ended</span>
           </div>
         )}
       </div>
