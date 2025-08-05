@@ -205,9 +205,9 @@ const EmailThreadItem = ({
         
         <div
           className={cn(
-            "p-3 rounded-lg border cursor-pointer transition-all duration-200",
+            "p-4 rounded-lg border cursor-pointer transition-all duration-200 bg-background",
             isSelected
-              ? "bg-accent border-accent-foreground/20 shadow-sm"
+              ? "bg-accent border-accent-foreground/20 shadow-md"
               : "border-border hover:bg-accent/50 hover:border-accent-foreground/10",
             email.unread && "border-l-4 border-l-primary",
             isForkedThread && getThreadBgColor(email.conversationType)
