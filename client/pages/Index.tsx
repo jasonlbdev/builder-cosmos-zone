@@ -362,6 +362,121 @@ export default function Index() {
 
   const sidebarItems = getSidebarItemsWithCounts();
 
+  // Search handlers
+  const handleBasicSearch = () => {
+    if (searchQuery.trim()) {
+      // Simulate search results with highlighting
+      const results = filteredEmails.map(email => ({
+        id: email.id,
+        type: "email" as const,
+        title: email.subject,
+        content: email.content || email.preview,
+        sender: email.sender,
+        platform: email.platform,
+        platformLogo: email.platformLogo,
+        time: email.time,
+        avatar: email.avatar,
+        category: email.category,
+        categoryColor: email.categoryColor,
+        matchedFields: ["subject", "content"],
+        relevanceScore: 0.8,
+        highlights: [
+          {
+            field: "title",
+            matches: highlightText(email.subject, searchQuery)
+          },
+          {
+            field: "content",
+            matches: highlightText(email.content || email.preview, searchQuery)
+          }
+        ]
+      }));
+
+      setSearchResults(results);
+      setShowSearchResults(true);
+    }
+  };
+
+  const highlightText = (text: string, query: string) => {
+    if (!query.trim()) return [{ text, isMatch: false }];
+
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')})`, 'gi');
+    const parts = text.split(regex);
+
+    return parts.map(part => ({
+      text: part,
+      isMatch: regex.test(part)
+    }));
+  };
+
+  const handleAdvancedSearch = (filters: any[], query: string) => {
+    setSearchFilters(filters);
+    setSearchQuery(query);
+
+    // Simulate advanced search with filters
+    let results = filteredEmails.map(email => ({
+      id: email.id,
+      type: "email" as const,
+      title: email.subject,
+      content: email.content || email.preview,
+      sender: email.sender,
+      platform: email.platform,
+      platformLogo: email.platformLogo,
+      time: email.time,
+      avatar: email.avatar,
+      category: email.category,
+      categoryColor: email.categoryColor,
+      matchedFields: ["subject", "content"],
+      relevanceScore: Math.random() * 0.4 + 0.6,
+      highlights: [
+        {
+          field: "title",
+          matches: highlightText(email.subject, query)
+        },
+        {
+          field: "content",
+          matches: highlightText(email.content || email.preview, query)
+        }
+      ]
+    }));
+
+    // Apply filters
+    filters.forEach(filter => {
+      results = results.filter(result => {
+        const field = result[filter.field as keyof typeof result] as string;
+        if (!field) return true;
+
+        switch (filter.operator) {
+          case "contains":
+            return field.toLowerCase().includes(filter.value.toLowerCase());
+          case "equals":
+            return field.toLowerCase() === filter.value.toLowerCase();
+          default:
+            return true;
+        }
+      });
+    });
+
+    setSearchResults(results);
+    setShowSearchResults(true);
+  };
+
+  const handleClearFilter = (filterIndex: number) => {
+    const newFilters = searchFilters.filter((_, index) => index !== filterIndex);
+    setSearchFilters(newFilters);
+    handleAdvancedSearch(newFilters, searchQuery);
+  };
+
+  const handleClearAllFilters = () => {
+    setSearchFilters([]);
+    handleAdvancedSearch([], searchQuery);
+  };
+
+  const handleSearchResultSelect = (result: any) => {
+    setSelectedEmailId(result.id);
+    setShowSearchResults(false);
+  };
+
   // Email action handlers
   const handleReply = () => {
     if (selectedEmail) {
