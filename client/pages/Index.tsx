@@ -758,87 +758,208 @@ export default function Index() {
                     </div>
                   </div>
 
-                  <ScrollArea className="h-[calc(100%-80px)]">
-                    <div className="p-2">
-                      {filteredEmails.map((email) => {
-                        const securityStatus = getEmailSecurityStatus(email);
-                        const crmContact = getCRMContactForEmail(email.email);
-                        
-                        return (
-                          <div
-                            key={email.id}
-                            className={cn(
-                              "p-3 rounded-lg cursor-pointer border transition-colors mb-2",
-                              selectedEmailId === email.id
-                                ? "bg-accent border-accent-foreground/20"
-                                : "border-transparent hover:bg-accent/50",
-                            )}
-                            onClick={() => setSelectedEmailId(email.id)}
-                          >
-                            <div className="flex items-start space-x-3">
-                              <Avatar className="w-8 h-8">
-                                <AvatarFallback className="text-xs">
-                                  {email.avatar}
-                                </AvatarFallback>
-                              </Avatar>
+                  {emailViewLayout === "card" ? (
+                    <ScrollArea className="h-[calc(100%-80px)]">
+                      <div className="p-2">
+                        {filteredEmails.map((email) => {
+                          const securityStatus = getEmailSecurityStatus(email);
+                          const crmContact = getCRMContactForEmail(email.email);
 
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between mb-1">
-                                  <div className="flex items-center space-x-2">
-                                    <span
-                                      className={cn(
-                                        "text-sm",
-                                        email.unread ? "font-medium" : "font-normal",
-                                      )}
-                                    >
-                                      {email.sender}
-                                    </span>
-                                    {email.platform && (
-                                      <Badge
-                                        variant="outline"
+                          return (
+                            <div
+                              key={email.id}
+                              className={cn(
+                                "p-3 rounded-lg cursor-pointer border transition-colors mb-2",
+                                selectedEmailId === email.id
+                                  ? "bg-accent border-accent-foreground/20"
+                                  : "border-transparent hover:bg-accent/50",
+                              )}
+                              onClick={() => setSelectedEmailId(email.id)}
+                            >
+                              <div className="flex items-start space-x-3">
+                                <Avatar className="w-8 h-8">
+                                  <AvatarFallback className="text-xs">
+                                    {email.avatar}
+                                  </AvatarFallback>
+                                </Avatar>
+
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <div className="flex items-center space-x-2">
+                                      <span
                                         className={cn(
-                                          "text-xs px-2 py-0.5",
-                                          email.platformColor?.replace("bg-", "border-") || "border-gray-400"
+                                          "text-sm",
+                                          email.unread ? "font-medium" : "font-normal",
                                         )}
                                       >
-                                        <span className="mr-1">{email.platformLogo}</span>
-                                        {email.platform}
-                                      </Badge>
-                                    )}
-                                    
-                                    {/* CRM Status Badge */}
-                                    {crmContact && (
-                                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                                        <Building2 className="w-3 h-3 mr-1" />
-                                        {crmContact.status}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-xs text-muted-foreground">
-                                      {email.time}
-                                    </span>
-                                    {email.unread && (
-                                      <div className="w-2 h-2 bg-primary rounded-full" />
-                                    )}
-                                  </div>
-                                </div>
+                                        {email.sender}
+                                      </span>
+                                      {email.platform && (
+                                        <Badge
+                                          variant="outline"
+                                          className={cn(
+                                            "text-xs px-2 py-0.5",
+                                            email.platformColor?.replace("bg-", "border-") || "border-gray-400"
+                                          )}
+                                        >
+                                          <span className="mr-1">{email.platformLogo}</span>
+                                          {email.platform}
+                                        </Badge>
+                                      )}
 
-                                <div className="flex items-center space-x-2 mb-1">
-                                  <Badge
-                                    variant="secondary"
+                                      {/* CRM Status Badge */}
+                                      {crmContact && (
+                                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                          <Building2 className="w-3 h-3 mr-1" />
+                                          {crmContact.status}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-xs text-muted-foreground">
+                                        {email.time}
+                                      </span>
+                                      {email.unread && (
+                                        <div className="w-2 h-2 bg-primary rounded-full" />
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    <Badge
+                                      variant="secondary"
+                                      className={cn(
+                                        "text-xs",
+                                        email.categoryColor.replace("bg-", "bg-"),
+                                        "text-white",
+                                      )}
+                                    >
+                                      {email.category}
+                                    </Badge>
+
+                                    {/* Security Status Badge */}
+                                    {securityStatus.status !== "safe" && (
+                                      <div className="relative group">
+                                        <Badge
+                                          variant="outline"
+                                          className={cn(
+                                            "text-xs cursor-help",
+                                            securityStatus.level === "high" ? "text-red-700 bg-red-50 border-red-200" :
+                                            securityStatus.level === "medium" ? "text-orange-700 bg-orange-50 border-orange-200" :
+                                            "text-yellow-700 bg-yellow-50 border-yellow-200"
+                                          )}
+                                        >
+                                          {securityStatus.status === "threat" ? (
+                                            <ShieldAlert className="w-3 h-3 mr-1" />
+                                          ) : (
+                                            <Shield className="w-3 h-3 mr-1" />
+                                          )}
+                                          {securityStatus.status}
+                                        </Badge>
+                                        {/* Tooltip */}
+                                        {securityStatus.reason && (
+                                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-normal max-w-xs">
+                                            <div className="text-center">
+                                              {securityStatus.reason}
+                                            </div>
+                                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {email.important && <Star className="w-3 h-3 text-yellow-500" />}
+                                  </div>
+
+                                  <h3
                                     className={cn(
-                                      "text-xs",
-                                      email.categoryColor.replace("bg-", "bg-"),
-                                      "text-white",
+                                      "text-sm mb-1 truncate",
+                                      email.unread ? "font-medium" : "font-normal",
                                     )}
                                   >
-                                    {email.category}
+                                    {email.subject}
+                                  </h3>
+
+                                  <p className="text-xs text-muted-foreground line-clamp-2">
+                                    {email.preview}
+                                  </p>
+
+                                  {/* CRM Contact Info */}
+                                  {crmContact && (
+                                    <div className="flex items-center space-x-2 mt-2 text-xs text-muted-foreground">
+                                      <Target className="w-3 h-3" />
+                                      <span>{crmContact.company} • Lead Score: {crmContact.leadScore}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </ScrollArea>
+                  ) : (
+                    <ScrollArea className="h-[calc(100%-80px)]">
+                      <div className="min-w-full">
+                        {/* Table Header */}
+                        <div className="border-b border-border bg-muted/30 sticky top-0 z-10">
+                          <div className="grid grid-cols-12 gap-2 p-3 text-xs font-medium text-muted-foreground">
+                            <div className="col-span-1"></div>
+                            <div className="col-span-3">From</div>
+                            <div className="col-span-4">Subject</div>
+                            <div className="col-span-2">Category</div>
+                            <div className="col-span-1">Platform</div>
+                            <div className="col-span-1">Time</div>
+                          </div>
+                        </div>
+
+                        {/* Table Body */}
+                        {filteredEmails.map((email) => {
+                          const securityStatus = getEmailSecurityStatus(email);
+                          const crmContact = getCRMContactForEmail(email.email);
+
+                          return (
+                            <div
+                              key={email.id}
+                              className={cn(
+                                "grid grid-cols-12 gap-2 p-3 cursor-pointer border-b border-border/50 transition-colors hover:bg-accent/50",
+                                selectedEmailId === email.id && "bg-accent",
+                                email.unread && "bg-blue-50/30 border-l-4 border-l-primary"
+                              )}
+                              onClick={() => setSelectedEmailId(email.id)}
+                            >
+                              {/* Checkbox/Avatar */}
+                              <div className="col-span-1 flex items-center">
+                                <Avatar className="w-6 h-6">
+                                  <AvatarFallback className="text-xs">
+                                    {email.avatar}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </div>
+
+                              {/* From */}
+                              <div className="col-span-3 flex items-center space-x-2 min-w-0">
+                                <span className={cn("text-sm truncate", email.unread ? "font-medium" : "font-normal")}>
+                                  {email.sender}
+                                </span>
+                                {email.unread && <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />}
+                                {crmContact && (
+                                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 flex-shrink-0">
+                                    <Building2 className="w-3 h-3 mr-1" />
+                                    {crmContact.status}
                                   </Badge>
-                                  
-                                  {/* Security Status Badge */}
+                                )}
+                              </div>
+
+                              {/* Subject */}
+                              <div className="col-span-4 min-w-0">
+                                <div className="flex items-center space-x-2">
+                                  <span className={cn("text-sm truncate", email.unread ? "font-medium" : "font-normal")}>
+                                    {email.subject}
+                                  </span>
+                                  {email.important && <Star className="w-3 h-3 text-yellow-500 flex-shrink-0" />}
                                   {securityStatus.status !== "safe" && (
-                                    <div className="relative group">
+                                    <div className="relative group flex-shrink-0">
                                       <Badge
                                         variant="outline"
                                         className={cn(
@@ -849,11 +970,10 @@ export default function Index() {
                                         )}
                                       >
                                         {securityStatus.status === "threat" ? (
-                                          <ShieldAlert className="w-3 h-3 mr-1" />
+                                          <ShieldAlert className="w-3 h-3" />
                                         ) : (
-                                          <Shield className="w-3 h-3 mr-1" />
+                                          <Shield className="w-3 h-3" />
                                         )}
-                                        {securityStatus.status}
                                       </Badge>
                                       {/* Tooltip */}
                                       {securityStatus.reason && (
@@ -866,37 +986,51 @@ export default function Index() {
                                       )}
                                     </div>
                                   )}
-                                  
-                                  {email.important && <Star className="w-3 h-3 text-yellow-500" />}
                                 </div>
-
-                                <h3
-                                  className={cn(
-                                    "text-sm mb-1 truncate",
-                                    email.unread ? "font-medium" : "font-normal",
-                                  )}
-                                >
-                                  {email.subject}
-                                </h3>
-
-                                <p className="text-xs text-muted-foreground line-clamp-2">
+                                <p className="text-xs text-muted-foreground truncate mt-1">
                                   {email.preview}
                                 </p>
-                                
-                                {/* CRM Contact Info */}
-                                {crmContact && (
-                                  <div className="flex items-center space-x-2 mt-2 text-xs text-muted-foreground">
-                                    <Target className="w-3 h-3" />
-                                    <span>{crmContact.company} • Lead Score: {crmContact.leadScore}</span>
-                                  </div>
+                              </div>
+
+                              {/* Category */}
+                              <div className="col-span-2 flex items-center">
+                                <Badge
+                                  variant="secondary"
+                                  className={cn(
+                                    "text-xs",
+                                    email.categoryColor.replace("bg-", "bg-"),
+                                    "text-white",
+                                  )}
+                                >
+                                  {email.category}
+                                </Badge>
+                              </div>
+
+                              {/* Platform */}
+                              <div className="col-span-1 flex items-center">
+                                {email.platform && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs px-1 py-0.5"
+                                  >
+                                    <span className="mr-1">{email.platformLogo}</span>
+                                    {email.platform.slice(0, 3)}
+                                  </Badge>
                                 )}
                               </div>
+
+                              {/* Time */}
+                              <div className="col-span-1 flex items-center justify-end">
+                                <span className="text-xs text-muted-foreground">
+                                  {email.time}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </ScrollArea>
+                          );
+                        })}
+                      </div>
+                    </ScrollArea>
+                  )}
                 </>
               )}
             </div>
