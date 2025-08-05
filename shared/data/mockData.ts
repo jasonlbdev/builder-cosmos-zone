@@ -805,21 +805,7 @@ export const mockDeletedEmails: Email[] = [
   },
 ];
 
-// Helper functions for different email types
-export const getSentEmails = (): Email[] => {
-  if (!DEV_MODE) return [];
-  return mockSentEmails;
-};
-
-export const getArchivedEmails = (): Email[] => {
-  if (!DEV_MODE) return [];
-  return mockArchivedEmails;
-};
-
-export const getDeletedEmails = (): Email[] => {
-  if (!DEV_MODE) return [];
-  return mockDeletedEmails;
-};
+// Old helper functions removed - now using organized data structure
 
 // Task Mock Data
 export interface Task {
