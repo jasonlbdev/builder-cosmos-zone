@@ -753,160 +753,186 @@ export default function Index() {
 
           <ResizableHandle />
 
-          {/* Email List */}
+          {/* Email List / Search Results / Email Chains */}
           <ResizablePanel defaultSize={35}>
             <div className="h-full border-r border-border">
-              <div className="p-4 border-b border-border">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold">{selectedSidebarItem}</h2>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </div>
+              {showSearchResults ? (
+                <SearchResultsView
+                  results={searchResults}
+                  query={searchQuery}
+                  filters={searchFilters}
+                  onResultSelect={handleSearchResultSelect}
+                  onClearFilter={handleClearFilter}
+                  onClearAllFilters={handleClearAllFilters}
+                  className="p-4"
+                />
+              ) : showEmailChains ? (
+                <div className="p-4">
+                  <EmailChainView
+                    emails={filteredEmails}
+                    selectedEmailId={selectedEmailId}
+                    onEmailSelect={setSelectedEmailId}
+                  />
                 </div>
+              ) : (
+                <>
+                  <div className="p-4 border-b border-border">
+                    <div className="flex items-center justify-between mb-3">
+                      <h2 className="text-lg font-semibold">{selectedSidebarItem}</h2>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowSearchResults(false)}
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
 
-                {/* Platform Filter */}
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground">Filter by:</span>
-                  <Select value={selectedIntegration} onValueChange={setSelectedIntegration}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="All">
-                        <div className="flex items-center space-x-2">
-                          <span>🌐</span>
-                          <span>All Platforms</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="Gmail">
-                        <div className="flex items-center space-x-2">
-                          <span>📧</span>
-                          <span>Gmail</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="Outlook">
-                        <div className="flex items-center space-x-2">
-                          <span>📨</span>
-                          <span>Outlook</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="WhatsApp">
-                        <div className="flex items-center space-x-2">
-                          <span>💬</span>
-                          <span>WhatsApp</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="Slack">
-                        <div className="flex items-center space-x-2">
-                          <span>💼</span>
-                          <span>Slack</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="Telegram">
-                        <div className="flex items-center space-x-2">
-                          <span>📨</span>
-                          <span>Telegram</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  {selectedIntegration !== "All" && (
-                    <Badge variant="secondary" className="text-xs">
-                      {filteredEmails.length} message{filteredEmails.length !== 1 ? 's' : ''}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-
-              <ScrollArea className="h-[calc(100%-80px)]">
-                <div className="p-2">
-                  {filteredEmails.map((email) => (
-                    <div
-                      key={email.id}
-                      className={cn(
-                        "p-3 rounded-lg cursor-pointer border transition-colors",
-                        selectedEmailId === email.id
-                          ? "bg-accent border-accent-foreground/20"
-                          : "border-transparent hover:bg-accent/50",
-                      )}
-                      onClick={() => setSelectedEmailId(email.id)}
-                    >
-                      <div className="flex items-start space-x-3">
-                        <Avatar className="w-8 h-8">
-                          <AvatarFallback className="text-xs">
-                            {email.avatar}
-                          </AvatarFallback>
-                        </Avatar>
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
+                    {/* Platform Filter */}
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-muted-foreground">Filter by:</span>
+                      <Select value={selectedIntegration} onValueChange={setSelectedIntegration}>
+                        <SelectTrigger className="w-40">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="All">
                             <div className="flex items-center space-x-2">
-                              <span
+                              <span>🌐</span>
+                              <span>All Platforms</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Gmail">
+                            <div className="flex items-center space-x-2">
+                              <span>📧</span>
+                              <span>Gmail</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Outlook">
+                            <div className="flex items-center space-x-2">
+                              <span>📨</span>
+                              <span>Outlook</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="WhatsApp">
+                            <div className="flex items-center space-x-2">
+                              <span>💬</span>
+                              <span>WhatsApp</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Slack">
+                            <div className="flex items-center space-x-2">
+                              <span>💼</span>
+                              <span>Slack</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Telegram">
+                            <div className="flex items-center space-x-2">
+                              <span>📨</span>
+                              <span>Telegram</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      {selectedIntegration !== "All" && (
+                        <Badge variant="secondary" className="text-xs">
+                          {filteredEmails.length} message{filteredEmails.length !== 1 ? 's' : ''}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  <ScrollArea className="h-[calc(100%-80px)]">
+                    <div className="p-2">
+                      {filteredEmails.map((email) => (
+                        <div
+                          key={email.id}
+                          className={cn(
+                            "p-3 rounded-lg cursor-pointer border transition-colors",
+                            selectedEmailId === email.id
+                              ? "bg-accent border-accent-foreground/20"
+                              : "border-transparent hover:bg-accent/50",
+                          )}
+                          onClick={() => setSelectedEmailId(email.id)}
+                        >
+                          <div className="flex items-start space-x-3">
+                            <Avatar className="w-8 h-8">
+                              <AvatarFallback className="text-xs">
+                                {email.avatar}
+                              </AvatarFallback>
+                            </Avatar>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center space-x-2">
+                                  <span
+                                    className={cn(
+                                      "text-sm",
+                                      email.unread ? "font-medium" : "font-normal",
+                                    )}
+                                  >
+                                    {email.sender}
+                                  </span>
+                                  {email.platform && (
+                                    <Badge
+                                      variant="outline"
+                                      className={cn(
+                                        "text-xs px-2 py-0.5",
+                                        email.platformColor?.replace("bg-", "border-") || "border-gray-400"
+                                      )}
+                                    >
+                                      <span className="mr-1">{email.platformLogo}</span>
+                                      {email.platform}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-xs text-muted-foreground">
+                                    {email.time}
+                                  </span>
+                                  {email.unread && (
+                                    <div className="w-2 h-2 bg-primary rounded-full" />
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="flex items-center space-x-2 mb-1">
+                                <Badge
+                                  variant="secondary"
+                                  className={cn(
+                                    "text-xs",
+                                    email.categoryColor.replace("bg-", "bg-"),
+                                    "text-white",
+                                  )}
+                                >
+                                  {email.category}
+                                </Badge>
+                                {email.important && <Star className="w-3 h-3 text-yellow-500" />}
+                              </div>
+
+                              <h3
                                 className={cn(
-                                  "text-sm",
+                                  "text-sm mb-1 truncate",
                                   email.unread ? "font-medium" : "font-normal",
                                 )}
                               >
-                                {email.sender}
-                              </span>
-                              {email.platform && (
-                                <Badge 
-                                  variant="outline" 
-                                  className={cn(
-                                    "text-xs px-2 py-0.5",
-                                    email.platformColor?.replace("bg-", "border-") || "border-gray-400"
-                                  )}
-                                >
-                                  <span className="mr-1">{email.platformLogo}</span>
-                                  {email.platform}
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-xs text-muted-foreground">
-                                {email.time}
-                              </span>
-                              {email.unread && (
-                                <div className="w-2 h-2 bg-primary rounded-full" />
-                              )}
+                                {email.subject}
+                              </h3>
+
+                              <p className="text-xs text-muted-foreground line-clamp-2">
+                                {email.preview}
+                              </p>
                             </div>
                           </div>
-
-                          <div className="flex items-center space-x-2 mb-1">
-                            <Badge
-                              variant="secondary"
-                              className={cn(
-                                "text-xs",
-                                email.categoryColor.replace("bg-", "bg-"),
-                                "text-white",
-                              )}
-                            >
-                              {email.category}
-                            </Badge>
-                            {email.important && <Star className="w-3 h-3 text-yellow-500" />}
-                          </div>
-
-                          <h3
-                            className={cn(
-                              "text-sm mb-1 truncate",
-                              email.unread ? "font-medium" : "font-normal",
-                            )}
-                          >
-                            {email.subject}
-                          </h3>
-
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            {email.preview}
-                          </p>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </ScrollArea>
+                  </ScrollArea>
+                </>
+              )}
             </div>
           </ResizablePanel>
 
