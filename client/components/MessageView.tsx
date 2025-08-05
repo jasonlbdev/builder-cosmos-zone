@@ -197,6 +197,8 @@ const fetchConversationMessages = async (
 
 const EmailView = ({ message }: { message: Message }) => {
   const [replyText, setReplyText] = useState("");
+  const [showReplyBox, setShowReplyBox] = useState(false);
+  const [isForwarding, setIsForwarding] = useState(false);
 
   const handleSendReply = () => {
     if (replyText.trim()) {
