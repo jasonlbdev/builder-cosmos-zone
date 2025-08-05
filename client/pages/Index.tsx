@@ -610,8 +610,8 @@ export default function Index() {
         
         if (response.ok) {
           toast({
-            title: selectedEmail.read ? "Marked as Unread" : "Marked as Read",
-            description: `Email ${selectedEmail.read ? 'unmarked' : 'marked'} as read.`
+            title: selectedEmail.unread ? "Marked as Read" : "Marked as Unread",
+            description: `Email ${selectedEmail.unread ? 'marked' : 'unmarked'} as read.`
           });
         } else {
           throw new Error('Failed to update read status');
