@@ -635,6 +635,22 @@ export default function Index() {
               >
                 <PanelLeft className="w-4 h-4" />
               </Button>
+
+              {/* Collapsed Folder Icons */}
+              <div className="space-y-1">
+                {sidebarItems.slice(0, 6).map((item) => (
+                  <Button
+                    key={item.label}
+                    variant={item.active ? "default" : "ghost"}
+                    size="sm"
+                    className="w-8 h-8 p-0"
+                    onClick={() => handleSidebarItemClick(item.label)}
+                    title={item.label}
+                  >
+                    <item.icon className="w-4 h-4" />
+                  </Button>
+                ))}
+              </div>
             </div>
           )}
 
