@@ -150,61 +150,45 @@ const EmailThreadItem = ({
   const isForkedThread = indentLevel > 0;
   
   return (
-    <div className="mb-5">
+    <div className="mb-8 relative">
+      {/* Main Thread Line - Straight Blue Line for All Emails */}
+      <div className="absolute left-3 top-0 bottom-0 w-px bg-blue-300" />
+
       {/* Fork Indicator */}
       {email.forkPoint && (
-        <div className="flex items-center space-x-2 mb-4 ml-8 text-xs text-muted-foreground bg-muted/30 p-2 rounded">
-          <GitBranch className={cn("w-3 h-3", email.conversationType === "internal" ? "text-orange-600" : "text-blue-600")} />
-          <span>
-            {email.conversationType === "internal"
-              ? "🔒 Internal discussion started"
-              : "🌐 External fork"}
-          </span>
+        <div className="flex items-center space-x-2 mb-6 ml-12 text-xs font-medium text-muted-foreground bg-orange-50 border border-orange-200 p-3 rounded-lg">
+          <GitBranch className="w-4 h-4 text-orange-600" />
+          <span>🔒 Internal discussion started</span>
         </div>
       )}
 
       <div className={cn("relative", isForkedThread && "ml-8")}>
-        {/* Folder-style indentation line */}
+        {/* Fork Branch Line - Only for forked emails */}
         {isForkedThread && (
-          <div className="absolute -left-4 top-0 bottom-0 flex flex-col">
-            {/* Vertical line - extends full height for continuation or shorter for end */}
+          <div className="absolute -left-4 top-0 bottom-0">
+            {/* Horizontal connector from main line to fork */}
+            <div className="absolute top-8 left-0 w-4 h-px bg-orange-400" />
+
+            {/* Vertical fork line */}
             <div
-              className={cn(
-                "w-px",
-                email.conversationType === "internal" ? "bg-orange-300" : "bg-blue-300"
-              )}
+              className="absolute left-4 top-8 w-px bg-orange-400"
               style={{
-                height: isLast ? "28px" : "calc(100% + 20px)"
+                height: isLast ? "32px" : "calc(100% + 32px)"
               }}
             />
-            {/* Horizontal connector */}
-            <div
-              className={cn(
-                "absolute top-7 left-0 w-6 h-px",
-                email.conversationType === "internal" ? "bg-orange-300" : "bg-blue-300"
-              )}
-            />
-            {/* End cap for last item in fork that doesn't rejoin */}
-            {isLast && !email.conversationType?.includes("mixed") && (
-              <>
-                {/* L-shaped corner */}
-                <div
-                  className={cn(
-                    "absolute top-7 left-0 w-6 h-px",
-                    email.conversationType === "internal" ? "bg-orange-300" : "bg-blue-300"
-                  )}
-                />
-                {/* End indicator dot */}
-                <div
-                  className={cn(
-                    "absolute top-6 left-6 w-2 h-2 rounded-full border-2 bg-background",
-                    email.conversationType === "internal" ? "border-orange-400" : "border-blue-400"
-                  )}
-                />
-              </>
+
+            {/* End indicator for last forked email */}
+            {isLast && (
+              <div className="absolute left-2 top-10 flex items-center space-x-2 bg-orange-100 border border-orange-300 px-2 py-1 rounded text-xs font-medium text-orange-700">
+                <div className="w-2 h-2 rounded-full bg-orange-500" />
+                <span>End</span>
+              </div>
             )}
           </div>
         )}
+
+        {/* Main thread connector dot */}
+        <div className="absolute left-2 top-8 w-2 h-2 rounded-full bg-blue-400 border-2 border-background" />
         
         <div
           className={cn(
