@@ -340,15 +340,25 @@ const EmailThreadItem = ({
   );
 };
 
-export default function EmailChainView({ 
-  emails, 
-  selectedEmailId, 
-  onEmailSelect, 
-  className 
+export default function EmailChainView({
+  emails = [],
+  selectedEmailId,
+  onEmailSelect,
+  className
 }: EmailChainViewProps) {
   const [showInternalOnly, setShowInternalOnly] = useState(false);
   const [expandedThreads, setExpandedThreads] = useState<Set<string>>(new Set());
-  
+
+  // Safety check for emails array
+  if (!emails || !Array.isArray(emails)) {
+    return (
+      <div className={cn("h-full flex flex-col items-center justify-center", className)}>
+        <Mail className="w-12 h-12 text-muted-foreground mb-4" />
+        <p className="text-muted-foreground">No emails to display</p>
+      </div>
+    );
+  }
+
   // Group emails by thread
   const emailsByThread = emails.reduce((acc, email) => {
     const threadId = email.threadId || email.id;
