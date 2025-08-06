@@ -1085,7 +1085,7 @@ export default function Settings() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-center space-x-2">
                       <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
