@@ -1391,68 +1391,55 @@ export default function Settings() {
 
             {/* Integrations Tab */}
             <TabsContent value="integrations" className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold">
-                  Integration Management
-                </h3>
-                <p className="text-muted-foreground">
-                  Manage your connected accounts and sync settings
-                </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    Integration Settings
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Configure sync preferences and automation rules
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => window.location.href = '/integrations'}
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  Manage Connections
+                </Button>
               </div>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Email Provider Integration</CardTitle>
+                  <CardTitle>Email Analysis</CardTitle>
                   <CardDescription>
-                    Configure how Dexter analyzes emails using Microsoft Graph
-                    API and Gmail API
+                    Configure how Dexter analyzes and processes your emails
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">
-                        Use Microsoft Graph API metadata
-                      </Label>
+                      <Label className="text-base">Enhanced email metadata</Label>
                       <p className="text-sm text-muted-foreground">
-                        Analyze Outlook emails using Graph API metadata (To/CC
-                        recipients, conversation threads, importance flags)
+                        Use provider APIs (Gmail, Outlook) for better thread tracking and categorization
                       </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">
-                        Use Gmail API metadata
-                      </Label>
+                      <Label className="text-base">Conversation tracking</Label>
                       <p className="text-sm text-muted-foreground">
-                        Analyze Gmail emails using Gmail API metadata (labels,
-                        thread tracking, message references)
+                        Automatically track email threads and reply status
                       </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-base">
-                        Conversation thread analysis
-                      </Label>
+                      <Label className="text-base">Priority detection</Label>
                       <p className="text-sm text-muted-foreground">
-                        Track email conversations to determine "Awaiting Reply"
-                        status based on thread history
-                      </p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label className="text-base">
-                        Recipient analysis priority
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        Prioritize emails sent directly to you (To field) over
-                        CC'd emails
+                        Prioritize direct emails over CC'd messages
                       </p>
                     </div>
                     <Switch defaultChecked />
@@ -1462,103 +1449,88 @@ export default function Settings() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Connected Integrations</CardTitle>
+                  <CardTitle>Automation & AI</CardTitle>
                   <CardDescription>
-                    View and manage your connected email and communication
-                    platforms
+                    Configure intelligent automation features
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Mock connected integrations */}
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
-                          <span className="text-sm">📧</span>
-                        </div>
-                        <div>
-                          <h4 className="font-medium">Microsoft Outlook</h4>
-                          <p className="text-sm text-muted-foreground">
-                            user@company.com
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full" />
-                        <Switch defaultChecked />
-                      </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Auto-create CRM contacts</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Create contacts automatically from new email senders
+                      </p>
                     </div>
-
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
-                          <span className="text-sm">✉️</span>
-                        </div>
-                        <div>
-                          <h4 className="font-medium">Gmail</h4>
-                          <p className="text-sm text-muted-foreground">
-                            user@gmail.com
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full" />
-                        <Switch defaultChecked />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                          <span className="text-sm">💼</span>
-                        </div>
-                        <div>
-                          <h4 className="font-medium">Slack</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Development Team
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-yellow-500 rounded-full" />
-                        <Switch defaultChecked />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                          <span className="text-sm">💬</span>
-                        </div>
-                        <div>
-                          <h4 className="font-medium">WhatsApp Business</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Not connected
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-gray-300 rounded-full" />
-                        <Switch />
-                      </div>
-                    </div>
+                    <Switch defaultChecked />
                   </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Extract tasks from emails</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically identify and create tasks from action items
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Meeting detection</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Auto-suggest calendar events from meeting requests
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base">Lead scoring updates</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Adjust lead scores based on email engagement
+                      </p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                </CardContent>
+              </Card>
 
-                  <div className="flex justify-between pt-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => window.location.href = '/integrations'}
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Integration
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => window.location.href = '/integrations/management'}
-                    >
-                      <Settings className="w-4 h-4 mr-2" />
-                      Manage All
-                    </Button>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Connection Status</CardTitle>
+                  <CardDescription>
+                    Quick overview of connected platforms
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex flex-col items-center p-3 border rounded-lg">
+                      <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center mb-2">
+                        <span className="text-sm">📧</span>
+                      </div>
+                      <h4 className="font-medium text-sm">Outlook</h4>
+                      <div className="w-2 h-2 bg-green-500 rounded-full mt-1" />
+                    </div>
+                    <div className="flex flex-col items-center p-3 border rounded-lg">
+                      <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center mb-2">
+                        <span className="text-sm">✉️</span>
+                      </div>
+                      <h4 className="font-medium text-sm">Gmail</h4>
+                      <div className="w-2 h-2 bg-green-500 rounded-full mt-1" />
+                    </div>
+                    <div className="flex flex-col items-center p-3 border rounded-lg">
+                      <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center mb-2">
+                        <span className="text-sm">💼</span>
+                      </div>
+                      <h4 className="font-medium text-sm">Slack</h4>
+                      <div className="w-2 h-2 bg-green-500 rounded-full mt-1" />
+                    </div>
+                    <div className="flex flex-col items-center p-3 border rounded-lg">
+                      <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mb-2">
+                        <span className="text-sm">🏢</span>
+                      </div>
+                      <h4 className="font-medium text-sm">CRM</h4>
+                      <div className="w-2 h-2 bg-green-500 rounded-full mt-1" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
