@@ -1049,7 +1049,7 @@ export default function Settings() {
 
               {/* Quick Setup Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-center space-x-2">
                       <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
