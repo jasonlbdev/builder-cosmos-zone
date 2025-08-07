@@ -3,6 +3,35 @@
 // Configure DEV_MODE to control data source behavior
 export const DEV_MODE = true;
 
+// Import organized data from separate files
+import { allEmails, inboxEmails, sentEmails, archivedEmails, suspiciousEmails } from "./emails";
+import { mockTasks } from "./tasks";
+import { mockUserAccounts, mockIntegrations, integrationCategories } from "./integrations";
+import type {
+  Email,
+  Task,
+  UserAccount,
+  Integration,
+  CalendarEvent,
+  EmailCategory,
+  CategoryRule,
+  ConversationMessage,
+  CRMContact
+} from "./types";
+
+// Re-export types for backward compatibility
+export type {
+  Email,
+  Task,
+  UserAccount,
+  Integration,
+  CalendarEvent,
+  EmailCategory,
+  CategoryRule,
+  ConversationMessage,
+  CRMContact
+};
+
 // User Accounts Mock Data - Multiple accounts per platform
 export interface UserAccount {
   id: string;
@@ -224,9 +253,62 @@ export interface Email {
   platform?: string;
   platformLogo?: string;
   platformColor?: string;
+  // Thread/Chain support
+  threadId?: string;
+  parentId?: string;
+  conversationType?: "external" | "internal" | "mixed";
+  participants?: Array<{
+    email: string;
+    name: string;
+    avatar: string;
+    type: "external" | "internal";
+    domain?: string;
+  }>;
+  threadPosition?: number;
+  hasReplies?: boolean;
+  isThreadHead?: boolean;
+  forkPoint?: boolean;
 }
 
 export const mockEmails: Email[] = [
+  // SUSPICIOUS DEMO EMAILS
+  {
+    id: "suspicious1",
+    sender: "Microsoft Security Team",
+    email: "microsoft@micros0ft-security.com",
+    subject: "URGENT: Your Account Security Alert - Immediate Action Required",
+    content: "Dear User,\n\nWe have detected suspicious activity on your Microsoft account. Your account will be suspended in 24 hours unless you verify your identity immediately.\n\nClick here to verify: https://microsoft-verify.suspicious-domain.com\n\nDo not ignore this message.\n\nMicrosoft Security Team",
+    preview: "We have detected suspicious activity on your Microsoft account. Your account will be suspended...",
+    time: "15m ago",
+    unread: true,
+    important: false,
+    category: "Security Alert",
+    categoryColor: "bg-red-500",
+    avatar: "MS",
+    labels: ["phishing", "urgent"],
+    platform: "Gmail",
+    platformLogo: "📧",
+    platformColor: "bg-red-500"
+  },
+  {
+    id: "suspicious2",
+    sender: "Microsoft Support",
+    email: "noreply@micr0soft-support.net",
+    subject: "Account Verification Required - Action Needed",
+    content: "Hello,\n\nYour Microsoft Office 365 subscription requires immediate verification. Click the link below to maintain access to your account.\n\nVerify Now: https://office365-verify.fake-domain.org\n\nThis link expires in 2 hours.\n\nBest regards,\nMicrosoft Support",
+    preview: "Your Microsoft Office 365 subscription requires immediate verification. Click the link below...",
+    time: "3h ago",
+    unread: true,
+    important: false,
+    category: "Updates",
+    categoryColor: "bg-blue-500",
+    avatar: "MS",
+    labels: ["verification", "office365"],
+    platform: "Outlook",
+    platformLogo: "📨",
+    platformColor: "bg-blue-500"
+  },
+  // Thread 1: Budget Review - External to Internal Fork
   {
     id: "1",
     sender: "Sarah Johnson",
@@ -244,33 +326,281 @@ export const mockEmails: Email[] = [
     platform: "Slack",
     platformLogo: "💼",
     platformColor: "bg-purple-500",
+    threadId: "thread_budget_1",
+    isThreadHead: true,
+    threadPosition: 1,
+    hasReplies: true,
+    conversationType: "external",
+    participants: [
+      { email: "sarah@company.com", name: "Sarah Johnson", avatar: "SJ", type: "internal", domain: "company.com" },
+      { email: "client@external.com", name: "Client Contact", avatar: "CC", type: "external", domain: "external.com" },
+      { email: "you@company.com", name: "You", avatar: "ME", type: "internal", domain: "company.com" }
+    ]
   },
+  {
+    id: "1b",
+    sender: "You",
+    email: "you@company.com",
+    subject: "Re: Q4 Budget Review Meeting",
+    content: "Thanks Sarah, I can attend. Just one concern about the client costs...",
+    preview: "Thanks Sarah, I can attend. Just one concern about the client costs...",
+    time: "1h ago",
+    unread: false,
+    important: false,
+    category: "Sent",
+    categoryColor: "bg-blue-500",
+    avatar: "ME",
+    labels: ["work", "budget", "reply"],
+    platform: "Slack",
+    platformLogo: "💼",
+    platformColor: "bg-purple-500",
+    threadId: "thread_budget_1",
+    parentId: "1",
+    threadPosition: 2,
+    hasReplies: true,
+    conversationType: "external"
+  },
+  {
+    id: "1c",
+    sender: "Sarah Johnson",
+    email: "sarah@company.com",
+    subject: "Re: Q4 Budget Review Meeting - Internal Discussion",
+    content: "Let's discuss the client cost concerns privately before the meeting...",
+    preview: "Let's discuss the client cost concerns privately before the meeting...",
+    time: "45m ago",
+    unread: true,
+    important: false,
+    category: "FYI",
+    categoryColor: "bg-blue-500",
+    avatar: "SJ",
+    labels: ["work", "budget", "internal"],
+    platform: "Slack",
+    platformLogo: "💼",
+    platformColor: "bg-purple-500",
+    threadId: "thread_budget_1",
+    parentId: "1b",
+    threadPosition: 3,
+    hasReplies: true,
+    conversationType: "internal",
+    forkPoint: true,
+    participants: [
+      { email: "sarah@company.com", name: "Sarah Johnson", avatar: "SJ", type: "internal", domain: "company.com" },
+      { email: "you@company.com", name: "You", avatar: "ME", type: "internal", domain: "company.com" }
+    ]
+  },
+  {
+    id: "1d",
+    sender: "You",
+    email: "you@company.com",
+    subject: "Re: Q4 Budget Review Meeting - Internal Discussion",
+    content: "Agreed. The client might not understand our overhead calculations...",
+    preview: "Agreed. The client might not understand our overhead calculations...",
+    time: "30m ago",
+    unread: false,
+    important: false,
+    category: "Sent",
+    categoryColor: "bg-blue-500",
+    avatar: "ME",
+    labels: ["work", "budget", "internal"],
+    platform: "Slack",
+    platformLogo: "💼",
+    platformColor: "bg-purple-500",
+    threadId: "thread_budget_1",
+    parentId: "1c",
+    threadPosition: 4,
+    hasReplies: true,
+    conversationType: "internal"
+  },
+  {
+    id: "1e",
+    sender: "Sarah Johnson",
+    email: "sarah@company.com",
+    subject: "Re: Q4 Budget Review Meeting",
+    content: "Perfect! Let's proceed with the meeting as scheduled. @client@external.com, see you tomorrow!",
+    preview: "Perfect! Let's proceed with the meeting as scheduled. @client@external.com, see you tomorrow!",
+    time: "15m ago",
+    unread: true,
+    important: false,
+    category: "FYI",
+    categoryColor: "bg-blue-500",
+    avatar: "SJ",
+    labels: ["work", "budget", "meeting"],
+    platform: "Slack",
+    platformLogo: "💼",
+    platformColor: "bg-purple-500",
+    threadId: "thread_budget_1",
+    parentId: "1d",
+    threadPosition: 5,
+    hasReplies: false,
+    conversationType: "mixed",
+    participants: [
+      { email: "sarah@company.com", name: "Sarah Johnson", avatar: "SJ", type: "internal", domain: "company.com" },
+      { email: "client@external.com", name: "Client Contact", avatar: "CC", type: "external", domain: "external.com" },
+      { email: "you@company.com", name: "You", avatar: "ME", type: "internal", domain: "company.com" }
+    ]
+  },
+
+  // Thread 2: Outlook Email Chain - Project Timeline Discussion with Fork
   {
     id: "2",
     sender: "Marcus Chen",
     email: "marcus@designco.com",
-    subject: "New Design System Updates",
-    content: "The latest updates to our design system are now available...",
-    preview: "The latest updates to our design system are now available. Please review the new...",
+    subject: "Project Timeline Review - Client Meeting",
+    content: "Hi team, I wanted to discuss the project timeline for our upcoming client deliverables. We need to review milestones and ensure we're on track for the Q1 deadline.",
+    preview: "Hi team, I wanted to discuss the project timeline for our upcoming client deliverables...",
+    time: "2h ago",
+    unread: true,
+    important: true,
+    category: "To Respond",
+    categoryColor: "bg-red-500",
+    avatar: "MC",
+    labels: ["project", "timeline", "client"],
+    platform: "Outlook",
+    platformLogo: "📨",
+    platformColor: "bg-blue-700",
+    threadId: "thread_project_1",
+    isThreadHead: true,
+    threadPosition: 1,
+    hasReplies: true,
+    conversationType: "external",
+    participants: [
+      { email: "marcus@designco.com", name: "Marcus Chen", avatar: "MC", type: "internal", domain: "designco.com" },
+      { email: "client.lead@clientcorp.com", name: "Client Lead", avatar: "CL", type: "external", domain: "clientcorp.com" },
+      { email: "you@designco.com", name: "You", avatar: "ME", type: "internal", domain: "designco.com" },
+      { email: "pm@clientcorp.com", name: "Project Manager", avatar: "PM", type: "external", domain: "clientcorp.com" }
+    ]
+  },
+  {
+    id: "2b",
+    sender: "You",
+    email: "you@designco.com",
+    subject: "Re: Project Timeline Review - Client Meeting",
+    content: "Thanks Marcus. I've reviewed the timeline and have some concerns about the testing phase duration.",
+    preview: "Thanks Marcus. I've reviewed the timeline and have some concerns about the testing phase...",
+    time: "1h ago",
+    unread: false,
+    important: false,
+    category: "Sent",
+    categoryColor: "bg-blue-500",
+    avatar: "ME",
+    labels: ["project", "timeline", "feedback"],
+    platform: "Outlook",
+    platformLogo: "📨",
+    platformColor: "bg-blue-700",
+    threadId: "thread_project_1",
+    parentId: "2",
+    threadPosition: 2,
+    hasReplies: true,
+    conversationType: "external"
+  },
+  {
+    id: "2c",
+    sender: "Marcus Chen",
+    email: "marcus@designco.com",
+    subject: "Re: Project Timeline Review - INTERNAL: Testing Concerns",
+    content: "Hey, let's discuss this testing timeline concern offline before responding to the client. I think we can optimize the process.",
+    preview: "Hey, let's discuss this testing timeline concern offline before responding to the client...",
+    time: "45m ago",
+    unread: true,
+    important: false,
+    category: "Important",
+    categoryColor: "bg-yellow-500",
+    avatar: "MC",
+    labels: ["project", "internal", "testing"],
+    platform: "Outlook",
+    platformLogo: "📨",
+    platformColor: "bg-blue-700",
+    threadId: "thread_project_1",
+    parentId: "2b",
+    threadPosition: 3,
+    hasReplies: true,
+    conversationType: "internal",
+    forkPoint: true,
+    participants: [
+      { email: "marcus@designco.com", name: "Marcus Chen", avatar: "MC", type: "internal", domain: "designco.com" },
+      { email: "you@designco.com", name: "You", avatar: "ME", type: "internal", domain: "designco.com" }
+    ]
+  },
+  {
+    id: "2d",
+    sender: "You",
+    email: "you@designco.com",
+    subject: "Re: Project Timeline Review - INTERNAL: Testing Concerns",
+    content: "Good point. I think we can reduce testing from 3 weeks to 2 weeks if we implement automated testing for the UI components.",
+    preview: "Good point. I think we can reduce testing from 3 weeks to 2 weeks if we implement...",
+    time: "30m ago",
+    unread: false,
+    important: false,
+    category: "Sent",
+    categoryColor: "bg-blue-500",
+    avatar: "ME",
+    labels: ["project", "internal", "testing"],
+    platform: "Outlook",
+    platformLogo: "📨",
+    platformColor: "bg-blue-700",
+    threadId: "thread_project_1",
+    parentId: "2c",
+    threadPosition: 4,
+    hasReplies: true,
+    conversationType: "internal"
+  },
+  {
+    id: "2e",
+    sender: "Marcus Chen",
+    email: "marcus@designco.com",
+    subject: "Re: Project Timeline Review - Client Meeting",
+    content: "Perfect! @client.lead@clientcorp.com @pm@clientcorp.com - We've optimized our testing timeline and can commit to the original deadline. Updated timeline attached.",
+    preview: "Perfect! @client.lead@clientcorp.com @pm@clientcorp.com - We've optimized our testing timeline...",
     time: "15m ago",
     unread: true,
     important: false,
     category: "FYI",
     categoryColor: "bg-blue-500",
     avatar: "MC",
+    labels: ["project", "timeline", "client"],
+    platform: "Outlook",
+    platformLogo: "📨",
+    platformColor: "bg-blue-700",
+    threadId: "thread_project_1",
+    parentId: "2d",
+    threadPosition: 5,
+    hasReplies: false,
+    conversationType: "mixed",
+    participants: [
+      { email: "marcus@designco.com", name: "Marcus Chen", avatar: "MC", type: "internal", domain: "designco.com" },
+      { email: "client.lead@clientcorp.com", name: "Client Lead", avatar: "CL", type: "external", domain: "clientcorp.com" },
+      { email: "you@designco.com", name: "You", avatar: "ME", type: "internal", domain: "designco.com" },
+      { email: "pm@clientcorp.com", name: "Project Manager", avatar: "PM", type: "external", domain: "clientcorp.com" }
+    ]
+  },
+
+  // Single Gmail email for variety
+  {
+    id: "3",
+    sender: "Design System Team",
+    email: "design-system@designco.com",
+    subject: "New Design System Updates",
+    content: "The latest updates to our design system are now available...",
+    preview: "The latest updates to our design system are now available. Please review the new...",
+    time: "3h ago",
+    unread: true,
+    important: false,
+    category: "FYI",
+    categoryColor: "bg-blue-500",
+    avatar: "DS",
     labels: ["design", "updates"],
     platform: "Gmail",
     platformLogo: "✉️",
     platformColor: "bg-red-500",
   },
   {
-    id: "3",
+    id: "4",
     sender: "LinkedIn",
     email: "notifications@linkedin.com",
     subject: "Your weekly summary is ready",
     content: "See who viewed your profile this week and discover new connections...",
     preview: "See who viewed your profile this week and discover new connections in your industry...",
-    time: "1h ago",
+    time: "4h ago",
     unread: false,
     important: false,
     category: "Marketing",
@@ -475,21 +805,7 @@ export const mockDeletedEmails: Email[] = [
   },
 ];
 
-// Helper functions for different email types
-export const getSentEmails = (): Email[] => {
-  if (!DEV_MODE) return [];
-  return mockSentEmails;
-};
-
-export const getArchivedEmails = (): Email[] => {
-  if (!DEV_MODE) return [];
-  return mockArchivedEmails;
-};
-
-export const getDeletedEmails = (): Email[] => {
-  if (!DEV_MODE) return [];
-  return mockDeletedEmails;
-};
+// Old helper functions removed - now using organized data structure
 
 // Task Mock Data
 export interface Task {
@@ -911,8 +1227,11 @@ export const mockIntegrations: Integration[] = [
   },
 ];
 
-// Helper functions for data access
-export const getEmails = (): Email[] => DEV_MODE ? mockEmails : [];
+// Helper functions for data access - now using imported organized data
+export const getEmails = (): Email[] => DEV_MODE ? allEmails : [];
+export const getSentEmails = (): Email[] => DEV_MODE ? sentEmails : [];
+export const getArchivedEmails = (): Email[] => DEV_MODE ? archivedEmails : [];
+export const getDeletedEmails = (): Email[] => DEV_MODE ? archivedEmails : []; // Using archived as placeholder
 export const getTasks = (): Task[] => DEV_MODE ? mockTasks : [];
 export const getEvents = (): CalendarEvent[] => DEV_MODE ? mockEvents : [];
 export const getEmailCategories = (): EmailCategory[] => DEV_MODE ? mockEmailCategories : [];
